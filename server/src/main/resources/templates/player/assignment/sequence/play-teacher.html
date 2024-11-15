@@ -44,7 +44,9 @@
 
     <body>
 
+    <!--/* Icone for the page */-->
     <div id="pageSpecificMenu">
+        <!--/* Update the subject */-->
         <a class="item"
            th:href="@{/subject/{subjectId}(subjectId=${playerModel.assignment.subject.id}, activeTab='questions')}"
            th:attr="data-tooltip=#{subject.action.show.label}"
@@ -53,6 +55,7 @@
             <i class="yellow edit icon"></i>
         </a>
 
+        <!--/* Change the assignment */-->
         <a class="item"
            th:href="@{/subject/{subjectId}(subjectId=${playerModel.assignment.subject.id}, activeTab='assignments')}"
            th:attr="data-tooltip=#{subject.assignment.change.action}"
@@ -61,6 +64,7 @@
             <i class="yellow file alternate outline icon"></i>
         </a>
 
+        <!--/* Get a link for learners */-->
         <div class="item"
              onclick="elaastic.showLearnerAccessModal()"
              th:attr="data-tooltip=#{assignment.learnerAccess.oneLine}"
@@ -71,6 +75,7 @@
         </div>
         <div th:replace="assignment/_modal_learner_access.html :: modalLearnerAccess(${playerModel.assignment}, ${playerModel.serverBaseUrl})"></div>
 
+        <!--/* Manage LTI parameter */-->
         <div class="item"
              onclick="elaastic.showLtiParameterModal()"
              th:attr="data-tooltip=#{assignment.ltiparameter.oneLine}"
@@ -80,35 +85,37 @@
             <i class="yellow graduation icon"></i>
         </div>
         <div th:replace="assignment/_modal_lti_parameter.html :: modalLtiParameter(${playerModel.assignment})"></div>
-
     </div>
 
+    <!--/* The aside contain the list of sequence and the Dashboard */-->
     <aside class="ob-start-sequence-2" id="layout-aside"
            th:with="components=${'player/assignment/sequence/components'}">
+
+        <!--/* Top of the aside, contain button to toggle between assignment and Dashboard */-->
         <header id="aside_header" style="display: flex; justify-content: space-between; margin-bottom: 20px;">
             <div class="ui buttons">
+                <!--/* Show the list of sequence */-->
                 <button id="show_assignments_button"
                         class="ui button"
                         style="margin: 0;"
                         onclick="tableOfContent.showAssignments()">
 
                     <i class="icon list ul"></i>
-                    <span th:text="#{dashboard.navigation.assignments}">
-          assignments_list</span>
+                    <span th:text="#{dashboard.navigation.assignments}">assignments_list</span>
                 </button>
 
+                <!--/* Show the Dashboard */-->
                 <button id="show_attendees_button"
                         class="ui button"
                         style="margin: 0;"
                         onclick="tableOfContent.showAttendees()">
 
                     <i class="icon users alternate outline"></i>
-
-                    <span th:text="#{dashboard.navigation.attendees(${playerModel.assignmentOverviewModel.getNbRegisteredUser()})}">
-          attendees_label</span>
+                    <span th:text="#{dashboard.navigation.attendees(${playerModel.assignmentOverviewModel.getNbRegisteredUser()})}">attendees_label</span>
                 </button>
             </div>
 
+            <!--/* Close the aside */-->
             <button id="close_pane_button"
                     class="ui button"
                     style="aspect-ratio: 1; padding: 1.1em; margin: 0;"
@@ -118,12 +125,14 @@
             </button>
         </header>
 
+        <!--/* Detail of the assignment in assignment tab */-->
         <div id="assignments_container"
              style="display: none;">
 
             <div th:replace="|${components}/_assignment-overview.html| :: assignmentOverview(${playerModel.assignmentOverviewModel}, aside, true)"></div>
         </div>
 
+        <!--/* Detail of the attendees in Dashboard tab */-->
         <div id="attendees_container"
              style="display: none;">
 
@@ -136,31 +145,38 @@
         </div>
     </aside>
 
+    <!--/* When using a phone, the sequence list can be access in a modal */-->
     <div id="modal-aside" th:with="components=${'player/assignment/sequence/components'}">
-        <div
-                th:replace="|${components}/_assignment-overview.html| :: assignmentOverview(${playerModel.assignmentOverviewModel}, modal-aside, true)"></div>
+        <div th:replace="|${components}/_assignment-overview.html| :: assignmentOverview(${playerModel.assignmentOverviewModel}, modal-aside, true)"></div>
     </div>
 
+    <!--/* The main content of the page */-->
     <section th:with="components=${'player/assignment/sequence/components'}">
-        <div th:if="${playerModel.sequence}"
-             th:id="|sequence_${playerModel.sequence.id}|">
-            <div
-                    th:replace="|${components}/steps/_steps.html| :: steps(${playerModel.stepsModel}, ${playerModel.sequenceStatistics})"></div>
+        <div th:if="${playerModel.sequence}" th:id="|sequence_${playerModel.sequence.id}|">
+            <!--/* The sequence's interactions as steps */-->
+            <div th:replace="|${components}/steps/_steps.html| :: steps(${playerModel.stepsModel}, ${playerModel.sequenceStatistics})"></div>
+
+            <!--/* The sequence's management via button */-->
             <div th:replace="|${components}/command/_command.html| :: command(${playerModel.commandModel})"></div>
-            <div
-                    th:replace="|${components}/sequence-info/_sequenceInfo.html| :: sequenceInfo(${playerModel.sequenceInfoModel},${playerModel.sequence.id})"></div>
+
+            <!--/* The sequence's information */-->
+            <div th:replace="|${components}/sequence-info/_sequenceInfo.html| :: sequenceInfo(${playerModel.sequenceInfoModel},${playerModel.sequence.id})"></div>
+
+            <!--/* Recommandation given to the teacher */-->
             <div th:if="${playerModel.showResults and playerModel.resultsModel.recommendationModel != null}"
                  th:insert="|${components}/_recommendation.html| :: recommendation(${playerModel.resultsModel},${playerModel.sequence.id})"></div>
-            <div
-                    th:replace="|${components}/statement/_statement.html| :: statement(${playerModel.statementPanelModel},${playerModel.statement})"></div>
 
+            <!--/* The statement of the sequence */-->
+            <div th:replace="|${components}/statement/_statement.html| :: statement(${playerModel.statementPanelModel},${playerModel.statement})"></div>
+
+            <!--/* The results of the sequence */-->
             <div th:if="${playerModel.showResults}" th:remove="tag">
                 <div th:replace="|${components}/results/_results.html| :: results(${playerModel.resultsModel}, true)"></div>
             </div>
 
+            <!--/* The functional testing of the sequence */-->
             <div togglz:active="'FUNCTIONAL_TESTING'" th:remove="tag">
-                <div
-                        th:replace="|${components}/functional-testing/functional-test.html| :: functionalTesting(${playerModel.assignment.id},${playerModel.sequence.id})"></div>
+                <div th:replace="|${components}/functional-testing/functional-test.html| :: functionalTesting(${playerModel.assignment.id},${playerModel.sequence.id})"></div>
             </div>
         </div>
     </section>
