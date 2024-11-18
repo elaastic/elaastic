@@ -395,19 +395,21 @@ class SequenceService(
     }
 
     fun getNbReportBySequence(sequences: List<Sequence>, isTeacher: Boolean): Map<Sequence, ReportInformation> {
-        return sequences.associateWith { sequence ->
-            // Load interactions if not already loaded
-            val sequenceInteractionsFetched = if (sequence.interactions.isEmpty()) {
-                loadInteractions(sequence)
-            } else {
-                sequence
-            }
-            val nbRemovedReport = getReportedEvaluation(sequenceInteractionsFetched, isTeacher, true)
-            val nbNotRemovedReport = getReportedEvaluation(sequenceInteractionsFetched, isTeacher, false)
-            ReportInformation(
+        return sequences.associateWith { getNbReportBySequence(it, isTeacher) }
+    }
+
+    fun getNbReportBySequence(sequence: Sequence, isTeacher: Boolean): ReportInformation {
+        // Load interactions if not already loaded
+        val sequenceInteractionsFetched = if (sequence.interactions.isEmpty()) {
+            loadInteractions(sequence)
+        } else {
+            sequence
+        }
+        val nbRemovedReport = getReportedEvaluation(sequenceInteractionsFetched, isTeacher, true)
+        val nbNotRemovedReport = getReportedEvaluation(sequenceInteractionsFetched, isTeacher, false)
+        return ReportInformation(
                 nbReportTotal = nbRemovedReport + nbNotRemovedReport,
                 nbReportToModerate = nbNotRemovedReport
-            )
-        }
+        )
     }
 }
