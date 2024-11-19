@@ -1,30 +1,30 @@
 package org.elaastic.player.activeinteraction
 
 import org.elaastic.player.results.ResultsModel
-import org.elaastic.player.statement.StatementInfo
+import org.elaastic.player.statement.StatementInfoPanelModel
 import org.elaastic.sequence.phase.LearnerPhase
 
 open class ActiveInteractionModel(
-    val statementInfo: StatementInfo,
+    val statementInfoPanelModel: StatementInfoPanelModel,
 )
 
 /**
  * Contain the data about the current interaction of a teacher for the player template.
  */
 class TeacherActiveInteractionModel(
-    statementInfo: StatementInfo,
+    statementInfoPanelModel: StatementInfoPanelModel,
     val resultsModel: ResultsModel?,
     val showResults: Boolean,
 ) : ActiveInteractionModel(
-    statementInfo = statementInfo,
+    statementInfoPanelModel = statementInfoPanelModel,
 )
 
 /**
  * Contain the data about the current interaction of a learner for the player template.
  */
 class LearnerActiveInteractionModel(
-    statementInfo: StatementInfo,
+    statementInfoPanelModel: StatementInfoPanelModel,
     val phaseList: List<LearnerPhase>,
 ) : ActiveInteractionModel(
-    statementInfo = statementInfo,
+    statementInfoPanelModel = statementInfoPanelModel,
 )

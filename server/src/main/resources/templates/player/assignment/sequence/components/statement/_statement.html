@@ -16,31 +16,31 @@
   ~ along with this program.  If not, see <https://www.gnu.org/licenses/>.
   -->
 
-<div th:fragment="statement(statement)"
+<div th:fragment="statement(statementInfoPanelModel)"
      th:remove="tag"
      xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/html">
-    <!--/*@thymesVar id="statement" type="org.elaastic.player.statement.StatementInfo"*/-->
+    <!--/*@thymesVar id="statementInfoPanelModel" type="org.elaastic.player.statement.StatementInfoPanelModel"*/-->
 
     <div class="ui accordion segment ob-start-sequence-4" id="statement-accordion" style="padding-bottom: 0;">
         <div class="ui ${isClosed ? '' : 'active'} title header"
-             th:classappend="${statement.panelClosed ? '' : 'active'}">
-            <i class="dropdown icon"></i> <span th:text="${statement.title}"></span>
+             th:classappend="${statementInfoPanelModel.panelClosed ? '' : 'active'}">
+            <i class="dropdown icon"></i> <span th:text="${statementInfoPanelModel.title}"></span>
 
-            <th:block th:unless="${statement.hideQuestionType}">
+            <th:block th:unless="${statementInfoPanelModel.hideQuestionType}">
                 [<span
                     style="font-variant: all-small-caps; font-weight: normal; font-size: 0.8em; vertical-align: text-top"
-                    th:text="#{|statement.questionType.${statement.questionType}|}">
+                    th:text="#{|statement.questionType.${statementInfoPanelModel.questionType}|}">
                 </span>]
             </th:block>
         </div>
 
         <div class="ui basic padded large text segment content"
-             th:classappend="${statement.panelClosed ? '' : 'active'}">
-            <div th:unless="${statement.hideStatement}">
-                <div th:if="${statement.attachment != null}" th:remove="tag">
-                    <div th:replace="subject/statement/_statement_attachment :: statementAttachment(${statement.attachment},650,380)"></div>
+             th:classappend="${statementInfoPanelModel.panelClosed ? '' : 'active'}">
+            <div th:unless="${statementInfoPanelModel.hideStatement}">
+                <div th:if="${statementInfoPanelModel.attachment != null}" th:remove="tag">
+                    <div th:replace="subject/statement/_statement_attachment :: statementAttachment(${statementInfoPanelModel.attachment},650,380)"></div>
                 </div>
-                <p th:utext="${statement.content}">Question content</p>
+                <p th:utext="${statementInfoPanelModel.content}">Question content</p>
             </div>
         </div>
 

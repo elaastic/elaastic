@@ -22,7 +22,7 @@ import org.elaastic.material.instructional.question.QuestionType
 import org.elaastic.material.instructional.question.attachment.Attachment
 import org.elaastic.material.instructional.statement.Statement
 
-data class StatementInfo(
+data class StatementInfoPanelModel(
     val title: String,
     val questionType: QuestionType,
     val content: String,

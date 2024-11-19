@@ -23,7 +23,7 @@ import org.elaastic.player.assignmentview.AssignmentOverviewModelFactory
 import org.elaastic.player.command.CommandModelFactory
 import org.elaastic.player.results.TeacherResultDashboardService
 import org.elaastic.player.sequence.status.SequenceInfoResolver
-import org.elaastic.player.statement.StatementInfo
+import org.elaastic.player.statement.StatementInfoPanelModel
 import org.elaastic.player.steps.SequenceStatistics
 import org.elaastic.player.steps.StepsModelFactory
 import org.elaastic.sequence.ILearnerSequence
@@ -70,7 +70,7 @@ object PlayerModelFactory {
                 messageBuilder,
                 nbReportBySequence[sequence] ?: ReportInformation.empty
             ),
-            statement = StatementInfo(
+            statementInfoPanelModel = StatementInfoPanelModel(
                 sequence.statement,
                 hideStatement = false,
                 panelClosed = sequence.state != State.beforeStart
@@ -108,7 +108,7 @@ object PlayerModelFactory {
             ),
             stepsModel = StepsModelFactory.buildForLearner(sequence, activeInteraction),
             sequenceInfoModel = SequenceInfoResolver.resolve(false, sequence, messageBuilder),
-            statement = StatementInfo(
+            statementInfoPanelModel = StatementInfoPanelModel(
                 sequence.statement,
                 hideStatement = sequence.state == State.beforeStart,
                 panelClosed = false

@@ -2,7 +2,7 @@ package org.elaastic.player.activeinteraction
 
 import org.elaastic.player.results.ResultsModel
 import org.elaastic.player.results.TeacherResultDashboardService
-import org.elaastic.player.statement.StatementInfo
+import org.elaastic.player.statement.StatementInfoPanelModel
 import org.elaastic.sequence.ILearnerSequence
 import org.elaastic.sequence.Sequence
 import org.elaastic.sequence.State
@@ -21,7 +21,7 @@ object ActiveInteractionModelFactory {
         val showResults = !sequence.isNotStarted()
 
         return TeacherActiveInteractionModel(
-            statementInfo = StatementInfo(
+            statementInfoPanelModel = StatementInfoPanelModel(
                 sequence.statement,
                 hideStatement = false,
                 panelClosed = showResults
@@ -34,7 +34,7 @@ object ActiveInteractionModelFactory {
     fun buildForLearner(
         learnerSequence: ILearnerSequence,
     ): LearnerActiveInteractionModel = LearnerActiveInteractionModel(
-        statementInfo = StatementInfo(
+        statementInfoPanelModel = StatementInfoPanelModel(
             learnerSequence.sequence.statement,
             hideStatement = learnerSequence.sequence.state == State.beforeStart,
             panelClosed = false

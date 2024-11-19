@@ -96,7 +96,7 @@
             <div th:replace="|${components}/sequence-info/_sequenceInfo.html| :: sequenceInfo(${playerModel.sequenceInfoModel},${playerModel.sequence.id})"></div>
 
             <!--/* The sequence's statement */-->
-            <div th:replace="|${components}/statement/_statement.html| :: statement(${playerModel.statement})"></div>
+            <div th:replace="|${components}/statement/_statement.html| :: statement(${playerModel.statementInfoPanelModel})"></div>
 
             <!--/* Each phase of the sequence */-->
             <th:block th:each="phase : ${playerModel.phaseList}">
