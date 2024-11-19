@@ -13,13 +13,10 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 
 @Component
-object SequenceProgressionModelFactory {
-
-    @Autowired
-    lateinit var sequenceService: SequenceService
-
-    @Autowired
-    lateinit var messageBuilder: MessageBuilder
+class SequenceProgressionModelFactory(
+    @Autowired val sequenceService: SequenceService,
+    @Autowired val messageBuilder: MessageBuilder,
+) {
 
     fun buildForTeacher(
         teacher: User,

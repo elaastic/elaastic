@@ -1,21 +1,27 @@
 package org.elaastic.player.sequence
 
 import org.elaastic.player.activeinteraction.ActiveInteractionModelFactory
-import org.elaastic.player.activeinteraction.ActiveInteractionModelFactory.teacherResultDashboardService
 import org.elaastic.player.results.ResultsModel
+import org.elaastic.player.results.TeacherResultDashboardService
 import org.elaastic.sequence.ILearnerSequence
 import org.elaastic.sequence.Sequence
 import org.elaastic.sequence.interaction.Interaction
 import org.elaastic.user.User
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.stereotype.Component
 
-object SequenceModelFactory {
+@Component
+class SequenceModelFactory (
+    @Autowired val teacherResultDashboardService: TeacherResultDashboardService,
+    @Autowired val sequenceProgressionModelFactory: SequenceProgressionModelFactory,
+){
 
     fun buildForTeacher(
         teacher: User,
         sequence: Sequence,
     ): TeacherSequenceModel {
         return TeacherSequenceModel(
-            sequenceProgressionModel = SequenceProgressionModelFactory.buildForTeacher(teacher, sequence),
+            sequenceProgressionModel = sequenceProgressionModelFactory.buildForTeacher(teacher, sequence),
             activeInteractionModel = ActiveInteractionModelFactory.buildForTeacher(sequence),
             resultsModel = getResultsModel(sequence),
             showResults = !sequence.isNotStarted(),
@@ -29,7 +35,7 @@ object SequenceModelFactory {
         learnerActiveInteraction: Interaction?,
     ): SequenceModel {
         return SequenceModel(
-            sequenceProgressionModel = SequenceProgressionModelFactory.buildForLearner(
+            sequenceProgressionModel = sequenceProgressionModelFactory.buildForLearner(
                 learner,
                 learnerSequence.sequence,
                 learnerActiveInteraction
