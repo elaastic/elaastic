@@ -167,7 +167,7 @@
                  th:insert="|${components}/_recommendation.html| :: recommendation(${playerModel.resultsModel},${playerModel.sequence.id})"></div>
 
             <!--/* The statement of the sequence */-->
-            <div th:replace="|${components}/statement/_statement.html| :: statement(${playerModel.statementPanelModel},${playerModel.statement})"></div>
+            <div th:replace="|${components}/statement/_statement.html| :: statement(${playerModel.statement})"></div>
 
             <!--/* The results of the sequence */-->
             <div th:if="${playerModel.showResults}" th:remove="tag">

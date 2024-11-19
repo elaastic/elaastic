@@ -32,15 +32,15 @@
     <div class="fields">
       <div class="field">
         <label>panelClosed</label>
-        <input name="panelClosed" type="checkbox" th:checked="${statementPanelModel.panelClosed}"/>
+        <input name="panelClosed" type="checkbox" th:checked="${statement.panelClosed}"/>
       </div>
       <div class="field">
         <label>hideQuestionType</label>
-        <input name="hideQuestionType" type="checkbox" th:checked="${statementPanelModel.hideQuestionType}"/>
+        <input name="hideQuestionType" type="checkbox" th:checked="${statement.hideQuestionType}"/>
       </div>
       <div class="field">
         <label>hideStatement</label>
-        <input name="hideStatement" type="checkbox" th:checked="${statementPanelModel.hideStatement}"/>
+        <input name="hideStatement" type="checkbox" th:checked="${statement.hideStatement}"/>
       </div>
     </div>
 
@@ -49,7 +49,7 @@
   </form>
 
   <div
-    th:replace="player/assignment/sequence/components/statement/_statement.html :: statement(${statementPanelModel},${statement})"></div>
+    th:replace="player/assignment/sequence/components/statement/_statement.html :: statement(${statement})"></div>
 </section>
 </body>
 </html>

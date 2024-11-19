@@ -19,20 +19,30 @@
 package org.elaastic.player.statement
 
 import org.elaastic.material.instructional.question.QuestionType
-import org.elaastic.material.instructional.statement.Statement
 import org.elaastic.material.instructional.question.attachment.Attachment
+import org.elaastic.material.instructional.statement.Statement
 
 data class StatementInfo(
     val title: String,
     val questionType: QuestionType,
     val content: String,
-    val attachment: Attachment? = null
+    val attachment: Attachment? = null,
+    val panelClosed: Boolean = false,
+    val hideQuestionType: Boolean = false,
+    val hideStatement: Boolean = false,
 ) {
-    constructor(statement: Statement) :
-            this(
-                statement.title,
-                statement.questionType,
-                statement.content,
-                statement.attachment
-            )
+    constructor(
+        statement: Statement,
+        panelClosed: Boolean = false,
+        hideQuestionType: Boolean = false,
+        hideStatement: Boolean = false
+    ) : this(
+        statement.title,
+        statement.questionType,
+        statement.content,
+        statement.attachment,
+        panelClosed,
+        hideQuestionType,
+        hideStatement,
+    )
 }

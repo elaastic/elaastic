@@ -23,7 +23,6 @@ import org.elaastic.player.command.CommandModel
 import org.elaastic.player.results.ResultsModel
 import org.elaastic.player.sequence.status.SequenceInfoModel
 import org.elaastic.player.statement.StatementInfo
-import org.elaastic.player.statement.StatementPanelModel
 import org.elaastic.player.steps.SequenceStatistics
 import org.elaastic.player.steps.StepsModel
 import org.elaastic.sequence.phase.LearnerPhase
@@ -34,7 +33,6 @@ abstract class PlayerModel(
     val assignmentOverviewModel: AssignmentOverviewModel,
     val stepsModel: StepsModel,
     val sequenceInfoModel: SequenceInfoModel,
-    val statementPanelModel: StatementPanelModel,
     val statement: StatementInfo,
 ) {
     fun getAssignment() = sequence.assignment
@@ -50,7 +48,6 @@ class TeacherPlayerModel(
     val sequenceStatistics: SequenceStatistics,
     val commandModel: CommandModel,
     sequenceInfoModel: SequenceInfoModel,
-    statementPanelModel: StatementPanelModel,
     statement: StatementInfo,
     val showResults: Boolean,
     val resultsModel: ResultsModel?,
@@ -61,7 +58,6 @@ class TeacherPlayerModel(
     assignmentOverviewModel = assignmentOverviewModel,
     stepsModel = stepsModel,
     sequenceInfoModel = sequenceInfoModel,
-    statementPanelModel = statementPanelModel, // TODO Perhaps we merge this one with the following
     statement = statement,
 ) {
     override fun isTeacher() = true
@@ -72,7 +68,6 @@ class LearnerPlayerModel(
     assignmentOverviewModel: AssignmentOverviewModel,
     stepsModel: StepsModel,
     sequenceInfoModel: SequenceInfoModel,
-    statementPanelModel: StatementPanelModel,
     statement: StatementInfo,
     val phaseList: List<LearnerPhase>
 ) : PlayerModel(
@@ -81,7 +76,6 @@ class LearnerPlayerModel(
     assignmentOverviewModel = assignmentOverviewModel,
     stepsModel = stepsModel,
     sequenceInfoModel = sequenceInfoModel,
-    statementPanelModel = statementPanelModel, // TODO Perhaps we merge this one with the following
     statement = statement,
 ) {
     override fun isTeacher() = false
