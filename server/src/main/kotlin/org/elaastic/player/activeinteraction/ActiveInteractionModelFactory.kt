@@ -17,19 +17,13 @@ object ActiveInteractionModelFactory {
 
     fun buildForTeacher(
         sequence: Sequence,
-    ): TeacherActiveInteractionModel {
-        val showResults = !sequence.isNotStarted()
-
-        return TeacherActiveInteractionModel(
-            statementInfoPanelModel = StatementInfoPanelModel(
-                sequence.statement,
-                hideStatement = false,
-                panelClosed = showResults
-            ),
-            showResults = showResults,
-            resultsModel = getResultsModel(sequence),
-        )
-    }
+    ): ActiveInteractionModel = ActiveInteractionModel(
+        statementInfoPanelModel = StatementInfoPanelModel(
+            sequence.statement,
+            hideStatement = false,
+            panelClosed = !sequence.isNotStarted()
+        ),
+    )
 
     fun buildForLearner(
         learnerSequence: ILearnerSequence,
@@ -41,17 +35,4 @@ object ActiveInteractionModelFactory {
         ),
         phaseList = learnerSequence.phaseList.filterNotNull(),
     )
-
-
-    private fun getResultsModel(
-        sequence: Sequence
-    ): ResultsModel? {
-        var resultsModel: ResultsModel? = null
-
-        if (!sequence.isNotStarted()) {
-            resultsModel = teacherResultDashboardService.buildModel(sequence)
-        }
-
-        return resultsModel
-    }
 }

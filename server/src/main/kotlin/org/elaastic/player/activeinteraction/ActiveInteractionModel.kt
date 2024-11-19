@@ -9,17 +9,6 @@ open class ActiveInteractionModel(
 )
 
 /**
- * Contain the data about the current interaction of a teacher for the player template.
- */
-class TeacherActiveInteractionModel(
-    statementInfoPanelModel: StatementInfoPanelModel,
-    val resultsModel: ResultsModel?,
-    val showResults: Boolean,
-) : ActiveInteractionModel(
-    statementInfoPanelModel = statementInfoPanelModel,
-)
-
-/**
  * Contain the data about the current interaction of a learner for the player template.
  */
 class LearnerActiveInteractionModel(
