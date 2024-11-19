@@ -38,6 +38,8 @@ import org.elaastic.player.evaluation.chatgpt.ChatGptEvaluationModelFactory
 import org.elaastic.player.results.TeacherResultDashboardService
 import org.elaastic.player.results.learner.LearnerResultsModel
 import org.elaastic.player.results.learner.LearnerResultsModelFactory
+import org.elaastic.player.sequence.SequenceModelFactory
+import org.elaastic.player.sequence.SequenceProgressionModelFactory
 import org.elaastic.player.websocket.AutoReloadSessionHandler
 import org.elaastic.questions.assignment.sequence.peergrading.draxo.DraxoPeerGradingService
 import org.elaastic.sequence.ExecutionContext
@@ -86,6 +88,7 @@ class PlayerController(
     @Autowired val messageBuilder: MessageBuilder,
     @Autowired val featureManager: FeatureManager,
     @Autowired val messageSource: MessageSource,
+    @Autowired val sequenceModelFactory: SequenceModelFactory,
 ) {
 
     private val autoReloadSessionHandler = AutoReloadSessionHandler
@@ -326,6 +329,55 @@ class PlayerController(
     fun getNbRegisteredUsers(@PathVariable id: Long): Int {
         return assignmentService.getNbRegisteredUsers(id)
     }
+
+    /**
+     * Get the sequence view for the given user
+     * @param authentication the current authentication
+     * @param model the model
+     * @param sequenceId the id of the sequence to get the view
+     */
+    @GetMapping("/sequence/{sequenceId}")
+    fun sequence(
+        authentication: Authentication,
+        model: Model,
+        @PathVariable sequenceId: Long
+    ): String {
+        val user: User = authentication.principal as User
+        val sequence = sequenceService.get(sequenceId, true)
+        val isTeacher = user == sequence.owner
+
+        return if (isTeacher) {
+            sequenceAsTeacher(user, sequence, model)
+        } else {
+            sequenceAsLearner(user, sequence, model)
+        }
+    }
+
+    private fun sequenceAsTeacher(
+        user: User,
+        sequence: Sequence,
+        model: Model,
+    ): String {
+        val sequenceModel = sequenceModelFactory.buildForTeacher(user, sequence)
+        model["sequenceModel"] = sequenceModel
+
+        return "player/assignment/sequence/play-sequence-teacher"
+    }
+
+    private fun sequenceAsLearner(
+        user: User,
+        sequence: Sequence,
+        model: Model,
+    ): String {
+        val learnerSequence = learnerSequenceService.getLearnerSequence(user, sequence)
+        learnerPhaseService.loadPhaseList(learnerSequence)
+
+        val sequenceModel = sequenceModelFactory.buildForLearner(user, learnerSequence, learnerSequence.activeInteraction)
+        model["sequenceModel"] = sequenceModel
+
+        return "player/assignment/sequence/play-sequence-learner"
+    }
+
 
     @GetMapping("/sequence/{id}/start")
     fun startSequence(
