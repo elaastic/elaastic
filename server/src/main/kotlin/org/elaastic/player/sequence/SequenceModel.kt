@@ -7,6 +7,7 @@ import org.elaastic.player.results.ResultsModel
 open class SequenceModel(
     val sequenceProgressionModel: SequenceProgressionModel,
     val activeInteractionModel: ActiveInteractionModel,
+    val sequenceId: Long?,
 )
 
 /**
@@ -17,9 +18,11 @@ open class SequenceModel(
 class TeacherSequenceModel(
     sequenceProgressionModel: SequenceOrchestrationModel,
     activeInteractionModel: ActiveInteractionModel,
+    sequenceId: Long?,
     val resultsModel: ResultsModel?,
     val showResults: Boolean,
 ) : SequenceModel(
     sequenceProgressionModel = sequenceProgressionModel,
     activeInteractionModel = activeInteractionModel,
+    sequenceId = sequenceId,
 )

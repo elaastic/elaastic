@@ -19,6 +19,7 @@ object SequenceModelFactory {
             activeInteractionModel = ActiveInteractionModelFactory.buildForTeacher(sequence),
             resultsModel = getResultsModel(sequence),
             showResults = !sequence.isNotStarted(),
+            sequenceId = sequence.id,
         )
     }
 
@@ -34,6 +35,7 @@ object SequenceModelFactory {
                 learnerActiveInteraction
             ),
             activeInteractionModel = ActiveInteractionModelFactory.buildForLearner(learnerSequence),
+            sequenceId = learnerSequence.sequence.id,
         )
     }
 
