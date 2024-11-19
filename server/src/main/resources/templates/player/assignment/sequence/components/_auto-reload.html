@@ -21,7 +21,7 @@
     <script>
         const autoReloader = elaastic.autoReload.createAutoReloader(
             "[(${@environment.getProperty('elaastic.questions.websocket.url')})]" +
-             "player/sequence/auto-reload/[(${playerModel.sequence.id})]"
+             "player/sequence/auto-reload/[(${sequenceId})]"
         );
     </script>
 </th:block>
