@@ -112,8 +112,7 @@
                 function handleReportedItemRemovedFromList() {
                     $('#no-selected-item').slideDown();
                     $actionButtons.slideUp();
-                    $detailReportCandidate.slideUp();
-                    $contextReportCandidate.slideUp();
+                    $infoReportManagerContainer.slideUp();
                     if ($('#reported-item-container').find('.ui.card').length === 0) {
                         $('#no-reported-item-message').slideDown();
                     }
