@@ -152,32 +152,23 @@
 
     <!--/* The main content of the page */-->
     <section th:with="components=${'player/assignment/sequence/components'}">
-        <div th:if="${playerModel.sequence}" th:id="|sequence_${playerModel.sequence.id}|">
-            <!--/* The sequence's interactions as steps */-->
-            <div th:replace="|${components}/steps/_steps.html| :: steps(${playerModel.stepsModel}, ${playerModel.sequenceStatistics})"></div>
+        <script th:inline="javascript">
+            $(function () {
+                //Initial load of the sequence
+                $('#sequence_' + [[${playerModel.sequence.id}]] + '_container').load('/player/sequence/' + [[${playerModel.sequence.id}]]);
+            });
+        </script>
 
-            <!--/* The sequence's management via button */-->
-            <div th:replace="|${components}/command/_command.html| :: command(${playerModel.commandModel})"></div>
-
-            <!--/* The sequence's information */-->
-            <div th:replace="|${components}/sequence-info/_sequenceInfo.html| :: sequenceInfo(${playerModel.sequenceInfoModel},${playerModel.sequence.id})"></div>
-
-            <!--/* Recommandation given to the teacher */-->
-            <div th:if="${playerModel.showResults and playerModel.resultsModel.recommendationModel != null}"
-                 th:insert="|${components}/_recommendation.html| :: recommendation(${playerModel.resultsModel},${playerModel.sequence.id})"></div>
-
-            <!--/* The statement of the sequence */-->
-            <div th:replace="|${components}/statement/_statement.html| :: statement(${playerModel.statementInfoPanelModel})"></div>
-
-            <!--/* The results of the sequence */-->
-            <div th:if="${playerModel.showResults}" th:remove="tag">
-                <div th:replace="|${components}/results/_results.html| :: results(${playerModel.resultsModel}, true)"></div>
+        <div th:id="|sequence_${playerModel.sequence.id}_container|">
+            <div class="loading ui segment">
+                <p>&amp;nbsp;</p>
+                <p>&amp;nbsp;</p>
             </div>
+        </div>
 
-            <!--/* The functional testing of the sequence */-->
-            <div togglz:active="'FUNCTIONAL_TESTING'" th:remove="tag">
-                <div th:replace="|${components}/functional-testing/functional-test.html| :: functionalTesting(${playerModel.assignment.id},${playerModel.sequence.id})"></div>
-            </div>
+        <!--/* The functional testing of the sequence */-->
+        <div togglz:active="'FUNCTIONAL_TESTING'" th:remove="tag">
+            <div th:replace="|${components}/functional-testing/functional-test.html| :: functionalTesting(${playerModel.assignment.id},${playerModel.sequence.id})"></div>
         </div>
     </section>
     </body>
