@@ -21,6 +21,17 @@
      class="ui attached stackable icon menu ob-start-sequence-5 ob-play-sequence-3"
      xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/html">
 
+    <script th:inline="javascript">
+        function loadSequence(urlToFetch) {
+            console.log(urlToFetch)
+
+            $.get(urlToFetch)
+                .done(function (data) {
+                    window.location.reload();
+                })
+        }
+    </script>
+
     <!--/* Start sequence */-->
     <a class="item"
        href="#"
@@ -35,7 +46,7 @@
     <!--/* Start phase (n) */-->
     <a class="item"
        th:unless="${model.actionStartInteraction.name() == 'HIDDEN'}"
-       th:href="@{/player/interaction/{interactionId}/start(interactionId=${model.interactionId},reloadPage=${true})}">
+       th:href="@{/player/interaction/{interactionId}/start(interactionId=${model.interactionId})}">
 
         <i class="green play icon"
            th:classappend="${model.actionStartInteraction.name() == 'DISABLED' ? 'disabled' : ''}"></i>
@@ -46,7 +57,7 @@
     <!--/* Stop phase (n) */-->
     <a class="item"
        th:unless="${model.actionStopInteraction.name() == 'HIDDEN'}"
-       th:href="@{/player/interaction/{interactionId}/stop(interactionId=${model.interactionId},reloadPage=${true})}">
+       th:onclick="|loadSequence('@{/player/interaction/{interactionId}/stop(interactionId=${model.interactionId})}')|">
 
         <i class="pause icon"></i>
         <span th:text="#{player.sequence.interaction.stop(${model.interactionRank})}"></span>
@@ -55,8 +66,8 @@
     <!--/* Start next phase (n) */-->
     <!--  TODO lazy loading th:onclick="|$('#sequence_${model.sequenceId}').load('@{/player/interaction/{interactionId}/startNext(interactionId=${model.interactionId})}')|" -->
     <a class="item"
-       th:href="@{/player/interaction/{interactionId}/startNext(interactionId=${model.interactionId})}"
-       th:unless="${model.actionStartNextInteraction.name() == 'HIDDEN'}">
+       th:unless="${model.actionStartNextInteraction.name() == 'HIDDEN'}"
+       th:onclick="|loadSequence('@{/player/interaction/{interactionId}/startNext(interactionId=${model.interactionId})}')|">
 
         <i class="green play icon"></i>
         <span th:text="#{player.sequence.interaction.start(${model.InteractionRank + 1})}"></span>
@@ -65,8 +76,8 @@
     <!--/* Skip next phase */-->
     <!--  TODO lazy loading th:onclick="|$('#sequence_${model.sequenceId}').load('@{/player/interaction/{interactionId}/startNext(interactionId=${model.interactionId})}')|" -->
     <a class="item"
-       th:href="@{/player/interaction/{interactionId}/skipNext(interactionId=${model.interactionId})}"
-       th:unless="${model.actionStartNextInteraction.name() == 'HIDDEN'}">
+       th:unless="${model.actionStartNextInteraction.name() == 'HIDDEN'}"
+       th:onclick="|loadSequence('@{/player/interaction/{interactionId}/skipNext(interactionId=${model.interactionId})}')|">
 
         <i class="green forward icon"></i>
         <span th:text="#{player.sequence.interaction.start(${model.InteractionRank + 2})}"></span>
@@ -77,7 +88,7 @@
     <a class="item"
        href="#"
        th:unless="${model.actionReopenInteraction.name() == 'HIDDEN'}"
-       th:href="@{/player/interaction/{interactionId}/restart(interactionId=${model.interactionId})}">
+       th:onclick="|loadSequence('@{/player/interaction/{interactionId}/restart(interactionId=${model.interactionId})}')|">
 
         <i class="red undo alternate  icon"></i>
         <span th:text="#{player.sequence.interaction.restart(${model.interactionRank})}">Reopen phase {0}</span>
@@ -87,8 +98,8 @@
         <!--/* Re-open sequence */-->
         <!-- TODO partial loading    th:onclick="|$('#sequence_${model.sequenceId}').load('@{/player/sequence/{sequenceId}/reopen}"-->
         <a class="item"
-           th:href="@{/player/sequence/{sequenceId}/reopen(sequenceId=${model.sequenceId})}"
-           th:unless="${model.actionReopenSequence.name() == 'HIDDEN'}">
+           th:unless="${model.actionReopenSequence.name() == 'HIDDEN'}"
+           th:onclick="|loadSequence('@{/player/sequence/{sequenceId}/reopen(sequenceId=${model.sequenceId})}')|">
 
             <i class="red undo alternate icon"></i>
             <span th:text="#{player.sequence.reopenSequence}">Re-open sequence</span>
@@ -97,8 +108,8 @@
         <!--/* Stop sequence */-->
         <!-- TODO partial reload -       th:onclick="|$('#sequence_${model.sequenceId}').load('@{/player/sequence/{sequenceId}/stop}')|">-->
         <a class="item ob-end-sequence-1"
-           th:href="@{/player/sequence/{sequenceId}/stop(sequenceId=${model.sequenceId})}"
-           th:unless="${model.actionStopSequence.name() == 'HIDDEN'}">
+           th:unless="${model.actionStopSequence.name() == 'HIDDEN'}"
+           th:onclick="|loadSequence('@{/player/sequence/{sequenceId}/stop(sequenceId=${model.sequenceId})}')|">
 
             <i class="red stop icon"></i>
             <span th:text="#{player.sequence.readinteraction.stopSequence}">Stop sequence</span>
@@ -107,8 +118,8 @@
         <!--/* Publish results */-->
         <!--   TODO load partiel template th:onclick="|$('#sequence_${model.sequenceId}').load('@{/player/sequence/{sequenceId}/publishResults}')|"-->
         <a class="item ob-end-sequence-2"
-           th:href="@{/player/sequence/{sequenceId}/publish-results(sequenceId=${model.sequenceId})}"
-           th:unless="${model.actionPublishResults.name() == 'HIDDEN'}">
+           th:unless="${model.actionPublishResults.name() == 'HIDDEN'}"
+           th:onclick="|loadSequence('@{/player/sequence/{sequenceId}/publish-results(sequenceId=${model.sequenceId})}')|">
 
             <i class="feed icon"></i>
             <span th:text="#{player.sequence.publishResults}">Publish results</span>
@@ -117,8 +128,8 @@
         <!--/* Cancel publication of results */-->
         <!--  TODO partial load : th:onclick="|$('#sequence_${model.sequenceId}').load('@{/player/sequence/{sequenceId}/unpublishResults}')|"  -->
         <a class="item"
-           th:href="@{/player/sequence/{sequenceId}/unpublish-results(sequenceId=${model.sequenceId})}"
-           th:unless="${model.actionUnpublishResults.name() == 'HIDDEN'}">
+           th:unless="${model.actionUnpublishResults.name() == 'HIDDEN'}"
+           th:onclick="|loadSequence('@{/player/sequence/{sequenceId}/unpublish-results(sequenceId=${model.sequenceId})}')|">
 
             <i class="red close icon"></i>
             <span th:text="#{player.sequence.unpublishResults}">Cancel the publication of results</span>

@@ -39,7 +39,6 @@ import org.elaastic.player.results.TeacherResultDashboardService
 import org.elaastic.player.results.learner.LearnerResultsModel
 import org.elaastic.player.results.learner.LearnerResultsModelFactory
 import org.elaastic.player.sequence.SequenceModelFactory
-import org.elaastic.player.sequence.SequenceProgressionModelFactory
 import org.elaastic.player.websocket.AutoReloadSessionHandler
 import org.elaastic.questions.assignment.sequence.peergrading.draxo.DraxoPeerGradingService
 import org.elaastic.sequence.ExecutionContext
@@ -379,21 +378,22 @@ class PlayerController(
     }
 
 
-    @GetMapping("/sequence/{id}/start")
+    @ResponseBody
+    @GetMapping("/sequence/{sequenceId}/start")
     fun startSequence(
         authentication: Authentication,
         model: Model,
-        @PathVariable id: Long,
+        @PathVariable sequenceId: Long,
         @RequestParam executionContext: ExecutionContext,
         @RequestParam studentsProvideExplanation: Boolean?,
         @RequestParam responseToEvaluateCount: Int?,
         @RequestParam chatGptEvaluation: Boolean?,
         @RequestParam evaluationPhaseConfig: EvaluationPhaseConfig?,
-    ): String {
+    ) {
         val user: User = authentication.principal as User
         var assignment: Assignment?
 
-        sequenceService.get(user, id, true)
+        sequenceService.get(user, sequenceId, true)
             .let {
                 sequenceService.start(
                     user,
@@ -405,172 +405,165 @@ class PlayerController(
                     chatGptEvaluation ?: false && studentsProvideExplanation ?: false
                 )
                 userService.updateUserActiveSince(user)
-                autoReloadSessionHandler.broadcastReload(id)
+                autoReloadSessionHandler.broadcastReload(sequenceId)
                 assignment = it.assignment!!
             }
-
-        return "redirect:/player/assignment/${assignment!!.id}/play/sequence/${id}"
     }
 
-    @GetMapping("/interaction/{id}/restart")
+    @ResponseBody
+    @GetMapping("/interaction/{interactionId}/restart")
     fun restartInteraction(
         authentication: Authentication,
         model: Model,
-        @PathVariable id: Long
-    ): String {
+        @PathVariable interactionId: Long
+    ) {
         val user: User = authentication.principal as User
-        val interaction = interactionService.restart(user, id)
+        val interaction = interactionService.restart(user, interactionId)
         autoReloadSessionHandler.broadcastReload(interaction.sequence.id!!)
-        return "redirect:/player/assignment/${interaction.sequence.assignment!!.id}/play/sequence/${interaction.sequence.id}"
     }
 
+    @ResponseBody
     @GetMapping("/interaction/{id}/start")
     fun startInteraction(
         authentication: Authentication,
         model: Model,
         @PathVariable id: Long
-    ): String {
+    ) {
         val user: User = authentication.principal as User
         val interaction = interactionService.start(user, id)
         autoReloadSessionHandler.broadcastReload(interaction.sequence.id!!)
-        return "redirect:/player/assignment/${interaction.sequence.assignment!!.id}/play/sequence/${interaction.sequence.id}"
     }
 
-    @GetMapping("/interaction/{id}/startNext")
+    @ResponseBody
+    @GetMapping("/interaction/{interactionId}/startNext")
     fun startNextInteraction(
         authentication: Authentication,
         model: Model,
-        @PathVariable id: Long
-    ): String {
+        @PathVariable interactionId: Long
+    ) {
         val user: User = authentication.principal as User
 
-        interactionService.findById(id).let {
+        interactionService.findById(interactionId).let {
             sequenceService.loadInteractions(it.sequence)
             val interaction = interactionService.startNext(user, it)
             autoReloadSessionHandler.broadcastReload(interaction.sequence.id!!)
-            return "redirect:/player/assignment/${interaction.sequence.assignment!!.id}/play/sequence/${interaction.sequence.id}"
         }
     }
 
-    @GetMapping("/interaction/{id}/skipNext")
+    @ResponseBody
+    @GetMapping("/interaction/{interactionId}/skipNext")
     fun skipNextInteraction(
         authentication: Authentication,
         model: Model,
-        @PathVariable id: Long
-    ): String {
+        @PathVariable interactionId: Long
+    ) {
         val user: User = authentication.principal as User
 
-        interactionService.findById(id).let {
+        interactionService.findById(interactionId).let {
             sequenceService.loadInteractions(it.sequence)
             val interaction = interactionService.skipNext(user, it)
             autoReloadSessionHandler.broadcastReload(interaction.sequence.id!!)
-            return "redirect:/player/assignment/${interaction.sequence.assignment!!.id}/play/sequence/${interaction.sequence.id}"
         }
     }
 
-    @GetMapping("/interaction/{id}/stop")
+    @ResponseBody
+    @GetMapping("/interaction/{interactionId}/stop")
     fun stopInteraction(
         authentication: Authentication,
         model: Model,
-        @PathVariable id: Long
-    ): String {
+        @PathVariable interactionId: Long
+    ) {
         val user: User = authentication.principal as User
 
-        interactionService.findById(id).let {
+        interactionService.findById(interactionId).let {
             sequenceService.loadInteractions(it.sequence)
-            interactionService.stop(user, id)
+            interactionService.stop(user, interactionId)
             autoReloadSessionHandler.broadcastReload(it.sequence.id!!)
-            return "redirect:/player/assignment/${it.sequence.assignment!!.id}/play/sequence/${it.sequence.id}"
         }
     }
 
-    @GetMapping("/sequence/{id}/stop")
+    @ResponseBody
+    @GetMapping("/sequence/{sequenceId}/stop")
     fun stopSequence(
         authentication: Authentication,
         model: Model,
-        @PathVariable id: Long
-    ): String {
+        @PathVariable sequenceId: Long
+    ) {
         val user: User = authentication.principal as User
         var assignment: Assignment?
 
-        sequenceService.get(user, id).let {
+        sequenceService.get(user, sequenceId).let {
             sequenceService.stop(user, it)
-            autoReloadSessionHandler.broadcastReload(id)
+            autoReloadSessionHandler.broadcastReload(sequenceId)
             assignment = it.assignment!!
         }
-
-        return "redirect:/player/assignment/${assignment!!.id}/play/sequence/${id}"
     }
 
-    @GetMapping("/sequence/{id}/reopen")
+    @ResponseBody
+    @GetMapping("/sequence/{sequenceId}/reopen")
     fun reopenSequence(
         authentication: Authentication,
         model: Model,
-        @PathVariable id: Long
-    ): String {
+        @PathVariable sequenceId: Long
+    ) {
         val user: User = authentication.principal as User
         var assignment: Assignment?
 
-        sequenceService.get(user, id).let {
+        sequenceService.get(user, sequenceId).let {
             sequenceService.reopen(user, it)
-            autoReloadSessionHandler.broadcastReload(id)
+            autoReloadSessionHandler.broadcastReload(sequenceId)
             assignment = it.assignment!!
         }
-
-        return "redirect:/player/assignment/${assignment!!.id}/play/sequence/${id}"
     }
 
-    @GetMapping("/sequence/{id}/publish-results")
+    @ResponseBody
+    @GetMapping("/sequence/{sequenceId}/publish-results")
     fun publishResults(
         authentication: Authentication,
         model: Model,
-        @PathVariable id: Long
-    ): String {
+        @PathVariable sequenceId: Long
+    ) {
         val user: User = authentication.principal as User
         var assignment: Assignment?
 
-        sequenceService.get(user, id, true).let {
+        sequenceService.get(user, sequenceId, true).let {
             sequenceService.publishResults(user, it)
-            autoReloadSessionHandler.broadcastReload(id)
+            autoReloadSessionHandler.broadcastReload(sequenceId)
             assignment = it.assignment!!
         }
-
-        return "redirect:/player/assignment/${assignment!!.id}/play/sequence/${id}"
     }
 
-    @GetMapping("/sequence/{id}/refresh-results")
+    @ResponseBody
+    @GetMapping("/sequence/{sequenceId}/refresh-results")
     fun refreshResults(
         authentication: Authentication,
         model: Model,
-        @PathVariable id: Long
-    ): String {
+        @PathVariable sequenceId: Long
+    ) {
         val user: User = authentication.principal as User
         var assignment: Assignment?
 
-        sequenceService.get(id, true).let {
+        sequenceService.get(sequenceId, true).let {
             sequenceService.refreshResults(user, it)
             assignment = it.assignment!!
         }
-
-        return "redirect:/player/assignment/${assignment!!.id}/play/sequence/${id}"
     }
 
-    @GetMapping("/sequence/{id}/unpublish-results")
+    @ResponseBody
+    @GetMapping("/sequence/{sequenceId}/unpublish-results")
     fun unpublishResults(
         authentication: Authentication,
         model: Model,
-        @PathVariable id: Long
-    ): String {
+        @PathVariable sequenceId: Long
+    ) {
         val user: User = authentication.principal as User
         var assignment: Assignment?
 
-        sequenceService.get(user, id, true).let {
+        sequenceService.get(user, sequenceId, true).let {
             sequenceService.unpublishResults(user, it)
-            autoReloadSessionHandler.broadcastReload(id)
+            autoReloadSessionHandler.broadcastReload(sequenceId)
             assignment = it.assignment!!
         }
-
-        return "redirect:/player/assignment/${assignment!!.id}/play/sequence/${id}"
     }
 
     data class ResponseSubmissionData(
