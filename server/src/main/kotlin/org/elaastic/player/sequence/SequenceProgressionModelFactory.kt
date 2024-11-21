@@ -1,6 +1,7 @@
 package org.elaastic.player.sequence
 
 import org.elaastic.common.web.MessageBuilder
+import org.elaastic.moderation.ReportInformation
 import org.elaastic.player.command.CommandModelFactory
 import org.elaastic.player.sequence.status.SequenceInfoResolver
 import org.elaastic.player.steps.SequenceStatistics
@@ -47,7 +48,7 @@ class SequenceProgressionModelFactory(
         messageBuilder = messageBuilder,
     )
 
-    private fun getNbRerportedEvaluation(sequence: Sequence, user: User): Pair<Int, Int> {
+    private fun getNbRerportedEvaluation(sequence: Sequence, user: User): ReportInformation {
         return sequenceService.getNbReportBySequence(sequence, sequence.owner == user)
     }
 
