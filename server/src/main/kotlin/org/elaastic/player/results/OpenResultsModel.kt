@@ -29,6 +29,6 @@ data class OpenResultsModel(
     override val recommendationModel: RecommendationModel? = null,
     override val userCanDisplayStudentsIdentity: Boolean = false
 ) : ResultsModel {
-    override val hasExplanations = explanationViewerModel?.nbExplanations ?: 0 > 0
+    override val hasExplanations = (explanationViewerModel?.nbExplanations ?: 0) > 0
     override fun getHasChoices() = false
 }
