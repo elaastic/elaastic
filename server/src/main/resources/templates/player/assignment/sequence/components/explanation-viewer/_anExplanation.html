@@ -139,7 +139,7 @@
 
             <!-- If explanationData is not hidden -->
             <a th:if="${!explanationData.hiddenByTeacher}"
-               th:href="@{/player/response/{responseId}/hide-response(responseId=${explanationData.responseId})}"
+               th:onclick="|toggleVisibilityByTeacher(${explanationData.responseId}, false)|"
                type="button" data-position="bottom right" th:data-tooltip="#{player.sequence.explanation.hideResponse}"
                class="ui button" style="padding: 0.5rem; margin-right: 0;">
                 <i class="unhide icon"></i>
@@ -147,7 +147,7 @@
 
             <!-- If explanationData is hidden -->
             <a th:if="${explanationData.hiddenByTeacher}"
-               th:href="@{/player/response/{responseId}/unhide-response(responseId=${explanationData.responseId})}"
+               th:onclick="|toggleVisibilityByTeacher(${explanationData.responseId}, true)|"
                type="button" data-position="bottom right" th:data-tooltip="#{player.sequence.explanation.showResponse}"
                class="ui button" style="padding: 0.5rem; margin-right: 0;">
                 <i class="hide icon"></i>
@@ -187,7 +187,7 @@
 
         var toReload = false;
 
-        $(document).ready(function () {
+        $(function () {
             setupRecommendedByTeacher([[${explanationData.responseId}]],
                 [[${explanationData.recommendedByTeacher}]])
         });
@@ -238,6 +238,18 @@
             } else {
                 $('#detailModal_' + userId).modal('show')
             }
+        }
+
+        function toggleVisibilityByTeacher(responseId, isVisible) {
+            let baseURL = "/player/response/" + responseId
+            let url = isVisible ? baseURL + "/unhide-response" : baseURL + "/hide-response"
+
+            console.log(url)
+
+            $.get(url)
+                .done(function () {
+                    window.location.reload()
+                })
         }
 
     </script>
