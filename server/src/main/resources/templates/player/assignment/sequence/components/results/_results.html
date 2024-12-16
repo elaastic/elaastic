@@ -20,24 +20,24 @@
      th:remove="tag"
      xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/html">
 
-  <div class="ui accordion segment ob-play-sequence-1"
-       th:id="|result-accordion-${resultsModel.sequenceId}|">
+    <div class="ui accordion segment ob-play-sequence-1"
+         th:id="|result-accordion-${resultsModel.sequenceId}|">
 
-    <div class="ui dividing active title header" style="margin-right: 1.25em;">
-      <i class="dropdown icon"></i>
-      <span th:text="#{questions.results}">Results</span>
-    </div>
+        <div class="ui dividing active title header" style="margin-right: 1.25em;">
+            <i class="dropdown icon"></i>
+            <span th:text="#{questions.results}">Results</span>
+        </div>
 
-    <div class="ui basic padded segment active content"
-         style="font-size: 1rem;"
-         th:id="|sequence_${resultsModel.sequenceId}_result|">
-      <div th:if="${resultsModel.hasChoices}">
-        <th:block th:if="${resultsModel.hasAnyResult}">
-          <div class="ui attached tabular menu top">
-            <a class="item active"
-               th:data-tab="|votes-${resultsModel.responseDistributionChartModel.interactionId}|"
-               th:text="#{player.sequence.interaction.votes.tabLabel}"
-               th:onclick="saveAction([[${sequenceId}]], 'click', 'p1_p2_graph');setTimeout(function(){elaastic.renderGraph(
+        <div class="ui basic padded segment active content"
+             style="font-size: 1rem;"
+             th:id="|sequence_${resultsModel.sequenceId}_result|">
+            <div th:if="${resultsModel.hasChoices}">
+                <th:block th:if="${resultsModel.hasAnyResult}">
+                    <div class="ui attached tabular menu top">
+                        <a class="item active"
+                           th:data-tab="|votes-${resultsModel.responseDistributionChartModel.interactionId}|"
+                           th:text="#{player.sequence.interaction.votes.tabLabel}"
+                           th:onclick="saveAction([[${sequenceId}]], 'click', 'p1_p2_graph');setTimeout(function(){elaastic.renderGraph(
                     '#vega-view-votes-[[${resultsModel.responseDistributionChartModel.interactionId}]]',
                     [[${resultsModel.responseDistributionChartModel.choiceSpecification}]],
                     [[${resultsModel.responseDistributionChartModel.results}]],
@@ -46,11 +46,11 @@
                         percentageOfVoters: [[#{player.sequence.result.percentageOfVoters}]],
                         choice: [[#{player.sequence.interaction.choice.label}]]
                     })}, 1)">Distribution of votes</a>
-            <a class="item"
-               th:if="${isTeacher}"
-               th:data-tab="|confidence-degree-${resultsModel.confidenceDistributionChartModel.interactionId}|"
-               th:text="#{player.sequence.interaction.confidenceDegree.tabLabel}"
-               th:onclick="saveAction([[${sequenceId}]], 'click', 'pconf_graph');setTimeout(function(){elaastic.renderConfidenceGraph(
+                        <a class="item"
+                           th:if="${isTeacher}"
+                           th:data-tab="|confidence-degree-${resultsModel.confidenceDistributionChartModel.interactionId}|"
+                           th:text="#{player.sequence.interaction.confidenceDegree.tabLabel}"
+                           th:onclick="saveAction([[${sequenceId}]], 'click', 'pconf_graph');setTimeout(function(){elaastic.renderConfidenceGraph(
                     '#confidence-tab-[[${resultsModel.confidenceDistributionChartModel.interactionId}]]',
                     [[${resultsModel.confidenceDistributionChartModel.choiceSpecification}]],
                     [[${resultsModel.confidenceDistributionChartModel.results}]],
@@ -66,12 +66,12 @@
                         cf3: [[#{player.sequence.interaction.confidenceDegree.CONFIDENT}]],
                         cf4: [[#{player.sequence.interaction.confidenceDegree.TOTALLY_CONFIDENT}]]
                     })}, 1)">Confidence
-              degree</a>
-            <a class="item"
-               th:if="|${isTeacher && resultsModel.evaluationDistributionChartModel != null}|"
-               th:data-tab="|peer-evaluation-${resultsModel.evaluationDistributionChartModel.interactionId}|"
-               th:text="#{player.sequence.interaction.peerEvaluation.tabLabel}"
-               th:onclick="saveAction([[${sequenceId}]], 'click', 'ppeer_graph');setTimeout(function(){elaastic.renderEvaluationGraph(
+                            degree</a>
+                        <a class="item"
+                           th:if="|${isTeacher && resultsModel.evaluationDistributionChartModel != null}|"
+                           th:data-tab="|peer-evaluation-${resultsModel.evaluationDistributionChartModel.interactionId}|"
+                           th:text="#{player.sequence.interaction.peerEvaluation.tabLabel}"
+                           th:onclick="saveAction([[${sequenceId}]], 'click', 'ppeer_graph');setTimeout(function(){elaastic.renderEvaluationGraph(
                             '#evaluation-tab-[[${resultsModel.evaluationDistributionChartModel.interactionId}]]',
                             [[${resultsModel.evaluationDistributionChartModel.choiceSpecification}]],
                             [[${resultsModel.evaluationDistributionChartModel.results}]],
@@ -88,143 +88,143 @@
                                 e4: [[#{player.sequence.interaction.grade.4}]],
                                 e5: [[#{player.sequence.interaction.grade.5}]]
                             })}, 1)">Peer Evaluation</a>
-          </div>
-          <style>
-              .noAccess {
-                  background-color: #e0e1e2 !important;
-                  color: rgba(0, 0, 0, .6) !important;
-                  border-radius: .28571429rem .28571429rem 0 0 !important;
-                  border-bottom: none;
-                  border-left: 1px solid transparent;
-                  border-right: 1px solid transparent;
-                  border-top: 2px solid transparent;
-                  padding: .92857143em 1.42857143em;
-              }
-          </style>
-          <div class="ui bottom attached tab segment active"
-               style="border-top: none !important;"
-               th:data-tab="|votes-${resultsModel.responseDistributionChartModel.interactionId}|">
-            <div
-              th:replace="player/assignment/sequence/components/response-distribution-chart/_response-distribution-chart::responseDistributionChart(${resultsModel.responseDistributionChartModel})"></div>
-          </div>
-          <div class="ui bottom attached tab segment"
-               style="border-top: none !important;"
-               th:data-tab="|confidence-degree-${resultsModel.confidenceDistributionChartModel.interactionId}|">
-            <div style="text-align: center;">
-              <div th:id="|confidence-tab-${resultsModel.confidenceDistributionChartModel.interactionId}|"></div>
+                    </div>
+                    <style>
+                        .noAccess {
+                            background-color: #e0e1e2 !important;
+                            color: rgba(0, 0, 0, .6) !important;
+                            border-radius: .28571429rem .28571429rem 0 0 !important;
+                            border-bottom: none;
+                            border-left: 1px solid transparent;
+                            border-right: 1px solid transparent;
+                            border-top: 2px solid transparent;
+                            padding: .92857143em 1.42857143em;
+                        }
+                    </style>
+                    <div class="ui bottom attached tab segment active"
+                         style="border-top: none !important;"
+                         th:data-tab="|votes-${resultsModel.responseDistributionChartModel.interactionId}|">
+                        <div
+                                th:replace="player/assignment/sequence/components/response-distribution-chart/_response-distribution-chart::responseDistributionChart(${resultsModel.responseDistributionChartModel})"></div>
+                    </div>
+                    <div class="ui bottom attached tab segment"
+                         style="border-top: none !important;"
+                         th:data-tab="|confidence-degree-${resultsModel.confidenceDistributionChartModel.interactionId}|">
+                        <div style="text-align: center;">
+                            <div th:id="|confidence-tab-${resultsModel.confidenceDistributionChartModel.interactionId}|"></div>
+                        </div>
+                    </div>
+                    <div th:if="${resultsModel.evaluationDistributionChartModel != null}"
+                         class="ui bottom attached tab segment"
+                         style="border-top: none !important;"
+                         th:data-tab="|peer-evaluation-${resultsModel.evaluationDistributionChartModel.interactionId}|">
+                        <div style="text-align: center;">
+                            <div th:id="|evaluation-tab-${resultsModel.evaluationDistributionChartModel.interactionId}|"></div>
+                        </div>
+                    </div>
+                    <script th:inline="javascript">
+                        $('.ui.menu .item').tab()
+                    </script>
+                </th:block>
             </div>
-          </div>
-          <div th:if="${resultsModel.evaluationDistributionChartModel != null}"
-               class="ui bottom attached tab segment"
-               style="border-top: none !important;"
-               th:data-tab="|peer-evaluation-${resultsModel.evaluationDistributionChartModel.interactionId}|">
-            <div style="text-align: center;">
-              <div th:id="|evaluation-tab-${resultsModel.evaluationDistributionChartModel.interactionId}|"></div>
+
+            <div>
+                <th:block th:if="${resultsModel.hasExplanations}">
+                    <a th:if="${resultsModel.userCanDisplayStudentsIdentity}"
+                       id="hide-name-btn"
+                       onclick="nameStudents.hide()"
+                       style="margin-bottom: 10px; cursor: pointer;">
+                        <i class="toggle off icon big teal"></i>
+                        <span class="small teal" th:text="#{common.hide-name}">Hide student names</span>
+                    </a>
+
+                    <a th:if="${resultsModel.userCanDisplayStudentsIdentity}"
+                       id="show-name-btn"
+                       onclick="nameStudents.show()"
+                       style="margin-bottom: 10px; cursor: pointer; display: none;">
+                        <i class="toggle on icon big teal"></i>
+                        <span class="small teal" th:text="#{common.show-name}">Show student names</span>
+                    </a>
+                    <div
+                            th:replace="player/assignment/sequence/components/explanation-viewer/_explanation-viewer.html :: explanationViewer(${resultsModel.sequenceId}, ${resultsModel.explanationViewerModel}, ${isTeacher})"></div>
+                </th:block>
+                <th:block th:if="${!resultsModel.hasExplanations}">
+                    <div th:replace="::noContribution"></div>
+                </th:block>
             </div>
-          </div>
-          <script th:inline="javascript">
-            $('.ui.menu .item').tab()
-          </script>
-        </th:block>
-      </div>
 
-      <div>
-        <th:block th:if="${resultsModel.hasExplanations}">
-          <a th:if="${resultsModel.userCanDisplayStudentsIdentity}"
-             id="hide-name-btn"
-             onclick="nameStudents.hide()"
-             style="margin-bottom: 10px; cursor: pointer;">
-            <i class="toggle off icon big teal"></i>
-            <span class="small teal" th:text="#{common.hide-name}">Hide student names</span>
-          </a>
+            <div th:remove="all">
+                <div th:fragment="noContribution"
+                     class="ui warning message"
+                     th:text="#{player.sequence.noContribution}">
+                    No contribution.
+                </div>
+            </div>
 
-          <a th:if="${resultsModel.userCanDisplayStudentsIdentity}"
-             id="show-name-btn"
-             onclick="nameStudents.show()"
-             style="margin-bottom: 10px; cursor: pointer; display: none;">
-            <i class="toggle on icon big teal"></i>
-            <span class="small teal" th:text="#{common.show-name}">Show student names</span>
-          </a>
-          <div
-            th:replace="player/assignment/sequence/components/explanation-viewer/_explanation-viewer.html :: explanationViewer(${resultsModel.sequenceId}, ${resultsModel.explanationViewerModel}, ${isTeacher})"></div>
-        </th:block>
-        <th:block th:if="${!resultsModel.hasExplanations}">
-          <div th:replace="::noContribution"></div>
-        </th:block>
-      </div>
-
-      <div th:remove="all">
-        <div th:fragment="noContribution"
-             class="ui warning message"
-             th:text="#{player.sequence.noContribution}">
-          No contribution.
+            <a th:if="${resultsModel.userCanRefreshResults}"
+               th:href="@{/player/sequence/{id}/refresh-results(id=${resultsModel.sequenceId})}"
+               style="position: absolute; top: 0.5em; right: 1em; font-size: 1.2em"
+               th:attr="data-tooltip=#{player.sequence.readinteraction.updateAllResults}"
+               data-inverted=""
+               class="ob-play-sequence-2" data-position="top right">
+                <i class="small refresh icon"></i>
+            </a>
         </div>
-      </div>
 
-      <a th:if="${resultsModel.userCanRefreshResults}"
-         th:href="@{/player/sequence/{id}/refresh-results(id=${resultsModel.sequenceId})}"
-         style="position: absolute; top: 0.5em; right: 1em; font-size: 1.2em"
-         th:attr="data-tooltip=#{player.sequence.readinteraction.updateAllResults}"
-         data-inverted=""
-         class="ob-play-sequence-2" data-position="top right">
-        <i class="small refresh icon"></i>
-      </a>
+        <script th:inline="javascript">
+            $(document).ready(function () {
+                $('#result-accordion-[[${resultsModel.sequenceId}]]').accordion()
+                saveAction([[${sequenceId}]], 'click', 'p1_p2_graph')
+            });
+
+            /**
+             * if the URL param 'hideName' has the value 'true' then the name will be hidden by default
+             * The name visibility may be controlled with show/hide button in the toggle button. Name state is stored in a cookie.
+             */
+
+            let nameStudents = {}
+
+            $(function () {
+                let currentUrl = new URL(window.location.href)
+                let showName = $('#show-name-btn')
+                let hideName = $('#hide-name-btn')
+                let urlParams = new URLSearchParams(currentUrl.search)
+
+                nameStudents.show = function () {
+                    $('.name-explanation').show()
+                    showName.hide()
+                    hideName.show()
+                    urlParams.delete('hideName')
+                    currentUrl.search = urlParams.toString();
+                    window.history.pushState(null, "", currentUrl.toString());
+                    Cookies.set('hideName', 'false')
+                    $(window).trigger("hideNamesToggle")
+                }
+
+                nameStudents.hide = function () {
+                    $('.name-explanation').hide()
+                    showName.show()
+                    hideName.hide()
+                    urlParams.set('hideName', 'true')
+                    currentUrl.search = urlParams.toString();
+                    window.history.pushState(null, "", currentUrl.toString());
+                    Cookies.set('hideName', 'true')
+                    // Launch an event to trigger another component who might have personal data to hide
+                    $(window).trigger("hideNamesToggle")
+                }
+
+                if (urlParams.has('hideName')) {
+                    if (urlParams.get('hideName') === 'true') {
+                        Cookies.set('hideName', 'true')
+                    } else {
+                        Cookies.remove('hideName')
+                    }
+                }
+
+                if (Cookies.get('hideName') === 'true') {
+                    nameStudents.hide()
+                }
+            });
+        </script>
     </div>
-
-    <script th:inline="javascript">
-      $(document).ready(function () {
-        $('#result-accordion-[[${resultsModel.sequenceId}]]').accordion()
-        saveAction([[${sequenceId}]], 'click', 'p1_p2_graph')
-      });
-
-      /**
-       * if the URL param 'hideName' has the value 'true' then the name will be hidden by default
-       * The name visibility may be controlled with show/hide button in the toggle button. Name state is stored in a cookie.
-       */
-
-      let nameStudents = {}
-
-      $(document).ready(function () {
-        let currentUrl = new URL(window.location.href)
-        let showName = $('#show-name-btn')
-        let hideName = $('#hide-name-btn')
-        let urlParams = new URLSearchParams(currentUrl.search)
-
-        nameStudents.show = function () {
-          $('.name-explanation').show()
-          showName.hide()
-          hideName.show()
-          urlParams.delete('hideName')
-          currentUrl.search = urlParams.toString();
-          window.history.pushState(null, "", currentUrl.toString());
-          Cookies.set('hideName', 'false')
-          $(window).trigger("hideNamesToggle")
-        }
-
-        nameStudents.hide = function () {
-          $('.name-explanation').hide()
-          showName.show()
-          hideName.hide()
-          urlParams.set('hideName', 'true')
-          currentUrl.search = urlParams.toString();
-          window.history.pushState(null, "", currentUrl.toString());
-          Cookies.set('hideName', 'true')
-          // Launch an event to trigger another component who might have personal data to hide
-          $(window).trigger("hideNamesToggle")
-        }
-
-        if (urlParams.has('hideName')) {
-          if (urlParams.get('hideName') === 'true') {
-            Cookies.set('hideName', 'true')
-          } else {
-            Cookies.remove('hideName')
-          }
-        }
-
-        if (Cookies.get('hideName') === 'true') {
-          nameStudents.hide()
-        }
-      })
-    </script>
-  </div>
 </div>
