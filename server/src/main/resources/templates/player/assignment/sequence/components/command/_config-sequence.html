@@ -267,7 +267,16 @@
 
             $('#' + modalId).modal({
                 onApprove: function () {
-                    $('#' + modalId + '_form').submit()
+                    const form = $('#' + modalId + '_form');
+
+                    // A Form serialized is a string like 'key1=value1&key2=value2',
+                    // very handy when you send data with a GET request
+                    const data = form.serialize();
+
+                    $.get(form.attr('action'), data)
+                        .done(function () {
+                            window.location.reload();
+                        })
                 }
             })
 
