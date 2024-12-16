@@ -159,7 +159,6 @@
                 </th:block>
             </div>
 
-
             <!--/* Toggle to display or not the name of the student */-->
             <th:block th:if="${resultsModel.hasExplanations}">
 
@@ -194,17 +193,30 @@
 
             <!--/* Refresh the results */-->
             <a th:if="${resultsModel.userCanRefreshResults}"
-               th:href="@{/player/sequence/{id}/refresh-results(id=${resultsModel.sequenceId})}"
-               style="position: absolute; top: 0.5em; right: 1em; font-size: 1.2em"
+               th:onclick="|refreshAllResults(${resultsModel.sequenceId})|"
+               style="position: absolute; top: 0.5em; right: 1em; font-size: 1.2em; cursor: pointer;"
                th:attr="data-tooltip=#{player.sequence.readinteraction.updateAllResults}"
                data-inverted=""
-               class="ob-play-sequence-2" data-position="top right"
+               class="ob-play-sequence-2"
+               data-position="top right"
             >
                 <i class="small refresh icon"></i>
             </a>
         </div>
 
         <script th:inline="javascript">
+
+            function refreshAllResults(sequenceId) {
+                const url = "/player/sequence/" + sequenceId + "/refresh-results"
+
+                console.log(url)
+
+                $.get(url)
+                    .done(function (data) {
+                        window.location.reload()
+                    })
+            }
+
             let nameStudents = {}
 
             $(function () {
