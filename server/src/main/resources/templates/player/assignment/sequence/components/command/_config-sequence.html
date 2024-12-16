@@ -15,7 +15,7 @@
   ~ You should have received a copy of the GNU Affero General Public License
   ~ along with this program.  If not, see <https://www.gnu.org/licenses/>.
   -->
-
+<!--/* Modal to configure a sequence */-->
 <div xmlns:th="http://www.thymeleaf.org"
      xmlns="http://www.w3.org/1999/html"
      xmlns:togglz="https://github.com/heneke/thymeleaf-extras-togglz"
@@ -23,22 +23,34 @@
      class="ui small modal"
      th:id="|sequenceSpec_${sequenceId}|">
 
-    <div class="header" style="border-bottom: 1px solid rgba(14, 110, 184, .15);"
-         th:text="#{sequence.interaction.configure.title}">
+    <!--/* Header of the modal */-->
+    <div class="header"
+         style="border-bottom: 1px solid rgba(14, 110, 184, .15);"
+         th:text="#{sequence.interaction.configure.title}"
+    >
         Configure the sequence
     </div>
 
+    <!--/* Content of the modal */-->
     <div class="content">
+
         <form class="ui form"
               th:id="|sequenceSpec_${sequenceId}_form|"
-              th:action="@{/player/sequence/{sequenceId}/start(sequenceId=${sequenceId})}">
+              th:action="@{/player/sequence/{sequenceId}/start(sequenceId=${sequenceId})}"
+        >
+            <!--/* Hidden input to send the sequence id */-->
             <input type="hidden" name="id" th:value="${sequenceId}">
+
+            <!--/* Execution context */-->
             <div class="ob-start-sequence-6">
+
+                <!--/* Execution context Input */-->
                 <div class="inline fields">
                     <label th:text="|#{sequence.interaction.executionContext} :|">
                         Execution context :
                     </label>
 
+                    <!--/* Face to face context */-->
                     <div class="field">
                         <div class="ui radio checkbox">
                             <input type="radio"
@@ -52,6 +64,7 @@
                         </div>
                     </div>
 
+                    <!--/* Distance context */-->
                     <div class="field">
                         <div class="ui radio checkbox fieldExecutionContext">
                             <input type="radio"
@@ -65,6 +78,7 @@
                         </div>
                     </div>
 
+                    <!--/* Blended context */-->
                     <div class="field">
                         <div class="ui radio checkbox">
                             <input type="radio"
@@ -79,6 +93,7 @@
                     </div>
                 </div>
 
+                <!--/* Notice for the Face to Face execution context */-->
                 <div class="ui info message"
                      id="context-faceToFace-notice"
                      th:utext="#{sequence.interaction.executionContext.faceToFace.notice}">
@@ -90,6 +105,7 @@
                     Learners should complete each phase in the dedicated time and wait until the next phase opens.
                 </div>
 
+                <!--/* Notice for the Distance execution context */-->
                 <div class="ui info message"
                      id="context-distance-notice"
                      style="display: none"
@@ -104,6 +120,7 @@
                     discover the results.
                 </div>
 
+                <!--/* Notice for the Blended execution context */-->
                 <div class="ui info message"
                      id="context-blended-notice"
                      style="display: none"
@@ -120,7 +137,10 @@
             </div>
             <div class="ui divider"></div>
 
+
             <div th:id="|configuration_${sequenceId}|" class="ob-start-sequence-7">
+
+                <!--/* Input for if students have to provide an explanation */-->
                 <div class="ui field">
                     <div class="ui checkbox" th:id="|phaseFirstSubmission_${sequenceId}|">
                         <input type="checkbox"
@@ -135,7 +155,11 @@
                 </div>
 
                 <div th:id="|phaseConfrontation_${sequenceId}|">
+
+                    <!--/* How many answer the students have to evaluate */-->
                     <div class="ui inline fields">
+
+                        <!--/* Checkbox to enable the evaluation of the student's answers, always true and unchangeable */-->
                         <div class="field">
                             <div class="ui checkbox">
                                 <input type="checkbox" checked disabled value="true">
@@ -146,44 +170,58 @@
                             </div>
                         </div>
 
+                        <!--/* Select to set how many answers the students have to evaluate */-->
                         <div class="field">
                             <select th:id="|responseToEvaluateCount_${sequenceId}|"
                                     name="responseToEvaluateCount"
-                                    class="compact">
-                                <option th:each="i : ${#numbers.sequence(5, 1)}" th:text="${i}"
-                                        th:value="${i}"></option>
+                                    class="compact"
+                            >
+                                <option th:each="i : ${#numbers.sequence(5, 1)}" th:text="${i}" th:value="${i}">
+                                </option>
                             </select>
                             <span th:text="#{sequence.interaction.answers}"></span>
                         </div>
                     </div>
 
+                    <!--/* Evaluation method */-->
                     <div class=" grouped fields">
                         <label th:for="|evaluationPhaseConfig_${sequenceId}|"
-                               th:text="#{player.sequence.interaction.evaluation.method.label}">Evaluation
-                            method: </label>
+                               th:text="#{player.sequence.interaction.evaluation.method.label}">
+                            Evaluation method:
+                        </label>
                         <div class="field"
                              th:each="method, it : ${T(org.elaastic.sequence.phase.evaluation.EvaluationPhaseConfig).values()}">
                             <div class="ui radio checkbox">
-                                <input type="radio" name="evaluationPhaseConfig" th:value="${method}"
-                                       th:checked="${it.index == 0}"/>
+                                <input type="radio" name="evaluationPhaseConfig" th:value="${method}" th:checked="${it.index == 0}"/>
                                 <label th:text="#{${'player.sequence.interaction.evaluation.method.'+method.name()}}"></label>
                             </div>
                         </div>
-
                     </div>
+
+                    <!--/* Link to the evaluation method documentation */-->
                     <span style="float: right" th:if="${@environment.getProperty('elaastic.draxo.help.url')}">
-                    <a th:href="${@environment.getProperty('elaastic.draxo.help.url')}" target="_blank">
-                        <i class="question circle outline ui icon"></i> <span th:text="#{draxo.help.title}">Link to the detailed explanation of the DRAXO grid</span>
-                    </a>
+                        <a th:href="${@environment.getProperty('elaastic.draxo.help.url')}" target="_blank">
+                            <i class="question circle outline ui icon"></i>
+                            <span th:text="#{draxo.help.title}">
+                                Link to the detailed explanation of the DRAXO grid
+                            </span>
+                        </a>
                     </span>
 
+                    <!--/* ChatGPT evaluation */-->
                     <div class="field" togglz:active="'CHATGPT_EVALUATION'">
-                        <label for="chat-gpt-checkbox" th:text="#{sequence.interaction.toggleChatGptEvaluations.section.label}">Automatic feedback:</label>
+                        <label for="chat-gpt-checkbox"
+                               th:text="#{sequence.interaction.toggleChatGptEvaluations.section.label}">
+                            Automatic feedback:
+                        </label>
 
-                        <div id="chat-gpt-checkbox" class="ui checkbox"
-                             style="display: flex; align-items: center; width: fit-content">
+                        <div id="chat-gpt-checkbox"
+                             class="ui checkbox"
+                             style="display: flex; align-items: center; width: fit-content"
+                        >
                             <input type="checkbox" name="chatGptEvaluation" th:value="false"/>
                             <label th:text="#{sequence.interaction.toggleChatGptEvaluations.label}"></label>
+
                             <span style="margin-left: 2px;"
                                   data-position="top center"
                                   data-inverted=""
@@ -192,10 +230,10 @@
                         </span>
                         </div>
                     </div>
-
                 </div>
             </div>
 
+            <!--/* Hidden divider to make some space */-->
             <div class="ui hidden divider"></div>
 
             <div>
@@ -204,20 +242,27 @@
         </form>
     </div>
 
+    <!--/* Actions of the modal */-->
     <div class="actions">
+
+        <!--/* Button to start the sequence */-->
         <div class="ui approve primary button ob-start-sequence-8"
              th:text="#{player.sequence.start}"
-        >Start sequence
+        >
+            Start sequence
         </div>
 
+        <!--/* Button to cancel the configuration */-->
         <div class="ui cancel button"
              th:text="#{common.cancel}"
-             th:onclick="|saveAction(${sequenceId}, 'close', 'configure_popup')|">Cancel
+             th:onclick="|saveAction(${sequenceId}, 'close', 'configure_popup')|"
+        >
+            Cancel
         </div>
     </div>
 
     <script th:inline="javascript">
-        $(document).ready(function () {
+        $(function () {
             let modalId = 'sequenceSpec_' + [[${sequenceId}]]
 
             $('#' + modalId).modal({
@@ -230,90 +275,84 @@
 
             $('#chat-gpt-checkbox').checkbox({
                 onChange: function () {
-                    const isChecked = $(this).is(':checked')
-                    $(this).val(isChecked)
+                    const isChecked = $(this).is(':checked');
+                    $(this).val(isChecked);
                 }
             })
 
-            const faceToFaceNotice = $('#context-faceToFace-notice')
-            const distanceNotice = $('#context-distance-notice')
-            const blendedNotice = $('#context-blended-notice')
+            const faceToFaceNotice = $('#context-faceToFace-notice');
+            const distanceNotice = $('#context-distance-notice');
+            const blendedNotice = $('#context-blended-notice');
 
+            /**
+             * Manage the configuration change
+             *
+             * @param sequenceId The id of the sequence
+             * @param questionType The type of the question (OpenEnded, MultipleChoice or ExclusiveChoice)
+             * @param sourceEvent The event that triggered the change.
+             *                    It must be the studentsProvideExplanation checkbox
+             */
             function manageConfigurationChange(sequenceId, questionType, sourceEvent) {
-                const phaseConfrontationPanel = $('#phaseConfrontation_' + sequenceId)
-                const phaseFirstSubmission = $('#phaseFirstSubmission_' + sequenceId)
+                // PhaseConfrontation = Number of answers to evaluate, Evaluation method and ChatGPT evaluation
+                const phaseConfrontationPanel = $('#phaseConfrontation_' + sequenceId);
+                // PhaseFirstSubmission = The studentsProvideExplanation input parent div
+                const phaseFirstSubmission = $('#phaseFirstSubmission_' + sequenceId);
 
                 if (questionType === 'OpenEnded') {
-                    sourceEvent.prop('checked', true)
-                    phaseFirstSubmission.hide()
-                    sourceEvent.val(true)
-                    phaseConfrontationPanel.show()
-                } else if (sourceEvent.is(':checked')) {
-                    sourceEvent.val(true)
-                    phaseConfrontationPanel.show()
-                } else {
-                    sourceEvent.val(false)
-                    phaseConfrontationPanel.hide()
+                    // If the question is an OpenEnded question, the student must provide an explanation.
+                    // So the checkbox is checked and hidden.
+                    sourceEvent.prop('checked', true);
+                    phaseFirstSubmission.hide();
                 }
+
+                const studentsHaveToProvideExplanation = sourceEvent.is(':checked');
+                sourceEvent.val(studentsHaveToProvideExplanation);
+                phaseConfrontationPanel.toggle(studentsHaveToProvideExplanation);
             }
 
             function manageExecutionContext(sequenceId, questionType, sourceEvent) {
-                var studentsProvideExplanation = $('#studentsProvideExplanation_' + sequenceId + '_' + questionType)
-                var configurationPanel = $('#configuration_' + sequenceId)
+                // The configuration panel = All the input except the execution context
+                const configurationPanel = $('#configuration_' + sequenceId);
+                // The studentsProvideExplanation input
+                const studentsProvideExplanation = $('#studentsProvideExplanation_' + sequenceId + '_' + questionType);
+                const contextExecution = sourceEvent.val();
 
-                switch (sourceEvent.val()) {
-                    case 'FaceToFace':
-                        distanceNotice.hide()
-                        blendedNotice.hide()
-                        faceToFaceNotice.show()
-                        break
-
-                    case 'Distance':
-                        faceToFaceNotice.hide()
-                        blendedNotice.hide()
-                        distanceNotice.show()
-                        break
-
-                    case 'Blended':
-                        faceToFaceNotice.hide()
-                        distanceNotice.hide()
-                        blendedNotice.show()
-                        break
-
-                    default:
-                        throw ('Unknown execution context')
+                // Update the notice visibility depending on the context
+                blendedNotice.toggle(contextExecution === 'Blended');
+                distanceNotice.toggle(contextExecution === 'Distance');
+                faceToFaceNotice.toggle(contextExecution === 'FaceToFace');
+                // If the context doesn't exist, throw an error
+                if (contextExecution !== 'FaceToFace' && contextExecution !== 'Distance' && contextExecution !== 'Blended') {
+                    throw ('Unknown execution context');
                 }
 
-                switch (sourceEvent.val()) {
-                    case 'FaceToFace':
-                        configurationPanel.show()
-                        studentsProvideExplanation.prop('readonly', false)
-                        manageConfigurationChange(sequenceId, questionType, studentsProvideExplanation)
-                        break
-                    default:
-                        studentsProvideExplanation.prop('checked', true)
-                        studentsProvideExplanation.prop('readonly', true)
-                        manageConfigurationChange(sequenceId, questionType, studentsProvideExplanation)
-                        break
+                if (contextExecution === 'FaceToFace') {
+                    configurationPanel.show();
+                    studentsProvideExplanation.prop('readonly', false);
+                } else {
+                    studentsProvideExplanation.prop('checked', true);
+                    studentsProvideExplanation.prop('readonly', true);
                 }
-
+                manageConfigurationChange(sequenceId, questionType, studentsProvideExplanation);
             }
 
             $('input[name=studentsProvideExplanation]').on('change', function () {
-                const infos = this.id.split('_')
-                const sequenceId = infos[1]
-                const questionType = infos[2]
-                manageConfigurationChange(sequenceId, questionType, $(this))
+                // Get infos from the id of the input
+                const infos = this.id.split('_');
+                const sequenceId = infos[1];
+                const questionType = infos[2];
+                // Update the form as some input are now irrelevant, depending on the context
+                manageConfigurationChange(sequenceId, questionType, $(this));
             })
 
             $('input[type=radio][name=\'executionContext\']').on('change', function () {
-                const infos = this.id.split('_')
-                const sequenceId = infos[1]
-                const questionType = infos[2]
-                manageExecutionContext(sequenceId, questionType, $(this))
+                const infos = this.id.split('_');
+                const sequenceId = infos[1];
+                const questionType = infos[2];
+                manageExecutionContext(sequenceId, questionType, $(this));
             })
 
-            manageConfigurationChange('[[${sequenceId}]]', [[${questionType}]], $('#studentsProvideExplanation_[[${sequenceId}]]_' + [[${questionType}]]))
+            manageConfigurationChange('[[${sequenceId}]]', [[${questionType}]], $('#studentsProvideExplanation_[[${sequenceId}]]_' + [[${questionType}]]));
         })
 
 

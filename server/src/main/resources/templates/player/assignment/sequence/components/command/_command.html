@@ -130,6 +130,7 @@
 
     </div>
 
+    <!--/* Configuration of the sequence */-->
     <div th:if="${model.actionStartSequence.name() == 'ENABLED'}" th:remove="tag">
         <div th:replace="player/assignment/sequence/components/command/_config-sequence.html :: configSequence(${model.sequenceId}, ${model.statementId}, ${model.questionType}, ${model.hasExpectedExplanation})"></div>
     </div>
