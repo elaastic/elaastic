@@ -148,16 +148,13 @@
                     <div
                             th:replace="player/assignment/sequence/components/explanation-viewer/_explanation-viewer.html :: explanationViewer(${resultsModel.sequenceId}, ${resultsModel.explanationViewerModel}, ${isTeacher})"></div>
                 </th:block>
-                <th:block th:if="${!resultsModel.hasExplanations}">
-                    <div th:replace="::noContribution"></div>
-                </th:block>
-            </div>
 
-            <div th:remove="all">
-                <div th:fragment="noContribution"
+                <!--/* If there is no explanation */-->
+                <div th:text="#{player.sequence.noContribution}"
+                     th:if="${!resultsModel.hasExplanations}"
                      class="ui warning message"
-                     th:text="#{player.sequence.noContribution}">
-                    No contribution.
+                >
+                        No contribution.
                 </div>
             </div>
 
