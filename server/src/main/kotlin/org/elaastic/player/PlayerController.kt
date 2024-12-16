@@ -51,6 +51,7 @@ import org.elaastic.sequence.phase.evaluation.EvaluationPhaseConfig
 import org.elaastic.user.AnonymousUserService
 import org.elaastic.user.User
 import org.elaastic.user.UserService
+import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.MessageSource
 import org.springframework.security.access.prepost.PreAuthorize
@@ -91,6 +92,8 @@ class PlayerController(
 ) {
 
     private val autoReloadSessionHandler = AutoReloadSessionHandler
+
+    private val logger = LoggerFactory.getLogger(PlayerController::class.java)
 
     @GetMapping(value = ["", "/", "/index"])
     fun index(
@@ -331,6 +334,7 @@ class PlayerController(
 
     /**
      * Get the sequence view for the given user
+     *
      * @param authentication the current authentication
      * @param model the model
      * @param sequenceId the id of the sequence to get the view
@@ -371,7 +375,8 @@ class PlayerController(
         val learnerSequence = learnerSequenceService.getLearnerSequence(user, sequence)
         learnerPhaseService.loadPhaseList(learnerSequence)
 
-        val sequenceModel = sequenceModelFactory.buildForLearner(user, learnerSequence, learnerSequence.activeInteraction)
+        val sequenceModel =
+            sequenceModelFactory.buildForLearner(user, learnerSequence, learnerSequence.activeInteraction)
         model["sequenceModel"] = sequenceModel
 
         return "player/assignment/sequence/play-sequence-learner"
@@ -604,10 +609,10 @@ class PlayerController(
         // Get response from database
         var response = responseService.findById(responseId)
 
-        println(response)
         // Update response visibility
         response = responseService.hideResponse(user, response)
-        println("Response hidden by teacher: ${response.hiddenByTeacher}")
+
+        logger.debug("Response hidden by teacher: ${response.hiddenByTeacher}")
 
         return "redirect:/player/assignment/${response.interaction.sequence.assignment!!.id}/play/sequence/${response.interaction.sequence.id}"
     }
@@ -622,9 +627,11 @@ class PlayerController(
 
         // Get response from database
         var response = responseService.findById(responseId)
+
         // Update response visibility
         response = responseService.unhideResponse(user, response)
-        println("Response hidden by teacher: ${response.hiddenByTeacher}")
+
+        logger.debug("Response unhidden by teacher: ${response.hiddenByTeacher}")
 
         return "redirect:/player/assignment/${response.interaction.sequence.assignment!!.id}/play/sequence/${response.interaction.sequence.id}"
     }
