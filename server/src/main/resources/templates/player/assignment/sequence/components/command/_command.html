@@ -64,7 +64,6 @@
     </a>
 
     <!--/* Start next phase (n) */-->
-    <!--  TODO lazy loading th:onclick="|$('#sequence_${model.sequenceId}').load('@{/player/interaction/{interactionId}/startNext(interactionId=${model.interactionId})}')|" -->
     <a class="item"
        th:unless="${model.actionStartNextInteraction.name() == 'HIDDEN'}"
        th:onclick="|loadSequence('@{/player/interaction/{interactionId}/startNext(interactionId=${model.interactionId})}')|">
@@ -74,7 +73,6 @@
     </a>
 
     <!--/* Skip next phase */-->
-    <!--  TODO lazy loading th:onclick="|$('#sequence_${model.sequenceId}').load('@{/player/interaction/{interactionId}/startNext(interactionId=${model.interactionId})}')|" -->
     <a class="item"
        th:unless="${model.actionStartNextInteraction.name() == 'HIDDEN'}"
        th:onclick="|loadSequence('@{/player/interaction/{interactionId}/skipNext(interactionId=${model.interactionId})}')|">
@@ -84,7 +82,6 @@
     </a>
 
     <!--/* Reopen phase (n) */-->
-    <!--  TODO partial load th:onclick="|$('#sequence_${model.sequenceId}').load('@{/player/interaction/{interactionId}/start(interactionId=${model.interactionId})}')|"-->
     <a class="item"
        href="#"
        th:unless="${model.actionReopenInteraction.name() == 'HIDDEN'}"
@@ -96,7 +93,6 @@
 
     <div class="right menu">
         <!--/* Re-open sequence */-->
-        <!-- TODO partial loading    th:onclick="|$('#sequence_${model.sequenceId}').load('@{/player/sequence/{sequenceId}/reopen}"-->
         <a class="item"
            th:unless="${model.actionReopenSequence.name() == 'HIDDEN'}"
            th:onclick="|loadSequence('@{/player/sequence/{sequenceId}/reopen(sequenceId=${model.sequenceId})}')|">
@@ -106,7 +102,6 @@
         </a>
 
         <!--/* Stop sequence */-->
-        <!-- TODO partial reload -       th:onclick="|$('#sequence_${model.sequenceId}').load('@{/player/sequence/{sequenceId}/stop}')|">-->
         <a class="item ob-end-sequence-1"
            th:unless="${model.actionStopSequence.name() == 'HIDDEN'}"
            th:onclick="|loadSequence('@{/player/sequence/{sequenceId}/stop(sequenceId=${model.sequenceId})}')|">
@@ -116,7 +111,6 @@
         </a>
 
         <!--/* Publish results */-->
-        <!--   TODO load partiel template th:onclick="|$('#sequence_${model.sequenceId}').load('@{/player/sequence/{sequenceId}/publishResults}')|"-->
         <a class="item ob-end-sequence-2"
            th:unless="${model.actionPublishResults.name() == 'HIDDEN'}"
            th:onclick="|loadSequence('@{/player/sequence/{sequenceId}/publish-results(sequenceId=${model.sequenceId})}')|">
@@ -126,7 +120,6 @@
         </a>
 
         <!--/* Cancel publication of results */-->
-        <!--  TODO partial load : th:onclick="|$('#sequence_${model.sequenceId}').load('@{/player/sequence/{sequenceId}/unpublishResults}')|"  -->
         <a class="item"
            th:unless="${model.actionUnpublishResults.name() == 'HIDDEN'}"
            th:onclick="|loadSequence('@{/player/sequence/{sequenceId}/unpublish-results(sequenceId=${model.sequenceId})}')|">
