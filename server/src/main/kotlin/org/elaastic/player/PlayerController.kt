@@ -759,7 +759,7 @@ class PlayerController(
         model["learnerResultsModel"] = getLearnerResultsModel(learner, sequence)
         // The accordionId is used to initialize the accordion in the view.
         // So to discriminate between all accordions in the page, we use the learnerId
-        model["accordionId"] = userId
+        model["userId"] = userId
         model["seenByTeacher"] = isTeacher
         model["seenByOwner"] = isOwnerOfResponse
 

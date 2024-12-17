@@ -18,11 +18,11 @@
 <!-- Pop up modal to report an evaluation from a peer -->
 <!--/* @thymesVar id="learnerResultsModel" type="org.elaastic.player.results.learner.LearnerResultsModel" */-->
 <!--/* @thymesVar id="learnerMonitoringModel" type="org.elaastic.player.dashboard.LearnerMonitoringModel" */-->
-<div th:fragment="myResultsModal(learnerMonitoringModel, learnerResultsModel, accordionId, seenByTeacher, seenByOwner)"
+<div th:fragment="myResultsModal(learnerMonitoringModel, learnerResultsModel, userId, seenByTeacher, seenByOwner)"
      xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/html"
      class="ui modal"
-     th:id="|myResultsModal_${accordionId}|"
-     >
+     th:id="|myResultsModal_${userId}|"
+>
 
     <i class="close icon"></i>
 
@@ -61,9 +61,16 @@
             </div>
         </div>
 
-        <div class="ui segment">
-            <!--/* The learner didn't answer yet */-->
-            <th:block th:unless="${learnerMonitoringModel.hasAnswered()}">
+        <!--/* The learner answered */-->
+        <div th:if="${learnerMonitoringModel.hasAnswered()}"
+             th:with="accordionId=${userId}"
+             th:replace="/player/assignment/sequence/components/my-results/_my-results.html ::
+                    myResults(${accordionId}, ${learnerResultsModel}, ${seenByTeacher}, ${seenByOwner})">
+        </div>
+
+        <!--/* The learner didn't answer yet */-->
+        <th:block th:unless="${learnerMonitoringModel.hasAnswered()}">
+            <div class="ui segment">
                 <div class="ui message warning">
                     <div class="header" th:text="#{player.sequence.studentResults.noAnswer}">No answer</div>
                     <div class="content"
@@ -71,12 +78,8 @@
                         No answer description
                     </div>
                 </div>
-            </th:block>
-            <!--/* The learner answered */-->
-            <div th:if="${learnerMonitoringModel.hasAnswered()}"  th:replace="/player/assignment/sequence/components/my-results/_my-results.html ::
-                myResults(${accordionId}, ${learnerResultsModel}, ${seenByTeacher}, ${seenByOwner})">
             </div>
-        </div>
+        </th:block>
 
     </div>
 </div>

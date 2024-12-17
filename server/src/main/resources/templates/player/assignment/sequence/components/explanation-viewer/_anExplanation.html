@@ -82,7 +82,7 @@
         <th:block th:if="${!isDisplayReview}">
             <span class="detail">
                 (
-                <a class="detail-link" href="#" th:onclick="showDetails([[${explanationData.userId}]], [[${isTeacher}]])"
+                <a class="detail-link" href="#" th:onclick="showDetails([[${explanationData.userId}]], [[${explanationData.sequenceId}]])"
                    th:text="#{player.sequence.explanation.showDetails}">
                 </a>
                 )
@@ -174,18 +174,9 @@
     <!--/* Container for the reviews (DRAXO and/or ChatGPT) */-->
     <div class="reviews-container" style="margin-top: 20px"></div>
 
-    <!--/* The detail modal setup for a student (no name and no progression) */-->
-    <!--/* We insert the modal only if the explanation isn't in the mod to display reviews
-    and if it's not the teacher because the teacher already has this modal through the dashboard */-->
-    <th:block th:if="${!isDisplayReview && !isTeacher}">
-        <div th:replace="|player/assignment/sequence/components/_detail-modal| ::
-             detailModal(${explanationData.userId}, ${explanationData.sequenceId})">
-        </div>
-    </th:block>
-
     <script th:inline="javascript">
 
-        var toReload = false;
+        let toReload = false;
 
         $(function () {
             setupRecommendedByTeacher([[${explanationData.responseId}]],
@@ -232,11 +223,26 @@
             });
         }
 
-        function showDetails(userId, isTeacher) {
-            if (isTeacher) {
-                $('#detailModalTeacher_' + userId).modal('show')
+        function showDetails(userId, sequenceId) {
+            console.log(sequenceId);
+            let $detailModal = $("#myResultsModal_" + userId)
+            if ($detailModal.length) {
+                // If the modal already exists, we show it
+                $detailModal.modal('show');
             } else {
-                $('#detailModal_' + userId).modal('show')
+                // If the modal doesn't exist, we fetch it
+                const urlModal = '/player/' + sequenceId + '/result/' + userId + '/modal';
+                console.log(urlModal);
+                console.log("userId : " + userId);
+                console.log("sequenceId : " + sequenceId);
+                $.get(urlModal)
+                    .done(function (data) {
+                        $('body').append(data);
+                        $("#myResultsModal_" + userId).modal('show');
+                    })
+                    .fail(function () {
+                        console.log("An error occurred while fetching the results");
+                    })
             }
         }
 

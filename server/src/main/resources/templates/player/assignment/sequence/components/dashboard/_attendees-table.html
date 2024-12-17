@@ -49,16 +49,29 @@
         </tr>
         </tbody>
     </table>
-    <!--/* Detail modal for each learner */-->
-    <th:block th:each="learner: ${sequenceMonitoringModel.learners}">
-        <div th:replace="player/assignment/sequence/components/_detail-modal.html ::  detailModalTeacher(${learner})"></div>
-    </th:block>
 
     <script th:inline="javascript">
         $(function () {
+            const sequenceId = [[${sequenceMonitoringModel.sequenceId}]];
+
             $('[id="see-detail"]').click(function () {
                 let userId = $(this).attr('learner-id');
-                $('#detailModalTeacher_' + userId).modal('show');
+
+                let $detailModal = $("#myResultsModal_" + userId)
+                if ($detailModal.length) {
+                    // If the modal already exists, we show it
+                    $detailModal.modal('show')
+                } else {
+                    // If the modal doesn't exist, we fetch it
+                    $.get('/player/' + sequenceId + '/result/' + userId + '/modal')
+                            .done(function (data) {
+                                $('body').append(data)
+                                $("#myResultsModal_" + userId).modal('show')
+                            })
+                            .fail(function () {
+                                console.log("An error occurred while fetching the results")
+                            })
+                }
             });
 
             // The event is trigger when the user toggles the button.
