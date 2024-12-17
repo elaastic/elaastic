@@ -31,8 +31,6 @@ import org.elaastic.assignment.LearnerAssignment
 import org.elaastic.common.web.ControllerUtil
 import org.elaastic.common.web.MessageBuilder
 import org.elaastic.material.instructional.course.Course
-import org.elaastic.material.instructional.question.QuestionType
-import org.elaastic.material.instructional.statement.Statement
 import org.elaastic.player.dashboard.DashboardModelFactory
 import org.elaastic.player.evaluation.chatgpt.ChatGptEvaluationModelFactory
 import org.elaastic.player.results.TeacherResultDashboardService
@@ -89,6 +87,7 @@ class PlayerController(
     @Autowired val featureManager: FeatureManager,
     @Autowired val messageSource: MessageSource,
     @Autowired val sequenceModelFactory: SequenceModelFactory,
+    @Autowired val dashboardModelFactory: DashboardModelFactory,
 ) {
 
     private val autoReloadSessionHandler = AutoReloadSessionHandler
@@ -245,45 +244,14 @@ class PlayerController(
         httpServletRequest: HttpServletRequest,
     ): String {
         val assignment: Assignment = selectedSequence.assignment!!
-        val previousSequence: Sequence? = sequenceService.findPreviousSequence(selectedSequence)
-        val nextSequence: Sequence? = sequenceService.findNextSequence(selectedSequence)
         val registeredUsers: List<LearnerAssignment> = assignmentService.getRegisteredUsers(assignment)
-        val nbRegisteredUsers = registeredUsers.size
-        val responses: List<Response> = interactionService.findAllResponsesBySequenceOrderById(selectedSequence)
 
-        // Associate each learner with the number of evaluations he made
-        val evaluationCountByUser = peerGradingService.countEvaluationsMadeByUsers(registeredUsers, selectedSequence)
-        // Associate each learner with a boolean indicating if he answered the question
-        val reponseAvailable = try {
-            peerGradingService.learnerToIfTheyAnswer(registeredUsers, selectedSequence)
-        } catch (_: IllegalStateException) {
-            registeredUsers.associateWith { false }
-        }
-        // Count the number of responses gradable
-        val countResponseGradable: Long = try {
-            val responseStudent = responseService.findAllByAttemptNotFake(1, selectedSequence).size.toLong()
-            val responseFake = responseService.findAllFakeResponses(selectedSequence).size.toLong()
-            responseStudent + responseFake
-        } catch (_: IllegalStateException) {
-            0
-        }
-
-        model["dashboardModel"] = DashboardModelFactory.build(
-            selectedSequence,
-            previousSequence,
-            nextSequence,
-            registeredUsers,
-            responses,
-            evaluationCountByUser,
-            reponseAvailable,
-            countResponseGradable,
-        )
-
+        model["dashboardModel"] = dashboardModelFactory.build(selectedSequence)
         model["playerModel"] = PlayerModelFactory.buildForTeacher(
             user = user,
             sequence = selectedSequence,
             serverBaseUrl = ControllerUtil.getServerBaseUrl(httpServletRequest),
-            nbRegisteredUsers = nbRegisteredUsers,
+            nbRegisteredUsers = registeredUsers.size,
             messageBuilder = messageBuilder,
             sequenceStatistics = sequenceService.getStatistics(selectedSequence),
             teacherResultDashboardService = teacherResultDashboardService,

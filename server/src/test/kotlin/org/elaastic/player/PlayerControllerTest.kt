@@ -36,6 +36,7 @@ import org.elaastic.common.web.MessageBuilder
 import org.elaastic.material.instructional.question.QuestionType
 import org.elaastic.material.instructional.statement.Statement
 import org.elaastic.material.instructional.subject.Subject
+import org.elaastic.player.dashboard.DashboardModelFactory
 import org.elaastic.player.results.TeacherResultDashboardService
 import org.elaastic.player.sequence.SequenceModelFactory
 import org.elaastic.questions.assignment.sequence.peergrading.draxo.DraxoPeerGradingService
@@ -131,6 +132,9 @@ internal class PlayerControllerTest(
 
     @MockBean
     lateinit var sequenceModelFactory: SequenceModelFactory
+
+    @MockBean
+    lateinit var dashboardModelFactory: DashboardModelFactory
 
 
     @Test

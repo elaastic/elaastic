@@ -1,24 +1,26 @@
 package org.elaastic.player.dashboard
 
+import org.elaastic.player.dashboard.DashboardPhaseState.*
+import org.elaastic.player.dashboard.LearnerMonitoringModel.StateCell.*
+import org.elaastic.player.dashboard.LearnerStateOnPhase.*
 import org.elaastic.sequence.ExecutionContext
 import org.elaastic.sequence.phase.LearnerPhaseType
 
 /**
  * Model for the learners monitoring dashboard.
  *
- * The model is used to display the state of the learners in the dashboard.
- * It contains the following information:
+ * The model is used to display the state of the learners in the dashboard. It contains the following information:
  * - The execution context of the sequence
  * - The state of phase 1
  * - The state of phase 2
  * - The list of [LearnerMonitoringModel]
  *
- * @see DashboardPhaseState
  * @property executionContext Sequence execution context type
  * @property phase1State the state of phase 1
  * @property phase2State the state of phase 2
  * @property learners the learners' states on each phase
  * @property sequenceId the id of the sequence
+ * @see DashboardPhaseState
  */
 class SequenceMonitoringModel(
     val executionContext: ExecutionContext,
@@ -43,9 +45,8 @@ class SequenceMonitoringModel(
     /**
      * With the given list of learners, set the list of learners in the model.
      *
-     * Replace the current list of learners with the new list. Before setting
-     * the new list, sort the learners according to the execution context and
-     * the current phase.
+     * Replace the current list of learners with the new list. Before setting the new list, sort the learners according
+     * to the execution context and the current phase.
      *
      * @param newLearnersList the new list of learners
      * @see ExecutionContext
@@ -54,26 +55,23 @@ class SequenceMonitoringModel(
      */
     fun setLearners(newLearnersList: MutableList<LearnerMonitoringModel>) {
         learners.clear()
-
-        val newLearnersListSorted: MutableList<LearnerMonitoringModel> = when (this.executionContext) {
-            ExecutionContext.FaceToFace -> this.sortWithFaceToFaceBehavior(newLearnersList)
-            else -> this.sortWithBlendedOrRemoteBehavior(newLearnersList)
-        }
-
-        learners.addAll(newLearnersListSorted)
+        learners.addAll(
+            when (this.executionContext) {
+                ExecutionContext.FaceToFace -> this.sortWithFaceToFaceBehavior(newLearnersList)
+                else -> this.sortWithBlendedOrRemoteBehavior(newLearnersList)
+            }
+        )
     }
 
     /**
      * Sort the learner when the sequence is in FaceToFace execution context
      *
-     * If the Phase 1 is active, then we want the learner still writing their
-     * answer at the top.
+     * If the Phase 1 is active, then we want the learner still writing their answer at the top.
      *
-     * If the Phase 2 is active, then we want the learner still evaluating at
-     * first and more than the learner who didn't answer the question.
+     * If the Phase 2 is active, then we want the learner still evaluating at first and more than the learner who didn't
+     * answer the question.
      *
-     * If the Phase 3 is active, then we want the learner who didn't answer and
-     * evaluate at first.
+     * If the Phase 3 is active, then we want the learner who didn't answer and evaluate at first.
      */
     private fun sortWithFaceToFaceBehavior(
         newLearnersList: MutableList<LearnerMonitoringModel>
@@ -98,11 +96,9 @@ class SequenceMonitoringModel(
     }
 
     /**
-     * Sort the learners when the sequence has Blended or Remote execution
-     * context.
+     * Sort the learners when the sequence has Blended or Remote execution context.
      *
-     * Sort the learners alphabetically and by their "In Progress..." states
-     * count.
+     * Sort the learners alphabetically and by their "In Progress..." states count.
      *
      * @param newLearnersList the list of learners to sort
      */
@@ -121,8 +117,7 @@ class SequenceMonitoringModel(
 /**
  * Model for a learner's state on each phase.
  *
- * Represents a learner's state in each phase, a line in the table.
- * The model contains the following information:
+ * Represents a learner's state in each phase, a line in the table. The model contains the following information:
  * - The id of the learner
  * - The name of the learner
  * - The [LearnerStateOnPhase] of the learner on phase 1
@@ -280,16 +275,16 @@ enum class DashboardPhaseState {
     /**
      * The phase has not started
      *
-     * Applicable to all phases. During phase 3 (evaluation), the phase is not
-     * started when the results are not displayed yet
+     * Applicable to all phases. During phase 3 (evaluation), the phase is not started when the results are not
+     * displayed yet
      */
     NOT_STARTED,
 
     /**
      * The phase is in progress
      *
-     * Applicable to all phases. During phase 3 (evaluation), the phase is in
-     * progress when the results are being displayed
+     * Applicable to all phases. During phase 3 (evaluation), the phase is in progress when the results are being
+     * displayed
      */
     IN_PROGRESS,
 
@@ -311,8 +306,7 @@ enum class DashboardPhaseState {
 /**
  * Enum defining states of a learner on a phase
  *
- * @property ACTIVITY_NOT_TERMINATED the learner has not terminated the
- *     activity
+ * @property ACTIVITY_NOT_TERMINATED the learner has not terminated the activity
  * @property ACTIVITY_TERMINATED the learner has terminated the activity
  * @property WAITING the learner is waiting for the next phase
  */

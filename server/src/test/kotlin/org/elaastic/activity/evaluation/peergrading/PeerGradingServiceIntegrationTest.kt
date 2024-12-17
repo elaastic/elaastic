@@ -53,6 +53,7 @@ class PeerGradingServiceIntegrationTest(
     @Autowired val statementRepository: StatementRepository,
     @Autowired val subjectRepository: SubjectRepository,
     @Autowired val subjectService: SubjectService,
+    @Autowired val dashboardModelFactory: DashboardModelFactory,
 ) {
 
     @Test
@@ -609,7 +610,7 @@ class PeerGradingServiceIntegrationTest(
             learnersAssignementList
         }.tThen { learnersAssignementList ->
             val responses: List<Response> = interactionService.findAllResponsesBySequenceOrderById(sequence)
-            assertTrue(DashboardModelFactory.learnerHasAnswer(responses, learnersAssignementList[0]))
+            assertTrue(dashboardModelFactory.learnerHasAnswer(responses, learnersAssignementList[0]))
         }
 
     }
