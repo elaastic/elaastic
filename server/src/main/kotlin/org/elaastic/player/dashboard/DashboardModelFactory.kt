@@ -117,7 +117,7 @@ class DashboardModelFactory(
      * @param sequence the sequence
      * @return the number of responses that are gradable
      */
-    private fun getCountResponseGradable(sequence: Sequence) = try {
+    fun getCountResponseGradable(sequence: Sequence) = try {
         val responseStudent = responseService.findAllByAttemptNotFake(1, sequence).size.toLong()
         val responseFake = responseService.findAllFakeResponses(sequence).size.toLong()
         responseStudent + responseFake
@@ -125,7 +125,7 @@ class DashboardModelFactory(
         0
     }
 
-    private fun buildLearnerMonitoringModel(
+    fun buildLearnerMonitoringModel(
         learnerAssignment: LearnerAssignment,
         learnerHasAnswered: Boolean,
         sequenceMonitoringModel: SequenceMonitoringModel,

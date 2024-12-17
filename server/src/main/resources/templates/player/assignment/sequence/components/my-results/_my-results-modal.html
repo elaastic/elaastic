@@ -1,0 +1,82 @@
+<!--
+  ~ Elaastic - formative assessment system
+  ~ Copyright (C) 2019. University Toulouse 1 Capitole, University Toulouse 3 Paul Sabatier
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Affero General Public License as
+  ~ published by the Free Software Foundation, either version 3 of the
+  ~ License, or (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU Affero General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Affero General Public License
+  ~ along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  -->
+<!-- Pop up modal to report an evaluation from a peer -->
+<!--/* @thymesVar id="learnerResultsModel" type="org.elaastic.player.results.learner.LearnerResultsModel" */-->
+<!--/* @thymesVar id="learnerMonitoringModel" type="org.elaastic.player.dashboard.LearnerMonitoringModel" */-->
+<div th:fragment="myResultsModal(learnerMonitoringModel, learnerResultsModel, accordionId, seenByTeacher, seenByOwner)"
+     xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/html"
+     class="ui modal"
+     th:id="|myResultsModal_${accordionId}|"
+     >
+
+    <i class="close icon"></i>
+
+    <div class="header">
+        <div th:text="#{attendee.details}"></div>
+    </div>
+    <div class="content">
+
+        <!--/* Learner's name and progress throughout the sequence */-->
+        <div class="ui message info personalData" th:if="${seenByTeacher}">
+            <!--/* Learner's name */-->
+            <div class="header" th:text="${learnerMonitoringModel.learnerName}"></div>
+
+            <!--/* Progress throughout the sequence */-->
+            <div class="content">
+                <table class="ui celled table">
+                    <thead>
+                    <tr>
+                        <th class="center aligned" th:text="#{attendee.phase(${1})}">first_phase_label</th>
+                        <th class="center aligned" th:text="#{attendee.phase(${2})}">second_phase_label</th>
+                    </tr>
+                    </thead>
+
+                    <tbody>
+                    <tr>
+                        <!--/* States of the learner */-->
+                        <th:block
+                                th:replace="player/assignment/sequence/components/dashboard/_state-cells.html :: stateCell(${learnerMonitoringModel.getStateCellInResponsePhase().name})">
+                        </th:block>
+                        <th:block
+                                th:replace="player/assignment/sequence/components/dashboard/_state-cells.html :: stateCell(${learnerMonitoringModel.getStateCellInEvaluationPhase().name})">
+                        </th:block>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="ui segment">
+            <!--/* The learner didn't answer yet */-->
+            <th:block th:unless="${learnerMonitoringModel.hasAnswered()}">
+                <div class="ui message warning">
+                    <div class="header" th:text="#{player.sequence.studentResults.noAnswer}">No answer</div>
+                    <div class="content"
+                         th:text="#{player.sequence.studentResults.noAnswer.description.teacherView}">
+                        No answer description
+                    </div>
+                </div>
+            </th:block>
+            <!--/* The learner answered */-->
+            <div th:if="${learnerMonitoringModel.hasAnswered()}"  th:replace="/player/assignment/sequence/components/my-results/_my-results.html ::
+                myResults(${accordionId}, ${learnerResultsModel}, ${seenByTeacher}, ${seenByOwner})">
+            </div>
+        </div>
+
+    </div>
+</div>

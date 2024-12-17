@@ -20,7 +20,6 @@ package org.elaastic.player
 
 import org.elaastic.activity.evaluation.peergrading.PeerGradingService
 import org.elaastic.activity.response.ConfidenceDegree
-import org.elaastic.activity.response.Response
 import org.elaastic.activity.response.ResponseService
 import org.elaastic.activity.results.AttemptNum
 import org.elaastic.ai.evaluation.chatgpt.ChatGptEvaluationService
@@ -28,15 +27,20 @@ import org.elaastic.analytics.lrs.EventLogService
 import org.elaastic.assignment.Assignment
 import org.elaastic.assignment.AssignmentService
 import org.elaastic.assignment.LearnerAssignment
+import org.elaastic.assignment.LearnerAssignmentService
 import org.elaastic.common.web.ControllerUtil
 import org.elaastic.common.web.MessageBuilder
 import org.elaastic.material.instructional.course.Course
 import org.elaastic.player.dashboard.DashboardModelFactory
+import org.elaastic.player.dashboard.LearnerMonitoringModel
+import org.elaastic.player.dashboard.SequenceMonitoringModel
 import org.elaastic.player.evaluation.chatgpt.ChatGptEvaluationModelFactory
 import org.elaastic.player.results.TeacherResultDashboardService
 import org.elaastic.player.results.learner.LearnerResultsModel
 import org.elaastic.player.results.learner.LearnerResultsModelFactory
 import org.elaastic.player.sequence.SequenceModelFactory
+import org.elaastic.player.steps.StepsModel
+import org.elaastic.player.steps.StepsModelFactory
 import org.elaastic.player.websocket.AutoReloadSessionHandler
 import org.elaastic.questions.assignment.sequence.peergrading.draxo.DraxoPeerGradingService
 import org.elaastic.sequence.ExecutionContext
@@ -88,6 +92,7 @@ class PlayerController(
     @Autowired val messageSource: MessageSource,
     @Autowired val sequenceModelFactory: SequenceModelFactory,
     @Autowired val dashboardModelFactory: DashboardModelFactory,
+    private val learnerAssignmentService: LearnerAssignmentService,
 ) {
 
     private val autoReloadSessionHandler = AutoReloadSessionHandler
@@ -699,26 +704,7 @@ class PlayerController(
         val sequence = sequenceService.get(sequenceId, true)
         val learner = userService.findById(userId)
 
-        val responseFirstTry = responseService.find(learner, sequence, 1)
-        val responseSecondTry = responseService.find(learner, sequence, 2)
-
-        val longBooleanMap = chatGptEvaluationService.associateResponseToChatGPTEvaluationExistence(
-            listOf(
-                responseFirstTry?.id,
-                responseSecondTry?.id
-            )
-        )
-
-        val responseFirstTryHasChatGPTEvaluation: Boolean = longBooleanMap[responseFirstTry?.id] == true
-        val responseSecondTryHasChatGPTEvaluation: Boolean = longBooleanMap[responseSecondTry?.id] == true
-
-        model["studentResultsModel"] = builtLearnerResultsModel(
-            responseFirstTry,
-            responseSecondTry,
-            responseFirstTryHasChatGPTEvaluation,
-            responseSecondTryHasChatGPTEvaluation,
-            sequence.statement
-        )
+        model["studentResultsModel"] = getLearnerResultsModel(learner, sequence)
         // The resultId is used to initialize the accordion in the view.
         // So to discriminate between all accordions in the page, we use the learnerId
         model["resultId"] = userId
@@ -729,44 +715,83 @@ class PlayerController(
     }
 
     /**
-     * Get the LearnerResultsModel for the given responses and statement
+     * Get the result modal for the given learner
      *
-     * @param responseFirstAttempt the response of the learner for the first attempt
-     * @param responseSecondAttempt the response of the learner for the second attempt
-     * @param statement the statement of the sequence
+     * @param authentication the current authentication
+     * @param model the model
+     * @param sequenceId the id of the sequence to get the result modal
+     * @param userId the id of the learner to get the result modal
+     * @return the result modal for the given learner
      */
-    private fun builtLearnerResultsModel(
-        responseFirstAttempt: Response?,
-        responseSecondAttempt: Response?,
-        responseFirstTryHasChatGPTEvaluation: Boolean,
-        responseSecondTryHasChatGPTEvaluation: Boolean,
-        statement: Statement
+    @GetMapping("/{sequenceId}/result/{userId}/modal")
+    fun resultModal(
+        authentication: Authentication,
+        model: Model,
+        @PathVariable sequenceId: Long,
+        @PathVariable userId: Long
+    ): String {
+        val user: User = authentication.principal as User
+
+        val sequence = sequenceService.get(sequenceId, true)
+        val learner = userService.findById(userId)
+        val isTeacher = user == sequence.owner
+        val isOwnerOfResponse = user == learner
+
+        val learnerStepsModel: StepsModel = StepsModelFactory.buildForTeacher(sequence)
+
+        val sequenceMonitoringModel = SequenceMonitoringModel(
+            sequence.executionContext,
+            learnerStepsModel.responseSubmissionState.getDashboardState(),
+            learnerStepsModel.evaluationState.getDashboardState(),
+            sequenceId = sequence.id
+        )
+
+        val learnerAssignment: LearnerAssignment = assignmentService.getRegisteredUser(sequence.assignment!!, learner)!!
+
+        model["learnerMonitoringModel"] = dashboardModelFactory.buildLearnerMonitoringModel(
+            learnerAssignment,
+            (responseService.find(learner, sequence) ?: responseService.find(learner, sequence, 2)) != null,
+            sequenceMonitoringModel,
+            sequence,
+            peerGradingService.countEvaluationsMadeByUsers(listOf(learnerAssignment), sequence)[learnerAssignment] ?: 0,
+            dashboardModelFactory.getCountResponseGradable(sequence)
+        )
+        model["learnerResultsModel"] = getLearnerResultsModel(learner, sequence)
+        // The accordionId is used to initialize the accordion in the view.
+        // So to discriminate between all accordions in the page, we use the learnerId
+        model["accordionId"] = userId
+        model["seenByTeacher"] = isTeacher
+        model["seenByOwner"] = isOwnerOfResponse
+
+        return "player/assignment/sequence/components/my-results/_my-results-modal.html :: myResultsModal"
+    }
+
+    /**
+     * Get the [LearnerResultsModel] for the given learner and sequence
+     */
+    private fun getLearnerResultsModel(
+        learner: User,
+        sequence: Sequence
     ): LearnerResultsModel {
+        val responseFirstTry = responseService.find(learner, sequence, 1)
+        val responseSecondTry = responseService.find(learner, sequence, 2)
 
-        val learnerResultsModel = when (statement.questionType) {
-            QuestionType.ExclusiveChoice -> LearnerResultsModelFactory.buildExclusiveChoiceResult(
-                responseFirstAttempt,
-                responseSecondAttempt,
-                responseFirstTryHasChatGPTEvaluation,
-                responseSecondTryHasChatGPTEvaluation,
-                statement
+        val responseToIsChatGPTExist = chatGptEvaluationService.associateResponseToChatGPTEvaluationExistence(
+            listOf(
+                responseFirstTry?.id,
+                responseSecondTry?.id
             )
+        )
 
-            QuestionType.MultipleChoice -> LearnerResultsModelFactory.buildMultipleChoiceResult(
-                responseFirstAttempt,
-                responseSecondAttempt,
-                responseFirstTryHasChatGPTEvaluation,
-                responseSecondTryHasChatGPTEvaluation,
-                statement
-            )
+        val responseFirstTryHasChatGPTEvaluation: Boolean = responseToIsChatGPTExist[responseFirstTry?.id] == true
+        val responseSecondTryHasChatGPTEvaluation: Boolean = responseToIsChatGPTExist[responseSecondTry?.id] == true
 
-            QuestionType.OpenEnded -> LearnerResultsModelFactory.buildOpenResult(
-                responseFirstAttempt,
-                responseSecondAttempt,
-                responseFirstTryHasChatGPTEvaluation,
-                responseSecondTryHasChatGPTEvaluation,
-            )
-        }
-        return learnerResultsModel
+        return LearnerResultsModelFactory.builtLearnerResultsModel(
+            responseFirstTry,
+            responseSecondTry,
+            responseFirstTryHasChatGPTEvaluation,
+            responseSecondTryHasChatGPTEvaluation,
+            sequence.statement
+        )
     }
 }
