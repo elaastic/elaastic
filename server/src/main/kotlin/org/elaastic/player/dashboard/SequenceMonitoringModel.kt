@@ -6,11 +6,19 @@ import org.elaastic.sequence.phase.LearnerPhaseType
 /**
  * Model for the learners monitoring dashboard.
  *
+ * The model is used to display the state of the learners in the dashboard.
+ * It contains the following information:
+ * - The execution context of the sequence
+ * - The state of phase 1
+ * - The state of phase 2
+ * - The list of [LearnerMonitoringModel]
+ *
+ * @see DashboardPhaseState
  * @property executionContext Sequence execution context type
  * @property phase1State the state of phase 1
  * @property phase2State the state of phase 2
- * @property phase3State the state of phase 3
  * @property learners the learners' states on each phase
+ * @property sequenceId the id of the sequence
  */
 class SequenceMonitoringModel(
     val executionContext: ExecutionContext,
@@ -114,6 +122,11 @@ class SequenceMonitoringModel(
  * Model for a learner's state on each phase.
  *
  * Represents a learner's state in each phase, a line in the table.
+ * The model contains the following information:
+ * - The id of the learner
+ * - The name of the learner
+ * - The [LearnerStateOnPhase] of the learner on phase 1
+ * - The [LearnerStateOnPhase] of the learner on phase 2
  *
  * @property userId the user id of the learner
  * @property learnerName the learner's name
