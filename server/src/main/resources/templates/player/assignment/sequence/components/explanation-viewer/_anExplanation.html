@@ -118,11 +118,14 @@
             <div th:if="${!explanationData.hiddenByTeacher
                         and (explanationData.correct or explanationData.score == null)}">
 
+                <!--/* Managing the display or not of recommendation buttons is managed by JS */-->
+
                 <!-- If explanationData is in recommended -->
                 <a th:classappend="'removeRecommendation-' + ${explanationData.responseId}"
                    th:onclick="removeRecommendation([[${explanationData.responseId}]])"
                    type="button" data-position="bottom right"
-                   th:data-tooltip="#{player.sequence.explanation.removeRecommended}" class="ui button"
+                   th:data-tooltip="#{player.sequence.explanation.removeRecommended}"
+                   class="ui button"
                    style="padding: 0.5rem; margin-right: 0;">
                     <i class="star icon"></i>
                 </a>
@@ -131,7 +134,8 @@
                 <a th:classappend="'addRecommendation-' + ${explanationData.responseId}"
                    th:onclick="addRecommendation([[${explanationData.responseId}]])"
                    type="button" data-position="bottom right"
-                   th:data-tooltip="#{player.sequence.explanation.addRecommended}" class="ui button"
+                   th:data-tooltip="#{player.sequence.explanation.addRecommended}"
+                   class="ui button"
                    style="padding: 0.5rem; margin-right: 0;">
                     <i class="empty star icon"></i>
                 </a>
@@ -176,19 +180,23 @@
 
     <script th:inline="javascript">
 
-        let toReload = false;
+        // This declaration need to be done with `var`,
+        // otherwise JS while not correctly setup the recommendation action button.
+        // TODO change the logic so we don't use a `var` declaration
+        var toReload = false;
 
         $(function () {
-            setupRecommendedByTeacher([[${explanationData.responseId}]],
-                [[${explanationData.recommendedByTeacher}]])
+            updateRecommendedByTeacherButtonVisibility(
+                [[${explanationData.responseId}]],
+                [[${explanationData.recommendedByTeacher}]]
+            );
         });
 
-        function setupRecommendedByTeacher(responseId, recommendedByTeacher) {
-            if (recommendedByTeacher) {
-                $('.addRecommendation-' + responseId).hide()
-            } else {
-                $('.removeRecommendation-' + responseId).hide()
-            }
+        function updateRecommendedByTeacherButtonVisibility(responseId, recommendedByTeacher) {
+            // If the response isn't recommended, we need to display the button to add the recommendation
+            $('.addRecommendation-' + responseId).toggle(!recommendedByTeacher)
+            // If the response is recommended, we need to display the button to remove the recommendation
+            $('.removeRecommendation-' + responseId).toggle(recommendedByTeacher)
         }
 
         function removeRecommendation(responseId) {
@@ -197,8 +205,7 @@
                 type: "GET",
                 url: '/player/response/' + responseId + '/remove-recommended-by-teacher',
                 success: () => {
-                    $('.removeRecommendation-' + responseId).hide()
-                    $('.addRecommendation-' + +responseId).show()
+                    updateRecommendedByTeacherButtonVisibility(responseId, false)
                 },
                 error: function (error) {
                     // Handle error
@@ -213,8 +220,7 @@
                 type: "GET",
                 url: '/player/response/' + responseId + '/add-recommended-by-teacher',
                 success: () => {
-                    $('.addRecommendation-' + responseId).hide()
-                    $(".removeRecommendation-" + responseId).show()
+                    updateRecommendedByTeacherButtonVisibility(responseId, true)
                 },
                 error: function (error) {
                     // Handle error
@@ -224,7 +230,6 @@
         }
 
         function showDetails(userId, sequenceId) {
-            console.log(sequenceId);
             let $detailModal = $("#myResultsModal_" + userId)
             if ($detailModal.length) {
                 // If the modal already exists, we show it
@@ -232,9 +237,6 @@
             } else {
                 // If the modal doesn't exist, we fetch it
                 const urlModal = '/player/' + sequenceId + '/result/' + userId + '/modal';
-                console.log(urlModal);
-                console.log("userId : " + userId);
-                console.log("sequenceId : " + sequenceId);
                 $.get(urlModal)
                     .done(function (data) {
                         $('body').append(data);
