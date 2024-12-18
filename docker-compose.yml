@@ -1,7 +1,7 @@
 version: '3'
 
 services:
-  elaastic-questions-db-8:
+  elaastic-questions-db-8: # Elaastic database (except for instructional materials produced by the writer)
     image: mysql:8.3
     container_name: elaastic-questions-db-8
     environment:
@@ -12,7 +12,18 @@ services:
     ports:
       - "6683:3306"
     command: --character-set-server=utf8 --collation-server=utf8_general_ci
-  elaastic-questions-db-test-8:
+  elaastic-writer-db-8: # Writer database (store instructional materials)
+      image: mysql:8.3
+      container_name: elaastic-questions-writer-8
+      environment:
+          - MYSQL_USER=elaastic
+          - MYSQL_DATABASE=elaastic-writer
+          - MYSQL_PASSWORD=elaastic
+          - MYSQL_ROOT_PASSWORD=root
+      ports:
+          - "6783:3306"
+      command: --character-set-server=utf8 --collation-server=utf8_general_ci
+  elaastic-questions-db-test-8: # Elaastic test database
     image: mysql:8.3
     container_name: elaastic-questions-db-test-8
     environment:
