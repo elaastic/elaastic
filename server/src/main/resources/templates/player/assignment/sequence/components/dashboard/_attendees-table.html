@@ -54,21 +54,26 @@
         $(function () {
             const sequenceId = [[${sequenceMonitoringModel.sequenceId}]];
 
-            $('[id="see-detail"]').click(function () {
-                let userId = $(this).attr('learner-id');
+            // We use the `[id=...]` syntaxe instead of `#...` so the eventListener is applied to all button that have this id
+            $('[id="see-detail"]').on("click",function () {
+                let $thisButton = $(this);
+                let userId = $thisButton.attr('learner-id');
 
                 let $detailModal = $("#myResultsModal_" + userId)
                 if ($detailModal.length) {
                     // If the modal already exists, we show it
                     $detailModal.modal('show')
                 } else {
+                    $thisButton.addClass(["loading", "disabled"]);
                     // If the modal doesn't exist, we fetch it
                     $.get('/player/' + sequenceId + '/result/' + userId + '/modal')
                             .done(function (data) {
+                                $thisButton.removeClass(["loading", "disabled"]);
                                 $('body').append(data)
                                 $("#myResultsModal_" + userId).modal('show')
                             })
                             .fail(function () {
+                                $thisButton.removeClass(["loading", "disabled"]);
                                 console.log("An error occurred while fetching the results")
                             })
                 }
