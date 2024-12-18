@@ -32,7 +32,9 @@
 
             <form class="ui form"
                   th:action="@{/player/sequence/{sequenceId}/submit-response(sequenceId=${model.sequenceId})}"
-                  method="post">
+                  method="post"
+                  id="responseForm"
+            >
                 <input type="hidden" name="interactionId" th:value="${model.interactionId}"/>
 
                 <div
@@ -43,9 +45,29 @@
                        th:value="#{player.sequence.interaction.submitResponse}"
                        class="ui primary button"/>
             </form>
-        
-
         </div>
+
+        <script th:inline="javascript">
+            $(function () {
+                $("#responseForm").on('submit', function (event) {
+                    event.preventDefault();
+                    let $form = $(this);
+                    let $submitButton = $form.find('input[type="submit"]');
+
+                    $submitButton.addClass('loading disabled');
+
+                    $.post($form.attr('action'), $form.serialize())
+                            .done(function () {
+                                $submitButton.removeClass('loading disabled');
+                                window.location.reload();
+                            })
+                            .fail(function () {
+                                $submitButton.removeClass('loading disabled');
+                                console.log('Error while submitting the response');
+                            });
+                });
+            });
+        </script>
 
     </th:block>
 
