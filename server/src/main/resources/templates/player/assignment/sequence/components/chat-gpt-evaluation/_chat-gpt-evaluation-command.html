@@ -23,8 +23,9 @@
     <form class="ui form"
           style="align-items: end;"
           th:action="@{/chatGptEvaluation/sequence/{sequenceId}/submit-utility-grade(sequenceId=${chatGptEvaluationModel.sequenceId})}"
-          method="post">
-        <!--/* TODO use a correct data */-->
+          method="post"
+          th:id="'utilityGradeForm_' + ${chatGptEvaluationModel.evaluationId}">
+
         <input type="hidden" name="isTeacher" th:value="${chatGptEvaluationModel.viewedByTeacher}">
 
         <input type="hidden" name="evaluationId" th:value="${chatGptEvaluationModel.evaluationId}">
@@ -66,7 +67,7 @@
         <!-- Submit Utility grade button -->
         <div id="submit-button-utility-grade" style="display: none"
              th:attr="evaluationId=${chatGptEvaluationModel.evaluationId}">
-            <input type="submit" value="Soumettre" class="ui primary button">
+            <input type="submit" th:value="#{common.submit}" class="ui primary button">
         </div>
     </form>
 
@@ -86,6 +87,20 @@
                 }
             }
         })
+
+        $(function () {
+            $("#utilityGradeForm_" + [[${chatGptEvaluationModel.evaluationId}]]).on("submit", function (event) {
+                event.preventDefault();
+                let $form = $(this);
+                $.post($form.attr('action'), $form.serialize())
+                    .done(function () {
+                        window.location.reload();
+                    })
+                    .fail(function () {
+                        console.log("An error occurred while submitting the utility grade");
+                    });
+            });
+        });
     </script>
 
     <style>
