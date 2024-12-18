@@ -31,7 +31,7 @@
             </div>
             <a class="ui button"
                th:if="${!chatGptEvaluationModel.viewedByTeacher}"
-               th:href="@{/player/sequence/{id}/regenerate-chat-gpt-evaluation(id=${chatGptEvaluationModel.sequenceId})}"
+               th:onclick="regenerateChatGPTEvaluation([[${chatGptEvaluationModel.sequenceId}]])"
                th:text="#{player.sequence.chatGptEvaluation.generate.button}"></a>
         </th:block>
 
@@ -52,7 +52,7 @@
             </div>
             <a class="ui button"
                th:if="${!chatGptEvaluationModel.viewedByTeacher}"
-               th:href="@{/player/sequence/{id}/regenerate-chat-gpt-evaluation(id=${chatGptEvaluationModel.sequenceId})}"
+               th:onclick="regenerateChatGPTEvaluation([[${chatGptEvaluationModel.sequenceId}]])"
                th:text="#{player.sequence.chatGptEvaluation.generate.button}"></a>
         </th:block>
 
@@ -67,5 +67,21 @@
             border-radius: 5px;
         }
     </style>
+
+    <script th:inline="javascript">
+        $(function () {
+        });
+
+        function regenerateChatGPTEvaluation(sequenceId) {
+            let url = "/player/sequence/" + sequenceId + "/regenerate-chat-gpt-evaluation"
+            $.get(url)
+                .done(function () {
+                    window.location.reload()
+                })
+                .fail(function () {
+                    console.log("An error occurred while regenerating the chat GPT evaluation")
+                })
+        }
+    </script>
 
 </div>
