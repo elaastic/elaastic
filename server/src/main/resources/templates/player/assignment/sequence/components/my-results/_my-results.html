@@ -24,8 +24,8 @@
         <!--/* Title of the accordion */-->
         <div class="ui active title header">
             <i class="dropdown icon"></i>
-            <span th:if="${seenByTeacher}" th:text="#{player.sequence.studentResults.seenByTeacher}"></span>
-            <span th:unless="${seenByTeacher}" th:text="#{player.sequence.studentResults.myResults}"></span>
+            <span th:if="${seenByTeacher || !seenByOwner}" th:text="#{player.sequence.studentResults.seenByTeacher}"></span>
+            <span th:if="${seenByOwner}" th:text="#{player.sequence.studentResults.myResults}"></span>
         </div>
 
         <!--/* Content of the accordion */-->
