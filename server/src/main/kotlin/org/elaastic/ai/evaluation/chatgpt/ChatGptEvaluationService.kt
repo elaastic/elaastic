@@ -237,19 +237,20 @@ class ChatGptEvaluationService(
      * @return a map with the response id as key and a boolean as value
      */
     fun associateResponseToChatGPTEvaluationExistence(listIdResponse: List<Long?>): Map<Long, Boolean> {
-        entityManager.createQuery(
+        val result =  entityManager.createQuery(
             """
             SELECT r.id, gpt.response.id
             FROM Response r
             LEFT JOIN ChatGptEvaluation gpt ON r.id = gpt.response.id
-            WHERE r.id IN :listIdResponse
+            WHERE r.id IN :listIdResponse AND gpt.removedByTeacher = false
         """.trimIndent()
         )
             .setParameter("listIdResponse", listIdResponse)
-            .resultList
-            .map { it as Array<*> }
-            .associate { (it[0] as Long) to (it[1] != null) }
-            .let { return it }
+            .resultList.toList()
+
+        return listIdResponse.associate { id ->
+            id!! to result.any { it is Array<*> && it[0] == id && it[1] != null }
+        }
     }
 
     /**
