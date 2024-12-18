@@ -332,6 +332,7 @@ class PlayerController(
         model: Model,
     ): String {
         val sequenceModel = sequenceModelFactory.buildForTeacher(user, sequence)
+
         model["sequenceModel"] = sequenceModel
 
         return "player/assignment/sequence/play-sequence-teacher"
@@ -366,7 +367,6 @@ class PlayerController(
         @RequestParam evaluationPhaseConfig: EvaluationPhaseConfig?,
     ) {
         val user: User = authentication.principal as User
-        var assignment: Assignment?
 
         sequenceService.get(user, sequenceId, true)
             .let {
@@ -381,7 +381,6 @@ class PlayerController(
                 )
                 userService.updateUserActiveSince(user)
                 autoReloadSessionHandler.broadcastReload(sequenceId)
-                assignment = it.assignment!!
             }
     }
 
@@ -465,12 +464,10 @@ class PlayerController(
         @PathVariable sequenceId: Long
     ) {
         val user: User = authentication.principal as User
-        var assignment: Assignment?
 
         sequenceService.get(user, sequenceId).let {
             sequenceService.stop(user, it)
             autoReloadSessionHandler.broadcastReload(sequenceId)
-            assignment = it.assignment!!
         }
     }
 
@@ -482,12 +479,10 @@ class PlayerController(
         @PathVariable sequenceId: Long
     ) {
         val user: User = authentication.principal as User
-        var assignment: Assignment?
 
         sequenceService.get(user, sequenceId).let {
             sequenceService.reopen(user, it)
             autoReloadSessionHandler.broadcastReload(sequenceId)
-            assignment = it.assignment!!
         }
     }
 
@@ -499,12 +494,10 @@ class PlayerController(
         @PathVariable sequenceId: Long
     ) {
         val user: User = authentication.principal as User
-        var assignment: Assignment?
 
         sequenceService.get(user, sequenceId, true).let {
             sequenceService.publishResults(user, it)
             autoReloadSessionHandler.broadcastReload(sequenceId)
-            assignment = it.assignment!!
         }
     }
 
@@ -516,11 +509,9 @@ class PlayerController(
         @PathVariable sequenceId: Long
     ) {
         val user: User = authentication.principal as User
-        var assignment: Assignment?
 
         sequenceService.get(sequenceId, true).let {
             sequenceService.refreshResults(user, it)
-            assignment = it.assignment!!
         }
     }
 
@@ -532,12 +523,10 @@ class PlayerController(
         @PathVariable sequenceId: Long
     ) {
         val user: User = authentication.principal as User
-        var assignment: Assignment?
 
         sequenceService.get(user, sequenceId, true).let {
             sequenceService.unpublishResults(user, it)
             autoReloadSessionHandler.broadcastReload(sequenceId)
-            assignment = it.assignment!!
         }
     }
 
@@ -576,7 +565,7 @@ class PlayerController(
     ): String {
         val user: User = authentication.principal as User
 
-        // Get response from database
+        // Get response from the database
         var response = responseService.findById(responseId)
 
         // Update response visibility
@@ -595,7 +584,7 @@ class PlayerController(
     ): String {
         val user: User = authentication.principal as User
 
-        // Get response from database
+        // Get response from the database
         var response = responseService.findById(responseId)
 
         // Update response visibility
@@ -614,7 +603,7 @@ class PlayerController(
     ): String {
         val user: User = authentication.principal as User
 
-        // Get response from database
+        // Get response from the database
         var response = responseService.findById(responseId)
         // Update response favourite
         response = responseService.addRecommendedByTeacher(user, response)
@@ -630,7 +619,7 @@ class PlayerController(
     ): String {
         val user: User = authentication.principal as User
 
-        // Get response from database
+        // Get response from the database
         var response = responseService.findById(responseId)
         // Update response not favourite
         response = responseService.removeRecommendedByTeacher(user, response)
