@@ -18,42 +18,44 @@
 <div th:fragment="responsePhase(model)"
      class="ui segment"
      xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/html">
-  <div class="ui dividing header" th:text="#{common.answer}">
-    Answer
-  </div>
-  <th:block th:if="${!model.responseSubmitted && model.isInProgress()}">
-
-    <div class="ui blue bottom attached message"
-         th:text="#{sequence.responseSubmission.instruction}">
-      Please submit you answer
+    <div class="ui dividing header" th:text="#{common.answer}">
+        Answer
     </div>
+    <th:block th:if="${!model.responseSubmitted && model.isInProgress()}">
 
-    <div class="ui basic padded large text segment">
+        <div class="ui blue bottom attached message"
+             th:text="#{sequence.responseSubmission.instruction}">
+            Please submit you answer
+        </div>
 
-      <form class="ui form" th:action="@{/player/sequence/{sequenceId}/submit-response(sequenceId=${model.sequenceId})}"
-            method="post">
-        <input type="hidden" name="interactionId" th:value="${model.interactionId}"/>
+        <div class="ui basic padded large text segment">
 
-        <div
-          th:replace="player/assignment/sequence/phase/response/_response-form.html :: responseForm(${model.responseFormModel})"></div>
+            <form class="ui form"
+                  th:action="@{/player/sequence/{sequenceId}/submit-response(sequenceId=${model.sequenceId})}"
+                  method="post">
+                <input type="hidden" name="interactionId" th:value="${model.interactionId}"/>
 
-        <input type="submit"
-               onclick="onSubmitResponse()"
-               th:value="#{player.sequence.interaction.submitResponse}"
-               class="ui primary button"/>
-      </form>
+                <div
+                        th:replace="player/assignment/sequence/phase/response/_response-form.html :: responseForm(${model.responseFormModel})"></div>
 
+                <input type="submit"
+                       onclick="onSubmitResponse()"
+                       th:value="#{player.sequence.interaction.submitResponse}"
+                       class="ui primary button"/>
+            </form>
+        
+
+        </div>
+
+    </th:block>
+
+    <div th:if="${model.responseSubmitted}"
+         class="ui blue bottom attached message"
+         th:text="#{player.sequence.interaction.responseSubmission.hasBeenRecorded}">
     </div>
-
-  </th:block>
-
-  <div th:if="${model.responseSubmitted}"
-       class="ui blue bottom attached message"
-       th:text="#{player.sequence.interaction.responseSubmission.hasBeenRecorded}">
-  </div>
-  <div th:if="${!model.responseSubmitted && model.learnerPhaseState.name() == 'afterStop'}"
-       class="ui blue bottom attached message"
-       th:text="#{player.sequence.interaction.responseSubmission.tooLate}">
-  </div>
+    <div th:if="${!model.responseSubmitted && model.learnerPhaseState.name() == 'afterStop'}"
+         class="ui blue bottom attached message"
+         th:text="#{player.sequence.interaction.responseSubmission.tooLate}">
+    </div>
 
 </div>
