@@ -78,13 +78,12 @@
         $(function () {
 
             const evaluationId = [[${evaluationId}]];
-
             const submitButton = $('#submit-button-' + evaluationId);
 
             $("#other-text-field").hide();
             submitButton.addClass('disabled');
 
-            $("input[name='reason']").change(function () {
+            $("input[name='reason']").on("change", function () {
                 if ($("input[value='OTHER']").is(":checked")) {
                     $("#other-text-field").stop().slideDown();
                 } else {
@@ -98,12 +97,19 @@
                 }
             });
 
-            submitButton.click(function () {
+            submitButton.on("click", function () {
                 console.log('submit button clicked');
-                if (submitButton.hasClass('disabled')) {
-                    return;
+                if (!submitButton.hasClass('disabled')) {
+                    const $form = $('#report-form-' + evaluationId);
+
+                    // A Form serialized is a string like 'key1=value1&key2=value2',
+                    // very handy when you send data with a GET request
+                    const data = $form.serialize();
+                    $.post($form.attr('action'), data)
+                            .done(function () {
+                                window.location.reload();
+                            })
                 }
-                $('#report-form-' + evaluationId).submit();
             });
 
         });
