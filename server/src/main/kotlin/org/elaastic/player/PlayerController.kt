@@ -27,12 +27,10 @@ import org.elaastic.analytics.lrs.EventLogService
 import org.elaastic.assignment.Assignment
 import org.elaastic.assignment.AssignmentService
 import org.elaastic.assignment.LearnerAssignment
-import org.elaastic.assignment.LearnerAssignmentService
 import org.elaastic.common.web.ControllerUtil
 import org.elaastic.common.web.MessageBuilder
 import org.elaastic.material.instructional.course.Course
 import org.elaastic.player.dashboard.DashboardModelFactory
-import org.elaastic.player.dashboard.LearnerMonitoringModel
 import org.elaastic.player.dashboard.SequenceMonitoringModel
 import org.elaastic.player.evaluation.chatgpt.ChatGptEvaluationModelFactory
 import org.elaastic.player.results.TeacherResultDashboardService
@@ -92,7 +90,6 @@ class PlayerController(
     @Autowired val messageSource: MessageSource,
     @Autowired val sequenceModelFactory: SequenceModelFactory,
     @Autowired val dashboardModelFactory: DashboardModelFactory,
-    private val learnerAssignmentService: LearnerAssignmentService,
 ) {
 
     private val autoReloadSessionHandler = AutoReloadSessionHandler
@@ -766,9 +763,7 @@ class PlayerController(
         return "player/assignment/sequence/components/my-results/_my-results-modal.html :: myResultsModal"
     }
 
-    /**
-     * Get the [LearnerResultsModel] for the given learner and sequence
-     */
+    /** Get the [LearnerResultsModel] for the given learner and sequence */
     private fun getLearnerResultsModel(
         learner: User,
         sequence: Sequence
