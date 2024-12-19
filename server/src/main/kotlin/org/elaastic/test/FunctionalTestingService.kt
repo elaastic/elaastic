@@ -11,13 +11,12 @@ import org.elaastic.material.instructional.course.Course
 import org.elaastic.material.instructional.course.CourseService
 import org.elaastic.material.instructional.question.*
 import org.elaastic.material.instructional.statement.Statement
+import org.elaastic.material.instructional.statement.StatementRepository
+import org.elaastic.material.instructional.statement.StatementService
 import org.elaastic.material.instructional.subject.Subject
 import org.elaastic.material.instructional.subject.SubjectService
 import org.elaastic.player.PlayerController
-import org.elaastic.sequence.ExecutionContext
-import org.elaastic.sequence.Sequence
-import org.elaastic.sequence.SequenceService
-import org.elaastic.sequence.State
+import org.elaastic.sequence.*
 import org.elaastic.sequence.interaction.InteractionService
 import org.elaastic.sequence.phase.evaluation.EvaluationPhaseConfig
 import org.elaastic.test.interpreter.command.*
@@ -43,6 +42,8 @@ class FunctionalTestingService(
     @Autowired val responseService: ResponseService,
     @Autowired val peerGradingService: PeerGradingService,
     @Autowired val interactionService: InteractionService,
+    @Autowired val statementService: StatementService,
+    @Autowired val statementRepository: StatementRepository,
 ) {
 
     fun createCourse(user: User, title: String = "Default course title") =
@@ -97,14 +98,15 @@ class FunctionalTestingService(
     fun addQuestion(subject: Subject, statement: Statement) =
         subjectService.addStatement(subject, statement)
 
-    fun addQuestion(subject: Subject, questionType: QuestionType) =
+    fun addQuestion(subject: Subject, questionType: QuestionType, addFakeResponse: Boolean = true,) =
         subject.statements.size.let { questionIndex ->
             addQuestion(
                 subject,
                 generateStatement(
                     owner = subject.owner,
                     questionType = questionType,
-                    questionIndex = questionIndex
+                    questionIndex = questionIndex,
+                    addFakeResponse = addFakeResponse
                 )
             )
 
@@ -113,11 +115,13 @@ class FunctionalTestingService(
     fun generateStatement(
         owner: User,
         questionType: QuestionType,
-        questionIndex: Int
+        questionIndex: Int,
+        addFakeResponse: Boolean = true,
     ): Statement {
         val title = "Question ${questionIndex + 1} - $questionType"
         val content = "Content of question ${questionIndex + 1}"
-        val expectedExplanation = "Expected answer to question ${questionIndex + 1}"
+        // The expected explanation will become a fake response
+        val expectedExplanation = if (addFakeResponse) "Expected answer to question ${questionIndex + 1}" else null
 
         return Statement(
             title = title,
@@ -144,42 +148,47 @@ class FunctionalTestingService(
         )
     }
 
-    /**
-     * Generate a subject with questions and assignments ready to practice
-     */
+    /** Generate a subject with questions and assignments ready to practice */
     fun generateSubjectWithQuestionsAndAssignmentsReadyToPratice(user: User) =
         generateSubjectWithQuestionsAndAssignments(user, ReadyForConsolidation.AfterTeachings)
 
-    fun generateSubjectWithQuestionsAndAssignments(user: User, praticeStatus: ReadyForConsolidation = ReadyForConsolidation.NotAtAll) =
+    fun generateSubjectWithQuestionsAndAssignments(
+        user: User,
+        praticeStatus: ReadyForConsolidation = ReadyForConsolidation.NotAtAll,
+        addFakeResponse: Boolean = true,
+    ) =
         createSubject(user, "Test subject ${LocalDate.now()}")
             // Questions
             .also { subject ->
-                addQuestion(subject, QuestionType.OpenEnded)
-                addQuestion(subject, QuestionType.ExclusiveChoice)
-                addQuestion(subject, QuestionType.MultipleChoice)
+                addQuestion(subject, QuestionType.OpenEnded, addFakeResponse = addFakeResponse)
+                addQuestion(subject, QuestionType.ExclusiveChoice, addFakeResponse = addFakeResponse)
+                addQuestion(subject, QuestionType.MultipleChoice, addFakeResponse = addFakeResponse)
             }
             // Assignments
             .also { subject ->
                 listOf("Face-to-face", "Blended", "Distant").forEach {
                     when (praticeStatus) {
                         ReadyForConsolidation.NotAtAll -> createAssignment(subject, "$it Test Assignment")
-                        ReadyForConsolidation.Immediately -> createAssignmentReadyImmediatelyForPractice(subject, "$it Test Assignment")
-                        ReadyForConsolidation.AfterTeachings -> createAssignmentReadyToPractice(subject, "$it Test Assignment")
+                        ReadyForConsolidation.Immediately -> createAssignmentReadyImmediatelyForPractice(
+                            subject,
+                            "$it Test Assignment"
+                        )
+
+                        ReadyForConsolidation.AfterTeachings -> createAssignmentReadyToPractice(
+                            subject,
+                            "$it Test Assignment"
+                        )
                     }
                 }
             }
 
-    /**
-     * Generate an Assignment ready to use
-     */
+    /** Generate an Assignment ready to use */
     fun generateAssignement(user: User): Assignment {
         val subject = generateSubjectWithQuestionsAndAssignments(user)
         return subject.assignments.first()
     }
 
-    /**
-     * Generate a sequence ready to use
-     */
+    /** Generate a sequence ready to use */
     fun generateSequence(user: User): Sequence {
         val assignment = generateAssignement(user)
         return assignment.sequences.first()
@@ -327,19 +336,14 @@ class FunctionalTestingService(
             interactionService.startNext(sequence.owner, activeInteraction)
         }
 
-    /**
-     * Stop the active interaction of the sequence
-     */
+    /** Stop the active interaction of the sequence */
     fun stopPhase(sequence: Sequence) =
         sequence.activeInteraction.let { activeInteraction ->
             checkNotNull(activeInteraction) { THE_SEQUENCE_HAS_NO_ACTIVE_INTERACTION }
             interactionService.stop(sequence.owner, activeInteraction)
         }
 
-    /**
-     * Start the next interaction of the sequence
-     * The active interaction must be stopped
-     */
+    /** Start the next interaction of the sequence The active interaction must be stopped */
     fun startNextPhase(sequence: Sequence) =
         sequence.activeInteraction.let { activeInteraction ->
             checkNotNull(activeInteraction) { THE_SEQUENCE_HAS_NO_ACTIVE_INTERACTION }
@@ -362,10 +366,7 @@ class FunctionalTestingService(
         }
 
 
-    /**
-     * Generate a user choice depending on the question specification & the
-     * response must be correct or not
-     */
+    /** Generate a user choice depending on the question specification & the response must be correct or not */
     private fun generateExclusiveChoiceResponse(
         choiceSpecification: ExclusiveChoiceSpecification,
         correct: Boolean,
@@ -382,10 +383,7 @@ class FunctionalTestingService(
         )
     }
 
-    /**
-     * Generate a user choice depending on the question specification & the
-     * response must be correct or not
-     */
+    /** Generate a user choice depending on the question specification & the response must be correct or not */
     private fun generateMultipleChoiceResponse(
         choiceSpecification: MultipleChoiceSpecification,
         correct: Boolean,
@@ -472,5 +470,40 @@ class FunctionalTestingService(
 
     fun unpublishResults(sequence: Sequence) {
         sequenceService.unpublishResults(sequence.owner, sequence)
+    }
+
+    /**
+     * Create a sequence ready to use.
+     *
+     * The sequence is saved in the database
+     *
+     * @param teacher the teacher who owns the sequence
+     */
+    fun createSequence(teacher: User, addFakeResponse: Boolean = false): Sequence {
+        return generateSubjectWithQuestionsAndAssignments(teacher, addFakeResponse = addFakeResponse).assignments.first().sequences.first()
+    }
+
+    /**
+     * Create a response for the sequence.
+     * The sequence must be started and have a response submission interaction The
+     * response is randomly generated
+     *
+     * The response is saved in the database
+     *
+     * @param sequence the sequence to create the response for
+     * @param learner the learner who submits the response
+     */
+    fun createResponse(sequence: Sequence, learner: User): Response {
+        check(sequence.hasStarted()) { "The sequence must be started" }
+        check(sequence.getResponseSubmissionInteractionOrNull() != null) { "The sequence must have a response submission interaction" }
+
+        return submitResponse(
+            Phase.PHASE_1,
+            learner,
+            sequence,
+            Random.nextBoolean(),
+            ConfidenceDegree.values().random(),
+            "Random explanation on ${LocalDate.now()} by ${learner.username}"
+        )
     }
 }
