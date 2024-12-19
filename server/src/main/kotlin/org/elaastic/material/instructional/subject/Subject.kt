@@ -2,9 +2,9 @@ package org.elaastic.material.instructional.subject
 
 import org.elaastic.assignment.Assignment
 import org.elaastic.common.persistence.AbstractJpaPersistable
+import org.elaastic.material.instructional.MaterialUser
 import org.elaastic.material.instructional.course.Course
 import org.elaastic.material.instructional.statement.Statement
-import org.elaastic.user.User
 import org.hibernate.annotations.SortNatural
 import org.springframework.data.annotation.CreatedDate
 import org.springframework.data.annotation.LastModifiedDate
@@ -43,7 +43,7 @@ class Subject (
         var title: String,
 
     @field:ManyToOne(fetch = FetchType.LAZY)
-        var owner: User,
+        var owner: MaterialUser,
 
     @field:ManyToOne(fetch = FetchType.LAZY)
         var parentSubject: Subject? = null,
@@ -138,14 +138,16 @@ class Subject (
      * @throws IllegalArgumentException if the owner of the assignment is different from the owner of the subject
      */
     fun addAssignment(assignment: Assignment): Assignment {
-        require(assignment.owner == owner) {
-            "The owner of the assignment cannot be different from the owner of subject"
-        }
+        TODO("*** Remove this relationship")
+//        require(assignment.owner == owner) {
+//            "The owner of the assignment cannot be different from the owner of subject"
+//        }
+//
+//        assignments.add(assignment)
+//        assignment.subject = this
+//        assignment.owner = owner
+//
+//        return assignment
 
-        assignments.add(assignment)
-        assignment.subject = this
-        assignment.owner = owner
-
-        return assignment
     }
 }

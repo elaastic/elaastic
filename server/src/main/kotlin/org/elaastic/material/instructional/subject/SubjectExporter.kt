@@ -2,9 +2,9 @@ package org.elaastic.material.instructional.subject
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.elaastic.common.util.ZipService
+import org.elaastic.material.instructional.MaterialUser
 import org.elaastic.material.instructional.question.attachment.AttachmentService
 import org.elaastic.material.instructional.statement.StatementService
-import org.elaastic.user.User
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter
@@ -82,7 +82,7 @@ class SubjectExporter(
     /**
      * Import a subject from JSON
      */
-    fun importFromJson(user: User, jsonReader: Reader): Subject =
+    fun importFromJson(user: MaterialUser, jsonReader: Reader): Subject =
         subjectService.createFromExportData(
             user,
             parseFromJson(jsonReader)
@@ -91,7 +91,7 @@ class SubjectExporter(
     /**
      * Import a subject and its attachments from a ZIP archive
      */
-    fun importFromZip(user: User, inputStream: InputStream): Subject {
+    fun importFromZip(user: MaterialUser, inputStream: InputStream): Subject {
         val zip = File.createTempFile("elaastic-" + UUID.randomUUID().toString(), null)
 
         inputStream.use { input ->

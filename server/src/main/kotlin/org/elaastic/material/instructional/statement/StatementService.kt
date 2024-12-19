@@ -3,6 +3,7 @@ package org.elaastic.material.instructional.statement
 import org.elaastic.activity.response.ResponseRepository
 import org.elaastic.analytics.lrs.EventLogRepository
 import org.elaastic.assignment.Assignment
+import org.elaastic.material.instructional.MaterialUser
 import org.elaastic.material.instructional.subject.Subject
 import org.elaastic.material.instructional.question.explanation.FakeExplanation
 import org.elaastic.material.instructional.question.explanation.FakeExplanationRepository
@@ -10,7 +11,6 @@ import org.elaastic.material.instructional.question.attachment.AttachmentService
 import org.elaastic.sequence.FakeExplanationData
 import org.elaastic.sequence.Sequence
 import org.elaastic.sequence.SequenceRepository
-import org.elaastic.user.User
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.access.AccessDeniedException
 import org.springframework.stereotype.Service
@@ -26,7 +26,7 @@ class StatementService(
     @Autowired val responseRepository: ResponseRepository,
     @Autowired val fakeExplanationRepository: FakeExplanationRepository
 ) {
-    fun get(user: User, id: Long): Statement {
+    fun get(user: MaterialUser, id: Long): Statement {
         val statement: Statement = get(id)
         if (statement.owner != user && !user.isTeacher()) {
             throw AccessDeniedException("You are not authorized to access to this statement")

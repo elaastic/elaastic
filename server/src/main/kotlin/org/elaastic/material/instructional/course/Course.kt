@@ -1,7 +1,7 @@
 package org.elaastic.material.instructional.course
 
-import org.elaastic.user.User
 import org.elaastic.common.persistence.AbstractJpaPersistable
+import org.elaastic.material.instructional.MaterialUser
 import org.elaastic.material.instructional.subject.Subject
 import org.springframework.data.annotation.CreatedDate
 import org.springframework.data.annotation.LastModifiedDate
@@ -42,7 +42,7 @@ class Course (
         var title: String,
 
         @field:ManyToOne(fetch = FetchType.LAZY) // TODO Lazy ?
-        var owner: User
+        var owner: MaterialUser
 
 ): AbstractJpaPersistable<Long>() {
 

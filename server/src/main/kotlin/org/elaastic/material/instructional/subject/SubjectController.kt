@@ -5,6 +5,7 @@ import org.elaastic.assignment.AssignmentService
 import org.elaastic.common.persistence.pagination.PaginationUtil
 import org.elaastic.common.web.ControllerUtil
 import org.elaastic.common.web.MessageBuilder
+import org.elaastic.material.instructional.MaterialUser
 import org.elaastic.material.instructional.course.Course
 import org.elaastic.material.instructional.course.CourseService
 import org.elaastic.material.instructional.question.attachment.AttachmentService
@@ -61,7 +62,7 @@ class SubjectController(
         @RequestParam("page") page: Int?,
         @RequestParam("size") size: Int?
     ): String {
-        val user: User = authentication.principal as User
+        val user = MaterialUser.fromElaasticUser(authentication.principal as User)
 
         subjectService.findAllByOwner(
             user,
@@ -88,7 +89,7 @@ class SubjectController(
         authentication: Authentication,
         @PathVariable id: Long,
     ): ResponseEntity<ByteArray> {
-        val user: User = authentication.principal as User
+        val user = MaterialUser.fromElaasticUser(authentication.principal as User)
 
         return subjectService.get(user, id).let { subject ->
             val bytes = subjectExporter.exportToJson(subject).toByteArray()
@@ -115,7 +116,7 @@ class SubjectController(
         @PathVariable id: Long,
         response: HttpServletResponse,
     )  {
-        val user: User = authentication.principal as User
+        val user = MaterialUser.fromElaasticUser(authentication.principal as User)
 
         return subjectService.get(user, id).let { subject ->
             val filename = subject.title
@@ -144,7 +145,7 @@ class SubjectController(
         authentication: Authentication,
         model: Model,
     ): String {
-        val user: User = authentication.principal as User
+        val user = MaterialUser.fromElaasticUser(authentication.principal as User)
         model.addAttribute("user", user)
 
         return "subject/upload-form-zip"
@@ -158,7 +159,7 @@ class SubjectController(
         locale: Locale,
         @RequestParam("zipFile") zipFile: MultipartFile,
     ): String {
-        val user: User = authentication.principal as User
+        val user = MaterialUser.fromElaasticUser(authentication.principal as User)
 
         if(zipFile.isEmpty) {
             model.addAttribute("user", user)
@@ -183,7 +184,7 @@ class SubjectController(
         @RequestParam("page") page: Int?,
         @RequestParam("size") size: Int?
     ): String {
-        val user: User = authentication.principal as User
+        val user = MaterialUser.fromElaasticUser(authentication.principal as User)
         model.addAttribute("user", user)
 
         val subject: Subject = subjectService.get(user, id, fetchStatementsAndAssignments = true)
@@ -215,7 +216,7 @@ class SubjectController(
 
     @GetMapping("create")
     fun create(authentication: Authentication, model: Model): String {
-        val user: User = authentication.principal as User
+        val user = MaterialUser.fromElaasticUser(authentication.principal as User)
 
         if (!model.containsAttribute("subjectData")) {
             model.addAttribute("subjectData", SubjectData(owner = user))
@@ -235,7 +236,7 @@ class SubjectController(
         response: HttpServletResponse,
         redirectAttributes: RedirectAttributes
     ): String {
-        val user: User = authentication.principal as User
+        val user = MaterialUser.fromElaasticUser(authentication.principal as User)
 
         return if (result.hasErrors()) {
             response.status = HttpStatus.BAD_REQUEST.value()
@@ -261,7 +262,7 @@ class SubjectController(
         response: HttpServletResponse,
         redirectAttributes: RedirectAttributes
     ): String {
-        val user: User = authentication.principal as User
+        val user = MaterialUser.fromElaasticUser(authentication.principal as User)
 
         val subject = subjectService.get(user, subjectId, fetchStatementsAndAssignments = true)
 
@@ -301,7 +302,7 @@ class SubjectController(
         @PathVariable subjectId: Long
     ): String {
 
-        val user: User = authentication.principal as User
+        val user = MaterialUser.fromElaasticUser(authentication.principal as User)
         val subject = subjectService.get(user, subjectId)
 
         model.addAttribute("user", user)
@@ -327,7 +328,7 @@ class SubjectController(
         @PathVariable subjectId: Long,
         redirectAttributes: RedirectAttributes
     ): String {
-        val user: User = authentication.principal as User
+        val user = MaterialUser.fromElaasticUser(authentication.principal as User)
         val subject = subjectService.get(user, subjectId)
 
         model.addAttribute("user", user)
@@ -357,7 +358,7 @@ class SubjectController(
         @PathVariable subjectId: Long
     ): String {
 
-        val user: User = authentication.principal as User
+        val user = MaterialUser.fromElaasticUser(authentication.principal as User)
         val subject = subjectService.get(user, subjectId)
 
         model.addAttribute("user", user)
@@ -365,7 +366,7 @@ class SubjectController(
         if (!model.containsAttribute("assignment")) {
             model.addAttribute(
                 "assignment", AssignmentController.AssignmentData(
-                    owner = user,
+                    owner = User.fromMaterialUser(user),
                     subject = subject,
                     title = subject.title
                 ).toEntity()
@@ -385,7 +386,7 @@ class SubjectController(
         response: HttpServletResponse,
         redirectAttributes: RedirectAttributes
     ): String {
-        val user: User = authentication.principal as User
+        val user = MaterialUser.fromElaasticUser(authentication.principal as User)
 
         model.addAttribute("user", user)
 
@@ -422,7 +423,7 @@ class SubjectController(
         @PathVariable id: Long,
         redirectAttributes: RedirectAttributes
     ): String {
-        val user: User = authentication.principal as User
+        val user = MaterialUser.fromElaasticUser(authentication.principal as User)
 
         val subject = subjectService.get(user, id)
         courseService.removeSubject(user, subject)
@@ -448,7 +449,7 @@ class SubjectController(
         @RequestParam("globalId") globalId: String?,
         redirectAttributes: RedirectAttributes
     ): String {
-        val user: User = authentication.principal as User
+        val user = MaterialUser.fromElaasticUser(authentication.principal as User)
 
         if (globalId == null || globalId == "") {
             throw IllegalArgumentException(
@@ -477,7 +478,7 @@ class SubjectController(
         @RequestParam("page") page: Int?,
         @RequestParam("size") size: Int?
     ): String {
-        val user: User = authentication.principal as User
+        val user = MaterialUser.fromElaasticUser(authentication.principal as User)
         var sharedSubjectPage: Page<Subject>?
         subjectService.findAllSharedSubjects(
             user,
@@ -497,7 +498,12 @@ class SubjectController(
         }
         val sharedInfos: MutableList<SharedSubject> = ArrayList()
         for (subject: Subject in sharedSubjectPage!!.content) {
-            sharedInfos.add(sharedSubjectService.getSharedSubject(user, subject)!!)
+            sharedInfos.add(
+                sharedSubjectService.getSharedSubject(
+                    user,
+                    subject
+                )!!
+            )
         }
         model.addAttribute("sharedInfos", sharedInfos)
 
@@ -509,7 +515,7 @@ class SubjectController(
         authentication: Authentication, model: Model, @PathVariable id: Long,
         redirectAttributes: RedirectAttributes
     ): String {
-        val user: User = authentication.principal as User
+        val user = MaterialUser.fromElaasticUser(authentication.principal as User)
         val sharedSubject = subjectService.get(user, id)
         val importedSubject = subjectService.import(user, sharedSubject)
         with(messageBuilder) {
@@ -531,7 +537,7 @@ class SubjectController(
         authentication: Authentication, model: Model, @PathVariable id: Long,
         redirectAttributes: RedirectAttributes
     ): String {
-        val user: User = authentication.principal as User
+        val user = MaterialUser.fromElaasticUser(authentication.principal as User)
         val originalSubject = subjectService.get(user, id)
         val duplicatedSubject = subjectService.duplicate(user, originalSubject)
         with(messageBuilder) {
@@ -553,7 +559,7 @@ class SubjectController(
         var id: Long? = null,
         var version: Long? = null,
         @field:NotBlank var title: String? = null,
-        @field:NotNull var owner: User? = null,
+        @field:NotNull var owner: MaterialUser? = null,
         var course: Course? = null
     ) {
         fun toEntity(): Subject {

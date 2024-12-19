@@ -21,7 +21,7 @@ package org.elaastic.material.instructional.question.attachment
 import org.elaastic.material.instructional.statement.Statement
 import org.elaastic.filestore.DataIdentifier
 import org.elaastic.filestore.FileDataStore
-import org.elaastic.user.User
+import org.elaastic.material.instructional.MaterialUser
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.access.AccessDeniedException
 import org.springframework.stereotype.Service
@@ -124,7 +124,7 @@ class AttachmentService(
      * @param statement the statement
      * @return the statement
      */
-    fun detachAttachmentFromStatement(user: User, statement: Statement): Statement {
+    fun detachAttachmentFromStatement(user: MaterialUser, statement: Statement): Statement {
         if (statement.owner != user) throw AccessDeniedException("You are not autorized to access to this sequence")
         statement.attachment?.let {
             statement.attachment = null

@@ -4,6 +4,7 @@ import org.elaastic.activity.response.ResponseService
 import org.elaastic.assignment.Assignment
 import org.elaastic.assignment.AssignmentRepository
 import org.elaastic.assignment.AssignmentService
+import org.elaastic.material.instructional.MaterialUser
 import org.elaastic.material.instructional.question.attachment.Attachment
 import org.elaastic.material.instructional.question.attachment.AttachmentService
 import org.elaastic.material.instructional.statement.Statement
@@ -52,7 +53,7 @@ class SubjectService(
         } ?: throw EntityNotFoundException("There is no subject for id \"$id\"")
     }
 
-    fun get(user: User, id: Long, fetchStatementsAndAssignments: Boolean = false): Subject {
+    fun get(user: MaterialUser, id: Long, fetchStatementsAndAssignments: Boolean = false): Subject {
         get(id, fetchStatementsAndAssignments).let {
             if (!user.isTeacher()) {
                 throw AccessDeniedException("You are not authorized to access to this subject")
@@ -76,7 +77,7 @@ class SubjectService(
     }
 
     fun createFromExportData(
-        user: User,
+        user: MaterialUser,
         subjectData: ExportSubjectData,
     ): Subject {
         val subject = save(
@@ -131,7 +132,7 @@ class SubjectService(
 
 
     fun findAllByOwner(
-        owner: User,
+        owner: MaterialUser,
         pageable: Pageable = PageRequest.of(0, 10, Sort.by(Sort.Direction.DESC, "lastUpdated"))
     )
             : Page<Subject> {
@@ -139,7 +140,7 @@ class SubjectService(
     }
 
     fun findAllWithoutCourseByOwner(
-        owner: User,
+        owner: MaterialUser,
         pageable: Pageable = PageRequest.of(0, 10, Sort.by(Sort.Direction.DESC, "lastUpdated"))
     )
             : Page<Subject> {
@@ -176,29 +177,30 @@ class SubjectService(
         return subjectRepository.count()
     }
 
-    fun countWithoutCourse(owner: User): Long {
+    fun countWithoutCourse(owner: MaterialUser): Long {
         return subjectRepository.countByCourseIsNullAndOwner(owner)
     }
 
-    fun delete(user: User, subject: Subject) {
+    fun delete(user: MaterialUser, subject: Subject) {
         require(user == subject.owner) {
             "Only the owner can delete an assignment"
         }
         for (statement: Statement in subject.statements) {
             statementService.delete(statement)
         }
-        for (assignment: Assignment in subject.assignments) {
-            assignmentService.delete(subject.owner, assignment)
-        }
+        // TODO *** Remove or reimplement without the relationship
+        // for (assignment: Assignment in subject.assignments) {
+        //     assignmentService.delete(subject.owner, assignment)
+        // }
         subjectRepository.delete(subject) // all other linked entities are deletes by DB cascade
     }
 
-    fun removeStatement(user: User, statement: Statement) {
+    fun removeStatement(user: MaterialUser, statement: Statement) {
         removeStatementFromSubject(user, statement)
         deleteStatementIfNotUsed(statement)
     }
 
-    fun removeStatementFromSubject(user: User, statement: Statement) {
+    fun removeStatementFromSubject(user: MaterialUser, statement: Statement) {
         require(user == statement.owner) {
             "Only the owner can delete a statement"
         }
@@ -218,7 +220,7 @@ class SubjectService(
             )
         if (!statementAlreadyUsed) {
             sequenceService.findAllSequencesByStatement(statement).forEach {
-                assignmentService.removeSequence(statement.owner, it)
+                assignmentService.removeSequence(User.fromMaterialUser(statement.owner), it)
             }
             statementService.delete(statement)
         }
@@ -325,7 +327,7 @@ class SubjectService(
         ).executeUpdate()
     }
 
-    fun removeAssignment(user: User, assignment: Assignment) {
+    fun removeAssignment(user: MaterialUser, assignment: Assignment) {
         require(user == assignment.owner) {
             "Only the owner can delete an assignment"
         }
@@ -355,7 +357,7 @@ class SubjectService(
         subject.assignments.mapIndexed { index, assignment -> assignment.rank = index + 1 }
     }
 
-    fun sharedToTeacher(user: User, subject: Subject): SharedSubject? {
+    fun sharedToTeacher(user: MaterialUser, subject: Subject): SharedSubject? {
         if (subject.owner == user) {
             return null
         }
@@ -369,13 +371,13 @@ class SubjectService(
     }
 
     fun findAllSharedSubjects(
-        user: User,
+        user: MaterialUser,
         pageable: Pageable = PageRequest.of(0, 10, Sort.by(Sort.Direction.DESC, "lastUpdated"))
     ): Page<Subject> {
         return sharedSubjectRepository.findAllSubjectsForTeacher(user, pageable)
     }
 
-    fun duplicate(user: User, initialSubject: Subject, inSameCourse: Boolean = true): Subject {
+    fun duplicate(user: MaterialUser, initialSubject: Subject, inSameCourse: Boolean = true): Subject {
         val normalizedTitle = normalizeTitle(initialSubject.title)
 
         val indexTitle = subjectRepository.countAllStartingWithTitle(user, normalizedTitle) + 1
@@ -396,14 +398,14 @@ class SubjectService(
         return duplicateSubject
     }
 
-    fun import(user: User, sharedSubject: Subject): Subject {
+    fun import(user: MaterialUser, sharedSubject: Subject): Subject {
         if (sharedSubjectRepository.findByTeacherAndSubject(user, sharedSubject) == null)
             throw EntityNotFoundException("The subject \"${sharedSubject.title}\" is not shared with you")
 
         return duplicate(user, sharedSubject, false)
     }
 
-    fun isUsedAsParentSubject(user: User, parentSubject: Subject): Boolean {
+    fun isUsedAsParentSubject(user: MaterialUser, parentSubject: Subject): Boolean {
         return subjectRepository.countAllByParentSubject(user, parentSubject) > 0
     }
 
@@ -436,7 +438,7 @@ class SubjectService(
             // create a subject
             Subject(
                 title = assignment.title,
-                owner = assignment.owner
+                owner = MaterialUser.fromElaasticUser(assignment.owner)
             ).let { subject ->
                 save(subject)
                 // for each sequence

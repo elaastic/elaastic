@@ -2,6 +2,7 @@ package org.elaastic.material.instructional.statement
 
 import org.elaastic.assignment.AssignmentService
 import org.elaastic.common.web.MessageBuilder
+import org.elaastic.material.instructional.MaterialUser
 import org.elaastic.material.instructional.question.*
 import org.elaastic.material.instructional.subject.SubjectService
 import org.elaastic.material.instructional.question.explanation.FakeExplanation
@@ -46,7 +47,7 @@ class StatementController(
         @PathVariable id: Long
     ): String {
 
-        val user: User = authentication.principal as User
+        val user = MaterialUser.fromElaasticUser(authentication.principal as User)
         val statementBase = statementService.get(user, id)
         val subject = statementBase.subject!!
         val fakeExplanations = fakeExplanationService.findAllByStatement(statementBase)
@@ -88,7 +89,7 @@ class StatementController(
         redirectAttributes: RedirectAttributes
     ): String {
 
-        val user: User = authentication.principal as User
+        val user = MaterialUser.fromElaasticUser(authentication.principal as User)
         val statementBase = statementService.get(user, id)
         val subject = statementBase.subject
         var newStatement = statementBase
@@ -155,7 +156,7 @@ class StatementController(
         @PathVariable id: Long,
         redirectAttributes: RedirectAttributes
     ): String {
-        val user: User = authentication.principal as User
+        val user = MaterialUser.fromElaasticUser(authentication.principal as User)
 
         val statement = statementService.get(user, id)
         subjectService.removeStatement(user, statement)
@@ -180,7 +181,7 @@ class StatementController(
         @PathVariable subjectId: Long,
         @PathVariable id: Long
     ): String {
-        val user: User = authentication.principal as User
+        val user = MaterialUser.fromElaasticUser(authentication.principal as User)
         statementService.get(user, id).let {
             attachmentService.detachAttachmentFromStatement(user, it)
         }
@@ -194,7 +195,7 @@ class StatementController(
         @PathVariable id: Long,
         redirectAttributes: RedirectAttributes
     ): String {
-        val user: User = authentication.principal as User
+        val user = MaterialUser.fromElaasticUser(authentication.principal as User)
 
         val subject = subjectService.get(user, subjectId, true)
         subjectService.moveUpStatement(subject, id)
@@ -209,7 +210,7 @@ class StatementController(
         @PathVariable id: Long,
         redirectAttributes: RedirectAttributes
     ): String {
-        val user: User = authentication.principal as User
+        val user = MaterialUser.fromElaasticUser(authentication.principal as User)
 
         val subject = subjectService.get(user, subjectId, true)
         subjectService.moveDownStatement(subject, id)
@@ -225,7 +226,7 @@ class StatementController(
         @PathVariable newSubjectId: Long,
         redirectAttributes: RedirectAttributes
     ): String {
-        val user: User = authentication.principal as User
+        val user = MaterialUser.fromElaasticUser(authentication.principal as User)
         val newSubject = subjectService.get(user, newSubjectId, false)
         var statement = statementService.get(user, id)
         statement = subjectService.importStatementInSubject(statement, newSubject)
@@ -291,7 +292,7 @@ class StatementController(
             this.fakeExplanations = fakeExplanations.map { FakeExplanationData(it) }
         }
 
-        fun toEntity(user: User): Statement {
+        fun toEntity(user: MaterialUser): Statement {
             val questionType: QuestionType =
                 if (hasChoices) {
                     when (choiceInteractionType) {

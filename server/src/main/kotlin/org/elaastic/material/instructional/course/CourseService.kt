@@ -18,7 +18,7 @@
 
 package org.elaastic.material.instructional.course
 
-import org.elaastic.user.User
+import org.elaastic.material.instructional.MaterialUser
 import org.elaastic.material.instructional.subject.Subject
 import org.elaastic.material.instructional.subject.SubjectService
 import org.springframework.beans.factory.annotation.Autowired
@@ -48,7 +48,7 @@ class CourseService(
         } ?: throw EntityNotFoundException("There is no course for id \"$id\"")
     }
 
-    fun get(user: User, id: Long): Course {
+    fun get(user: MaterialUser, id: Long): Course {
         courseRepository.findOneById(id).let {
             if (!user.isTeacher()) {
                 throw AccessDeniedException("You are not authorized to access to this course")
@@ -60,7 +60,7 @@ class CourseService(
         }
     }
 
-    fun delete(user: User, course: Course) {
+    fun delete(user: MaterialUser, course: Course) {
         require(user == course.owner) {
             "Only the owner can delete an assignment"
         }
@@ -75,7 +75,7 @@ class CourseService(
         courseRepository.save(course)
     }
 
-    fun removeSubject(user: User, subject: Subject) {
+    fun removeSubject(user: MaterialUser, subject: Subject) {
         require(user == subject.owner) {
             "Only the owner can delete a subject"
         }
@@ -91,7 +91,7 @@ class CourseService(
         entityManager.clear()
     }
 
-    fun addSubjectToCourse(user: User, subject: Subject, course: Course) {
+    fun addSubjectToCourse(user: MaterialUser, subject: Subject, course: Course) {
         require(user == course.owner) {
             "Only the owner can add a subject"
         }
@@ -113,7 +113,7 @@ class CourseService(
     }
 
     fun findPageOfAllByOwner(
-        owner: User,
+        owner: MaterialUser,
         pageable: Pageable = PageRequest.of(0, 10, Sort.by(Sort.Direction.DESC, "lastUpdated"))
     )
             : Page<Course> {
@@ -121,7 +121,7 @@ class CourseService(
     }
 
     fun findAllByOwner(
-        owner: User,
+        owner: MaterialUser,
         sort: Sort = Sort.by(Sort.Direction.DESC, "lastUpdated")
     )
             : List<Course> {
@@ -129,14 +129,14 @@ class CourseService(
     }
 
     fun findAllWithSubjectsByOwner(
-        owner: User,
+        owner: MaterialUser,
         pageable: Pageable = PageRequest.of(0, 10, Sort.by(Sort.Direction.DESC, "lastUpdated"))
     )
             : Page<Course> {
         return courseRepository.findAllWithSubjectsByOwner(owner, pageable)
     }
 
-    fun findFirstCourseByOwner(owner: User) : Course? {
+    fun findFirstCourseByOwner(owner: MaterialUser) : Course? {
         return courseRepository.findFirstByOwner(owner)
     }
 }

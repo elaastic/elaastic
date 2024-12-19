@@ -2,6 +2,7 @@ package org.elaastic.assignment
 
 import org.elaastic.common.persistence.pagination.PaginationUtil
 import org.elaastic.common.web.MessageBuilder
+import org.elaastic.material.instructional.MaterialUser
 import org.elaastic.material.instructional.subject.Subject
 import org.elaastic.material.instructional.subject.SubjectService
 import org.elaastic.material.instructional.statement.Statement
@@ -171,7 +172,7 @@ class AssignmentController(
         val user: User = authentication.principal as User
 
         val assignment = assignmentService.get(user, id)
-        subjectService.removeAssignment(user, assignment)
+        // TODO *** Remove or reimplement without relationships subjectService.removeAssignment(user, assignment)
 
         with(messageBuilder) {
             success(
@@ -205,7 +206,7 @@ class AssignmentController(
         model.addAttribute(
             "statementData",
             StatementController.StatementData(
-                Statement.createDefaultStatement(user)
+                Statement.createDefaultStatement(MaterialUser.fromElaasticUser(user))
             )
         )
 
@@ -221,7 +222,7 @@ class AssignmentController(
     ): String {
         val user: User = authentication.principal as User
 
-        val subject = subjectService.get(user, subjectId, true)
+        val subject = subjectService.get(MaterialUser.fromElaasticUser(user), subjectId, true)
         subjectService.moveUpAssignment(subject, id)
         redirectAttributes.addAttribute("activeTab", "assignments")
         return "redirect:/subject/$subjectId#assignment_${id}"
@@ -236,7 +237,7 @@ class AssignmentController(
     ): String {
         val user: User = authentication.principal as User
 
-        val subject = subjectService.get(user, subjectId, true)
+        val subject = subjectService.get(MaterialUser.fromElaasticUser(user), subjectId, true)
         subjectService.moveDownAssignment(subject, id)
         redirectAttributes.addAttribute("activeTab", "assignments")
         return "redirect:/subject/$subjectId#assignment_${id}"

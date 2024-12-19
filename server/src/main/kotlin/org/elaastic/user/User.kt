@@ -23,6 +23,7 @@ import org.elaastic.auth.cas.CasUser
 import org.elaastic.user.validation.PlainTextPasswordIsTooShort
 import org.elaastic.user.validation.ValidateHasEmailOrHasOwnerOrHasExternalSource
 import org.elaastic.common.persistence.AbstractJpaPersistable
+import org.elaastic.material.instructional.MaterialUser
 import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.core.userdetails.UserDetails
 import java.io.Serializable
@@ -76,6 +77,10 @@ class User(
     val casUser: CasUser? = null
 
 ) : AbstractJpaPersistable<Long>(), Serializable, UserDetails, HasEmailOrHasOwnerOrHasExternalSource {
+
+    companion object {
+        fun fromMaterialUser(user: MaterialUser): User = TODO()
+    }
 
     @Version
     var version: Long? = null
