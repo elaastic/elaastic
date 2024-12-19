@@ -117,12 +117,17 @@ class DashboardModelFactory(
      * @param sequence the sequence
      * @return the number of responses that are gradable
      */
-    fun getCountResponseGradable(sequence: Sequence) = try {
-        val responseStudent = responseService.findAllByAttemptNotFake(1, sequence).size.toLong()
-        val responseFake = responseService.findAllFakeResponses(sequence).size.toLong()
-        responseStudent + responseFake
-    } catch (_: IllegalStateException) {
-        0
+    fun getCountResponseGradable(sequence: Sequence): Long {
+        return if (sequence.getResponseSubmissionInteractionOrNull() == null) {
+            // If the sequence hasn't started yet, the ResponseSubmission interaction would be null
+            // If the sequence hasn't started yet, no response has been produce,
+            // so no response is gradable
+            0
+        } else {
+            val responseStudent = responseService.findAllByAttemptNotFake(1, sequence).size.toLong()
+            val responseFake = responseService.findAllFakeResponses(sequence).size.toLong()
+            responseStudent + responseFake
+        }
     }
 
     fun buildLearnerMonitoringModel(
