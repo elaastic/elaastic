@@ -1,6 +1,7 @@
 package org.elaastic.material.instructional.statement
 
 import org.elaastic.common.persistence.AbstractJpaPersistable
+import org.elaastic.material.instructional.MaterialUser
 import org.elaastic.material.instructional.question.*
 import org.elaastic.material.instructional.subject.Subject
 import org.elaastic.material.instructional.question.attachment.Attachment
@@ -30,7 +31,7 @@ import javax.validation.constraints.NotNull
 class Statement(
     @field:NotNull
     @field:ManyToOne(fetch = FetchType.LAZY)
-    var owner: User,
+    var owner: MaterialUser,
 
     @field:NotBlank
     var title: String = "",
@@ -200,7 +201,7 @@ class Statement(
          * @param user The futur owner of the statement.
          * @return The created statement.
          */
-        fun createDefaultStatement(user: User): Statement {
+        fun createDefaultStatement(user: MaterialUser): Statement {
             return Statement(
                 owner = user,
                 questionType = QuestionType.ExclusiveChoice,
@@ -210,6 +211,9 @@ class Statement(
                 )
             )
         }
+
+        fun createDefaultStatement(user: User) =
+            createDefaultStatement(MaterialUser.fromElaasticUser(user))
 
         /**
          * Create an example statement with the given user.
@@ -221,7 +225,7 @@ class Statement(
          * @param user The futur owner of the statement.
          * @return The created statement.
          */
-        fun createExampleStatement(user: User): Statement {
+        fun createExampleStatement(user: MaterialUser): Statement {
             return Statement(
                 owner = user,
                 questionType = QuestionType.ExclusiveChoice,

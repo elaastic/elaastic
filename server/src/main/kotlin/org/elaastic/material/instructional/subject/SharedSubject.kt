@@ -1,7 +1,7 @@
 package org.elaastic.material.instructional.subject
 
 import org.elaastic.common.persistence.AbstractJpaPersistable
-import org.elaastic.user.User
+import org.elaastic.material.instructional.MaterialUser
 import org.springframework.data.annotation.CreatedDate
 import org.springframework.data.annotation.LastModifiedDate
 import org.springframework.data.jpa.domain.support.AuditingEntityListener
@@ -13,7 +13,7 @@ import javax.persistence.*
 class SharedSubject(
 
     @field:ManyToOne
-        var teacher: User,
+        var teacher: MaterialUser,
 
     @field:ManyToOne(fetch = FetchType.EAGER)
         var subject: Subject

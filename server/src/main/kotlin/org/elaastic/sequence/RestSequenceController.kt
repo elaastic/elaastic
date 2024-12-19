@@ -18,6 +18,7 @@
 
 package org.elaastic.sequence
 
+import org.elaastic.material.instructional.MaterialUser
 import org.elaastic.material.instructional.question.explanation.FakeExplanation
 import org.elaastic.material.instructional.question.attachment.AttachmentService
 import org.elaastic.user.User
@@ -55,7 +56,7 @@ class RestSequenceController(
                          @PathVariable id: Long) {
         val user: User = authentication.principal as User
         sequenceService.get(user, id).let {
-            attachmentService.detachAttachmentFromStatement(user, it.statement)
+            attachmentService.detachAttachmentFromStatement(MaterialUser.fromElaasticUser(user), it.statement)
         }
 
     }

@@ -21,6 +21,7 @@ package org.elaastic.material.instructional.course
 import org.elaastic.common.web.MessageBuilder
 import org.elaastic.user.User
 import org.elaastic.common.persistence.pagination.PaginationUtil
+import org.elaastic.material.instructional.MaterialUser
 import org.elaastic.material.instructional.subject.SubjectController
 import org.elaastic.material.instructional.subject.SubjectService
 import org.springframework.beans.factory.annotation.Autowired
@@ -56,7 +57,7 @@ class CourseController(
         @RequestParam("size") size: Int?
     ): String {
 
-        val user: User = authentication.principal as User
+        val user = MaterialUser.fromElaasticUser(authentication.principal as User)
 
         courseService.findAllWithSubjectsByOwner(
             user,
@@ -81,7 +82,7 @@ class CourseController(
 
     @GetMapping("create")
     fun create(authentication: Authentication, model: Model): String {
-        val user: User = authentication.principal as User
+        val user = MaterialUser.fromElaasticUser(authentication.principal as User)
 
         if (!model.containsAttribute("course")) {
             model.addAttribute("course", CourseData(owner = user))
@@ -99,7 +100,7 @@ class CourseController(
         @RequestParam("size") size: Int?
     ): String {
 
-        val user: User = authentication.principal as User
+        val user = MaterialUser.fromElaasticUser(authentication.principal as User)
         model.addAttribute("user", user)
 
         if(id != -1L) {
@@ -139,7 +140,7 @@ class CourseController(
         response: HttpServletResponse,
         redirectAttributes: RedirectAttributes
     ): String {
-        val user: User = authentication.principal as User
+        val user = MaterialUser.fromElaasticUser(authentication.principal as User)
 
         model.addAttribute("user", user)
 
@@ -177,7 +178,7 @@ class CourseController(
         response: HttpServletResponse,
         redirectAttributes: RedirectAttributes
     ): String {
-        val user: User = authentication.principal as User
+        val user = MaterialUser.fromElaasticUser(authentication.principal as User)
 
         return if (result.hasErrors()) {
             response.status = HttpStatus.BAD_REQUEST.value()
@@ -198,14 +199,15 @@ class CourseController(
             @RequestParam("page") page: Int?,
             @RequestParam("size") size: Int?
     ): String {
-        val user: User = authentication.principal as User
+        val user = MaterialUser.fromElaasticUser(authentication.principal as User)
         var firstCourse = courseService.findFirstCourseByOwner(user)
         if(firstCourse == null)
             firstCourse = createExampleCourse(user)
         return "redirect:/course/${firstCourse.id}"
     }
 
-    private fun createExampleCourse(user: User): Course = courseService.save(CourseData(title = "Example Course", owner = user).toEntity())
+    private fun createExampleCourse(user: MaterialUser): Course =
+        courseService.save(CourseData(title = "Example Course", owner = user).toEntity())
 
     @GetMapping("{id}/delete")
     fun delete(
@@ -213,7 +215,7 @@ class CourseController(
         @PathVariable id: Long,
         redirectAttributes: RedirectAttributes
     ): String {
-        val user: User = authentication.principal as User
+        val user = MaterialUser.fromElaasticUser(authentication.principal as User)
 
         val course = courseService.get(user, id)
         courseService.delete(user, course)
@@ -239,7 +241,7 @@ class CourseController(
         @PathVariable courseId: Long
     ): String {
 
-        val user: User = authentication.principal as User
+        val user = MaterialUser.fromElaasticUser(authentication.principal as User)
         val course = courseService.get(user, courseId)
 
         model.addAttribute("user", user)
@@ -254,7 +256,7 @@ class CourseController(
         var id: Long? = null,
         var version: Long? = null,
         @field:NotBlank var title: String? = null,
-        @field:NotNull var owner: User? = null
+        @field:NotNull var owner: MaterialUser? = null
     ) {
         fun toEntity(): Course {
             return Course(

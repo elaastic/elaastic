@@ -101,7 +101,7 @@ class Response(
      *
      * @see Statement
      */
-    @field:ManyToOne
+    @field:ManyToOne // TODO : Remove this relationship to the statement (must be replaced by a reference to the statement UUID)
     var statement: Statement,
 
     @field:Column(name = "is_hidden_by_teacher")

@@ -7,6 +7,7 @@ import org.elaastic.activity.response.ResponseService
 import org.elaastic.assignment.Assignment
 import org.elaastic.assignment.AssignmentService
 import org.elaastic.assignment.ReadyForConsolidation
+import org.elaastic.material.instructional.MaterialUser
 import org.elaastic.material.instructional.course.Course
 import org.elaastic.material.instructional.course.CourseService
 import org.elaastic.material.instructional.question.*
@@ -48,7 +49,7 @@ class FunctionalTestingService(
     fun createCourse(user: User, title: String = "Default course title") =
         courseService.save(
             Course(
-                owner = user,
+                owner = MaterialUser.fromElaasticUser(user),
                 title = title,
             )
         )
@@ -58,18 +59,18 @@ class FunctionalTestingService(
         title: String = "Default subject title"
     ) =
         subjectService.save(
-            Subject(title, user)
+            Subject(title, MaterialUser.fromElaasticUser(user))
         )
 
     fun createSubject(user: User, course: Course, title: String = "Default subject title") =
         createSubject(user, title)
-            .also { courseService.addSubjectToCourse(user, it, course) }
+            .also { courseService.addSubjectToCourse(MaterialUser.fromElaasticUser(user), it, course) }
 
     fun createAssignment(subject: Subject, title: String = "Default assignment title") =
         subjectService.addAssignment(
             subject,
             Assignment(
-                owner = subject.owner,
+                owner = User.fromMaterialUser(subject.owner),
                 title = title,
             )
         )
@@ -78,7 +79,7 @@ class FunctionalTestingService(
         subjectService.addAssignment(
             subject,
             Assignment(
-                owner = subject.owner,
+                owner = User.fromMaterialUser(subject.owner),
                 title = title,
                 readyForConsolidation = ReadyForConsolidation.AfterTeachings
             )
@@ -88,7 +89,7 @@ class FunctionalTestingService(
         subjectService.addAssignment(
             subject,
             Assignment(
-                owner = subject.owner,
+                owner = User.fromMaterialUser(subject.owner),
                 title = title,
                 readyForConsolidation = ReadyForConsolidation.Immediately
             )
@@ -102,7 +103,7 @@ class FunctionalTestingService(
             addQuestion(
                 subject,
                 generateStatement(
-                    owner = subject.owner,
+                    owner = User.fromMaterialUser(subject.owner),
                     questionType = questionType,
                     questionIndex = questionIndex
                 )
@@ -122,7 +123,7 @@ class FunctionalTestingService(
         return Statement(
             title = title,
             content = content,
-            owner = owner,
+            owner = MaterialUser.fromElaasticUser(owner),
             questionType = questionType,
             rank = questionIndex,
             expectedExplanation = expectedExplanation,

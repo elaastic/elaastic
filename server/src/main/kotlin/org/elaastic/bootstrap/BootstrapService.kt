@@ -43,6 +43,7 @@ import org.elaastic.material.instructional.question.attachment.AttachmentService
 import org.elaastic.material.instructional.question.attachment.MimeType
 import org.elaastic.auth.lti.LtiConsumer
 import org.elaastic.auth.lti.LtiConsumerRepository
+import org.elaastic.material.instructional.MaterialUser
 import org.elaastic.sequence.ExecutionContext
 import org.elaastic.sequence.Sequence
 import org.elaastic.sequence.SequenceService
@@ -182,7 +183,7 @@ class BootstrapService(
     @Transactional
     fun initializeDemoContent() {
         val demoUser = userService.findByUsername("aein")!!
-        if (courseService.findAllByOwner(demoUser).isEmpty()) {
+        if (courseService.findAllByOwner(MaterialUser.fromElaasticUser(demoUser)).isEmpty()) {
             // if (courseService.count() == 0L) {
             initializeStepByStep()
         }
@@ -194,28 +195,28 @@ class BootstrapService(
         val demo = courseService.save(
             Course(
                 title = "Demo",
-                owner = userService.findByUsername("aein")!!
+                owner = MaterialUser.fromElaasticUser(userService.findByUsername("aein")!!)
             )
         )
 
         val maths = courseService.save(
             Course(
                 title = "Maths 6e",
-                owner = userService.findByUsername("aein")!!
+                owner = MaterialUser.fromElaasticUser(userService.findByUsername("aein")!!)
             )
         )
 
         val francais = courseService.save(
             Course(
                 title = "Français 5e",
-                owner = userService.findByUsername("fsil")!!
+                owner = MaterialUser.fromElaasticUser(userService.findByUsername("fsil")!!)
             )
         )
 
         val histoire = courseService.save(
             Course(
                 title = "Histoire 4e",
-                owner = userService.findByUsername("rand")!!
+                owner = MaterialUser.fromElaasticUser(userService.findByUsername("rand")!!)
             )
         )
 
@@ -224,27 +225,27 @@ class BootstrapService(
             Subject(
                 title = "Nombres décimaux",
                 course = maths,
-                owner = userService.findByUsername("aein")!!
+                owner = MaterialUser.fromElaasticUser(userService.findByUsername("aein")!!)
             ),
             Subject(
                 title = "Figures planes",
                 course = maths,
-                owner = userService.findByUsername("aein")!!
+                owner = MaterialUser.fromElaasticUser(userService.findByUsername("aein")!!)
             ),
             Subject(
                 title = "Le champ lexical",
                 course = francais,
-                owner = userService.findByUsername("fsil")!!
+                owner = MaterialUser.fromElaasticUser(userService.findByUsername("fsil")!!)
             ),
             Subject(
                 title = "Les compléments d'objets",
                 course = francais,
-                owner = userService.findByUsername("fsil")!!
+                owner = MaterialUser.fromElaasticUser(userService.findByUsername("fsil")!!)
             ),
             Subject(
                 title = "La révolution française",
                 course = histoire,
-                owner = userService.findByUsername("rand")!!
+                owner = MaterialUser.fromElaasticUser(userService.findByUsername("rand")!!)
             ),
         ).forEach {
             subjectService.save(it)
@@ -255,7 +256,7 @@ class BootstrapService(
             Subject(
                 title = "Accords du participe passé",
                 course = francais,
-                owner = userService.findByUsername("fsil")!!
+                owner = MaterialUser.fromElaasticUser(userService.findByUsername("fsil")!!)
             )
         )
 
@@ -267,7 +268,7 @@ class BootstrapService(
             Subject(
                 title = "Fractions",
                 course = maths,
-                owner = userService.findByUsername("aein")!!
+                owner = MaterialUser.fromElaasticUser(userService.findByUsername("aein")!!)
             )
         )
 
@@ -381,28 +382,28 @@ class BootstrapService(
     private fun initializeAssignment(subject: Subject) {
         var assignments = listOf(
             Assignment(
-                owner = subject.owner,
+                owner = User.fromMaterialUser(subject.owner),
                 title = subject.title + " - Face à face - Finished",
                 description = "Exercice en classe",
                 audience = "groupe A1",
                 readyForConsolidation = ReadyForConsolidation.NotAtAll
             ),
             Assignment(
-                owner = subject.owner,
+                owner = User.fromMaterialUser(subject.owner),
                 title = subject.title + " - Face à face",
                 description = "Exercice en classe",
                 audience = "groupe A2",
                 readyForConsolidation = ReadyForConsolidation.AfterTeachings
             ),
             Assignment(
-                owner = subject.owner,
+                owner = User.fromMaterialUser(subject.owner),
                 title = subject.title + " - Distant",
                 description = "Exercice en classe",
                 audience = "groupe C",
                 readyForConsolidation = ReadyForConsolidation.Immediately
             ),
             Assignment(
-                owner = subject.owner,
+                owner = User.fromMaterialUser(subject.owner),
                 title = subject.title + " - Blended",
                 description = "Exercice en classe",
                 audience = "groupe G",

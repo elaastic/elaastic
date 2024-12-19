@@ -40,8 +40,10 @@ interface SequenceRepository : JpaRepository<Sequence, Long> {
 
     fun countAllByAssignment(assignment: Assignment) : Int
 
+    // TODO: Replace by statement UUID
     fun findAllByStatementAndStateNot(statement: Statement, state: State) : List<Sequence>
 
+    // TODO: Replace by statement UUID
     fun findAllByStatement(statement: Statement) : List<Sequence>
 
     fun findSequenceByRankAndAssignment(rank: Int, assignment: Assignment): Sequence?

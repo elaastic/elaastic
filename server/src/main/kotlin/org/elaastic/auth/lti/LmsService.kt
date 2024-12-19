@@ -21,6 +21,7 @@ package org.elaastic.auth.lti
 import org.elaastic.assignment.Assignment
 import org.elaastic.assignment.AssignmentRepository
 import org.elaastic.assignment.AssignmentService
+import org.elaastic.material.instructional.MaterialUser
 import org.elaastic.material.instructional.course.CourseService
 import org.elaastic.user.RoleService
 import org.elaastic.user.User
@@ -157,7 +158,7 @@ class LmsService(
         return if (ltiActivity.globalId != null) {
             findAssignmentWithIdFromLtiData(ltiActivity.globalId)
         } else {
-            Subject(ltiActivity.title, lmsUser.user).let {
+            Subject(ltiActivity.title, MaterialUser.fromElaasticUser(lmsUser.user)).let {
                 subjectService.save(it)
             }.let { subject ->
                 Assignment(ltiActivity.title, lmsUser.user, subject = subject).let {
