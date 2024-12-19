@@ -1,0 +1,45 @@
+<!--
+  ~ Elaastic - formative assessment system
+  ~ Copyright (C) 2019. University Toulouse 1 Capitole, University Toulouse 3 Paul Sabatier
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Affero General Public License as
+  ~ published by the Free Software Foundation, either version 3 of the
+  ~ License, or (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU Affero General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Affero General Public License
+  ~ along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  -->
+<div th:fragment="utilityGradeVue"
+     th:remove="tag"
+     xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/html">
+
+      <!--/* iframe allowing to load the <utility-grade> app in a isolated context */-->
+      <iframe id="utiltiy-grade-app" class="transparent-iframe" th:src="@{/ui/utility-grade}" width="100%"></iframe>
+
+      <!--/* script for activating @iframe-resizer that allow us to smoothly integrate the previous iframe within the page layout */-->
+      <script src="https://cdn.jsdelivr.net/npm/@iframe-resizer/parent@5.3.2"></script>
+
+      <!--/* Initialise the <confronting-viewpoint app & interact with it */-->
+      <script th:inline="javascript">
+        /*[- Expose server model as JSON -]*/
+        const utilityGradePossible = /*[[${T(org.elaastic.moderation.UtilityGrade).values()}]]*/ ''
+
+        /*[- Trigger the app init function on iframe loading -]*/
+        const iframe = document.getElementById('utiltiy-grade-app')
+        iframe.onload = () => {
+          iframe.contentWindow.elaastic.initializeUtilityGrade(utilityGradePossible)
+        }
+
+        /*[- Init iframe resize -]*/
+        iframeResize({
+          license: 'GPLv3',
+          waitForLoad: true
+        }, '#utiltiy-grade-app')
+      </script>
+</div>
