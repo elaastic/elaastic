@@ -248,9 +248,11 @@ class ChatGptEvaluationService(
             .setParameter("listIdResponse", listIdResponse)
             .resultList.toList()
 
-        return listIdResponse.associate { id ->
-            id!! to result.any { it is Array<*> && it[0] == id && it[1] != null }
-        }
+        return listIdResponse
+            .filterNotNull()
+            .associateWith { id ->
+                result.any { it is Array<*> && it[0] == id && it[1] != null }
+            }
     }
 
     /**

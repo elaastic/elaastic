@@ -732,22 +732,30 @@ class PlayerController(
             sequenceId = sequence.id
         )
 
-        val learnerAssignment: LearnerAssignment = assignmentService.getRegisteredUser(sequence.assignment!!, learner)!!
+        val learnerAssignment: LearnerAssignment? = assignmentService.getRegisteredUser(sequence.assignment!!, learner)
 
-        model["learnerMonitoringModel"] = dashboardModelFactory.buildLearnerMonitoringModel(
-            learnerAssignment,
-            (responseService.find(learner, sequence) ?: responseService.find(learner, sequence, 2)) != null,
-            sequenceMonitoringModel,
-            sequence,
-            peerGradingService.countEvaluationsMadeByUsers(listOf(learnerAssignment), sequence)[learnerAssignment] ?: 0,
-            dashboardModelFactory.getCountResponseGradable(sequence)
-        )
-        model["learnerResultsModel"] = getLearnerResultsModel(learner, sequence)
+        // If the learner a fake one, the learnerAssignment will be null.
+        // Monitoring what the fake learner has done is not relevant.
+        // So we don't display the monitoring model.
+        if (learnerAssignment != null) {
+            model["learnerMonitoringModel"] = dashboardModelFactory.buildLearnerMonitoringModel(
+                learnerAssignment,
+                (responseService.find(learner, sequence) ?: responseService.find(learner, sequence, 2)) != null,
+                sequenceMonitoringModel,
+                sequence,
+                peerGradingService.countEvaluationsMadeByUsers(listOf(learnerAssignment), sequence)[learnerAssignment]
+                    ?: 0,
+                dashboardModelFactory.getCountResponseGradable(sequence)
+            )
+        }
+        val learnerResultsModel = getLearnerResultsModel(learner, sequence)
+        model["learnerResultsModel"] = learnerResultsModel
         // The accordionId is used to initialize the accordion in the view.
         // So to discriminate between all accordions in the page, we use the learnerId
         model["userId"] = userId
         model["seenByTeacher"] = isTeacher
         model["seenByOwner"] = isOwnerOfResponse
+        model["learnerHasAnswered"] = learnerResultsModel.hasAnsweredPhase1() || learnerResultsModel.hasAnsweredPhase2()
 
         return "player/assignment/sequence/components/my-results/_my-results-modal.html :: myResultsModal"
     }
@@ -760,15 +768,21 @@ class PlayerController(
         val responseFirstTry = responseService.find(learner, sequence, 1)
         val responseSecondTry = responseService.find(learner, sequence, 2)
 
-        val responseToIsChatGPTExist = chatGptEvaluationService.associateResponseToChatGPTEvaluationExistence(
-            listOf(
-                responseFirstTry?.id,
-                responseSecondTry?.id
-            )
-        )
+        var responseFirstTryHasChatGPTEvaluation: Boolean = false
+        var responseSecondTryHasChatGPTEvaluation: Boolean = false
 
-        val responseFirstTryHasChatGPTEvaluation: Boolean = responseToIsChatGPTExist[responseFirstTry?.id] == true
-        val responseSecondTryHasChatGPTEvaluation: Boolean = responseToIsChatGPTExist[responseSecondTry?.id] == true
+        if (sequence.chatGptEvaluationEnabled) {
+            val responseToIsChatGPTExist = chatGptEvaluationService.associateResponseToChatGPTEvaluationExistence(
+                listOf(
+                    responseFirstTry?.id,
+                    responseSecondTry?.id
+                )
+            )
+
+            responseFirstTryHasChatGPTEvaluation = responseToIsChatGPTExist[responseFirstTry?.id] == true
+            responseSecondTryHasChatGPTEvaluation  = responseToIsChatGPTExist[responseSecondTry?.id] == true
+        }
+
 
         return LearnerResultsModelFactory.builtLearnerResultsModel(
             responseFirstTry,
