@@ -8,7 +8,7 @@ const meta = {
   component: UtilityGrade,
   tags: ['autodocs'],
   args: {
-    possibleGrades: ["a", "b", "c"],
+    possibleGrades: [{label: "bad", value: "STRONGLY_DISAGREE"}, {label: "ok", value: "DISAGREE"}, {label: "good", value: "AGREE"}, {label: "great", value: "STRONGLY_AGREE"}],
   },
 } satisfies Meta<typeof UtilityGrade>;
 
@@ -18,11 +18,6 @@ type Story = StoryObj<typeof meta>;
 
 export const Primary: Story = {
   args: {
-    possibleGrades: [
-      "STRONGLY_DISAGREE",
-      "DISAGREE",
-      "AGREE",
-      "STRONGLY_AGREE"
-    ],
+    possibleGrades: [{label: "Bad", value: "STRONGLY_DISAGREE"}, {label: "Ok", value: "DISAGREE"}, {label: "Good", value: "AGREE"}, {label: "Great", value: "STRONGLY_AGREE"}],
   },
 };

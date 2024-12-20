@@ -1,50 +1,80 @@
 <script setup lang="ts">
 
-import { computed, ref } from 'vue'
+import {computed, ref} from 'vue'
+import {useI18n} from "vue-i18n";
+import utilityGradeStories from "@/stories/moderation/UtilityGrade.stories";
 
-export interface UtilityGradeProps {
-  possibleGrades: string[]
+type Grade = {
+  label: string,
+  value: string
 }
 
-const props = withDefaults(defineProps<UtilityGradeProps>(), {
-  possibleGrades: () => ['A', 'B', 'C', 'D', 'F']
-})
+export interface UtilityGradeProps {
+  possibleGrades: Grade[]
+}
+
+/** Fired when the selected value changes */
+export interface UtilityGradeEvents {
+  (event: 'update:submmitUtilityGrade', value: Grade): void;
+}
+const props = defineProps<UtilityGradeProps>()
+const emit = defineEmits<UtilityGradeEvents>()
 
 const modelValue = ref({
-  /**
-   * @property {null | string} selectedGrade - Represents the currently selected grade.
-   * Initially set to null, it can be updated to a string value representing a specific grade.
-   */
-  selectedGrade: null as null | string,
+  selectedGradeModel: null as Grade | null,
 })
 
 const selectedGrade = computed({
-  get: () => modelValue.value.selectedGrade,
+  get: () => modelValue.value.selectedGradeModel,
   set: newValue => {
-    modelValue.value.selectedGrade = newValue
+    modelValue.value.selectedGradeModel = newValue
   }
 });
 
-function handleClick(itemClicked: string) {
-  selectedGrade.value = itemClicked
-  console.log(itemClicked);
+function setSelectedUtilityGrade(itemClicked: Grade) {
+  selectedGrade.value = itemClicked;
 }
 
+function submitUtilityGrade() {
+  if (selectedGrade.value != null) {
+    emit('update:submmitUtilityGrade', selectedGrade.value);
+  }
+}
+
+const {t} = useI18n()
 </script>
 
 <template>
-
-  <v-col>
-    <v-row>
-      <div v-for="(grade, index) in props.possibleGrades" :key="index">
-        <v-btn @click="handleClick(grade)" color="primary" class="mr-2">{{ grade }}</v-btn>
-      </div>
-    </v-row>
-    <br>
-    <p>{{ selectedGrade }}</p>
-  </v-col>
-
-
+  <v-row>
+    <v-col>
+      <v-btn-toggle v-model="selectedGrade" v-for="(grade, index) in props.possibleGrades" :key="index" variant="tonal"
+                    color="light-blue-darken-1" rounded="0">
+        <v-btn @click="setSelectedUtilityGrade(grade)" :value="grade" class="text-none text-subtitle-1">
+          {{ grade.label }}
+        </v-btn>
+      </v-btn-toggle>
+    </v-col>
+  </v-row>
+  <v-row>
+    <v-col>
+      <v-btn v-if="selectedGrade != null" class="text-none text-subtitle-1" @click="submitUtilityGrade()">
+        {{ t('submit') }}
+      </v-btn>
+    </v-col>
+  </v-row>
 </template>
 
-<style scoped></style>
+<style scoped>
+
+</style>
+
+<i18n>
+{
+  "en": {
+    "submit": "Submit"
+  },
+  "fr": {
+    "submit": "Soumettre"
+  }
+}
+</i18n>
