@@ -76,7 +76,7 @@ class User(
     @OneToOne(mappedBy = "user", fetch = FetchType.LAZY)
     val casUser: CasUser? = null
 
-) : AbstractJpaPersistable<Long>(), Serializable, UserDetails, HasEmailOrHasOwnerOrHasExternalSource {
+) : AbstractJpaPersistable<Long>(), Serializable, UserId, UserDetails, HasEmailOrHasOwnerOrHasExternalSource {
 
     companion object {
         fun fromMaterialUser(user: MaterialUser): User = TODO()
@@ -87,7 +87,7 @@ class User(
 
     @field:NotNull
     @Column(columnDefinition = "BINARY(16)")
-    var uuid: UUID = UUID.randomUUID()
+    override var uuid: UUID = UUID.randomUUID()
 
     @NotNull
     @Size(min = 1)

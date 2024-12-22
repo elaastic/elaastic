@@ -22,6 +22,7 @@ import org.elaastic.user.validation.PlainTextPasswordIsTooShort
 import org.elaastic.user.validation.ValidateHasEmailOrHasOwnerOrHasExternalSource
 import org.elaastic.common.persistence.AbstractJpaPersistable
 import org.elaastic.user.User
+import org.elaastic.user.UserId
 import java.io.Serializable
 import java.util.*
 import javax.persistence.*
@@ -55,7 +56,7 @@ class MaterialUser(
     @field:Column(unique = true)
     @field:Email
     var email: String? = null,
-) : AbstractJpaPersistable<Long>(), Serializable {
+) : AbstractJpaPersistable<Long>(), UserId, Serializable {
 
     companion object {
         fun fromElaasticUser(user: User): MaterialUser = TODO("not implemented")
@@ -63,7 +64,7 @@ class MaterialUser(
 
     @field:NotNull
     @Column(columnDefinition = "BINARY(16)")
-    var uuid: UUID = UUID.randomUUID()
+    override var uuid: UUID = UUID.randomUUID()
 
     fun isTeacher(): Boolean = TODO("not implemented")
 
