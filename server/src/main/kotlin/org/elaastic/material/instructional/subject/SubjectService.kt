@@ -45,6 +45,7 @@ class SubjectService(
 
     val LOG: Logger = Logger.getLogger(SubjectService::class.toString())
 
+    // TODO : Uncouple from assignments
     fun get(id: Long, fetchStatementsAndAssignments: Boolean = false): Subject {
         // TODO (+) i18n error message
         return when (fetchStatementsAndAssignments) {
@@ -53,6 +54,7 @@ class SubjectService(
         } ?: throw EntityNotFoundException("There is no subject for id \"$id\"")
     }
 
+    // TODO : Uncouple from assignments
     fun get(user: MaterialUser, id: Long, fetchStatementsAndAssignments: Boolean = false): Subject {
         get(id, fetchStatementsAndAssignments).let {
             if (!user.isTeacher()) {
@@ -213,6 +215,7 @@ class SubjectService(
         updateAllStatementRank(subject)
     }
 
+    // TODO : Uncouple from assignments (we may implement a soft delete)
     private fun deleteStatementIfNotUsed(statement: Statement) {
         val statementAlreadyUsed =
             statementService.responsesExistForStatement(statement) || statementService.eventLogsExistForStatement(
@@ -280,6 +283,7 @@ class SubjectService(
         subject.statements.mapIndexed { index, statement -> statement.rank = index + 1 }
     }
 
+    // TODO : Remove to uncouple from assignments
     fun addAssignment(subject: Subject, assignment: Assignment): Assignment {
         assignment.subject = subject
         assignment.rank = (subject.assignments.map { it.rank }.maxOrNull() ?: 0) + 1
@@ -290,6 +294,7 @@ class SubjectService(
         return assignment
     }
 
+    // TODO : Should belong to the player, not the writer
     fun moveUpAssignment(subject: Subject, assignmentId: Long) {
         val idsArray = subject.assignments.map { it.id }.toTypedArray()
         val pos = idsArray.indexOf(assignmentId)
@@ -308,6 +313,7 @@ class SubjectService(
         ).executeUpdate()
     }
 
+    // TODO : Should belong to the player, not the writer
     fun moveDownAssignment(subject: Subject, assignmentId: Long) {
         val idsArray = subject.assignments.map { it.id }.toTypedArray()
         val pos = idsArray.indexOf(assignmentId)
@@ -327,6 +333,7 @@ class SubjectService(
         ).executeUpdate()
     }
 
+    // TODO : Remove to uncouple from assignments
     fun removeAssignment(user: MaterialUser, assignment: Assignment) {
         require(user == assignment.owner) {
             "Only the owner can delete an assignment"
@@ -341,6 +348,7 @@ class SubjectService(
         updateAllAssignmentRank(subject)
     }
 
+    // TODO : Should belong to the player, not the writer
     fun updateAllAssignmentRank(subject: Subject) {
         val assignmentIds = subject.assignments.map { it.id }
         if (assignmentIds.isEmpty()) return // Nothing to do
@@ -432,6 +440,7 @@ class SubjectService(
         return duplicatedStatement
     }
 
+    // TODO : Can we remove this method now?
     fun migrateAssignmentsTowardSubjects() {
         // get all assignments without subject
         assignmentRepository.findAllBySubjectIsNull().forEach { assignment ->

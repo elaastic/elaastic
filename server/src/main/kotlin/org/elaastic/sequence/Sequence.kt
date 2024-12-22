@@ -58,7 +58,7 @@ class Sequence(
     @field:ManyToOne(fetch = FetchType.LAZY)
     var owner: User,
 
-    @field:ManyToOne(fetch = FetchType.EAGER)
+    @field:ManyToOne(fetch = FetchType.EAGER) // TODO : Remove this relationship (replace by statement UUID)
     var statement: Statement,
 
     @field:NotNull

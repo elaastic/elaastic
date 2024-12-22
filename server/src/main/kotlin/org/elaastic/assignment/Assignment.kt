@@ -57,7 +57,7 @@ class Assignment(
      *
      * @see Subject
      */
-    @field:ManyToOne(fetch = FetchType.EAGER)
+    @field:ManyToOne(fetch = FetchType.EAGER) // TODO: Remove this relation to the subject (must transformed into a reference using subject UUID)
     var subject: Subject? = null,
 
     @field:NotNull

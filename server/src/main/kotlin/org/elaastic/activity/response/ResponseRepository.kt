@@ -31,6 +31,7 @@ interface ResponseRepository : JpaRepository<Response, Long> {
                                                    attempt: AttemptNum
     ): Int
 
+    // TODO replace by statement Uuid
     fun countByStatement(statement: Statement): Int
 
     fun findAllByAttemptAndInteractionAndFakeIsTrue(attempt: AttemptNum, interaction: Interaction): List<Response>
