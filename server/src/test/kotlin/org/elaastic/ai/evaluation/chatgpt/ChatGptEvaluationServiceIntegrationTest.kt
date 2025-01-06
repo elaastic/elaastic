@@ -45,7 +45,7 @@ internal class ChatGptEvaluationServiceIntegrationTest(
     fun setup() {
         chatGptEvaluationRepository.deleteAll()
         // Precondition
-        assertThat(chatGptEvaluationRepository.findAll(), `is`(empty()))
+        assertTrue(chatGptEvaluationRepository.findAll().isEmpty())
         // We want a reasonable good prompt for the test
         chatGptPromptService.updatePrompt(
             "Tu es un enseignant bienveillant qui doit évaluer la réponse donnée par un élève"
@@ -85,6 +85,53 @@ internal class ChatGptEvaluationServiceIntegrationTest(
 
             assertThat(it.hiddenByTeacher, equalTo(false))
             assertThat(it.removedByTeacher, equalTo(false))
+        }
+    }
+
+    @Test
+    @Transactional(propagation = Propagation.NOT_SUPPORTED)
+    fun `get a chatgpt evaluation - invalid (no teacher explanation)`() {
+
+        val response = integrationTestingService.getAnyResponse()
+        response.explanation =
+            "Git est le meilleur système de gestion de version, il coche donc toutes les bonnes options."
+        val promptFr = chatGptPromptService.getPrompt("fr")
+
+        response.statement.expectedExplanation = null
+
+        tWhen {
+            val block: () -> Unit = {
+                chatGptEvaluationService.createEvaluation(response, "fr")
+            }
+            block
+        }.tThen {
+            assertThrows(
+                IllegalArgumentException::class.java,
+                it,
+                "Error: You must define an expected explanation to create a ChatGPT evaluation"
+            )
+        }
+    }
+
+    @Test
+    @Transactional(propagation = Propagation.NOT_SUPPORTED)
+    fun `get a chatgpt evaluation - invalid (no student answer)`() {
+
+        val response = integrationTestingService.getAnyResponse()
+        response.explanation = null
+        val promptFr = chatGptPromptService.getPrompt("fr")
+
+        tWhen {
+            val block: () -> Unit = {
+                chatGptEvaluationService.createEvaluation(response, "fr")
+            }
+            block
+        }.tThen {
+            assertThrows(
+                IllegalArgumentException::class.java,
+                it,
+                "Error: No explanation to evaluate"
+            )
         }
     }
 
@@ -597,6 +644,205 @@ internal class ChatGptEvaluationServiceIntegrationTest(
             it
         }.tThen {
             assertFalse(it.removedByTeacher)
+        }
+    }
+
+    @Test
+    fun `test getAINameProvider`() {
+        assertEquals("ChatGPT", chatGptEvaluationService.getAINameProvider())
+    }
+
+    @Test
+    fun `test of findEvaluationByResponse`() {
+        // Given
+        val sequence = integrationTestingService.getAnySequence()
+        functionalTestingService.startSequence(sequence, ExecutionContext.FaceToFace)
+
+        val learner = integrationTestingService.getNLearners(3).shuffled().first()
+
+        val response = functionalTestingService.submitResponse(
+            Phase.PHASE_1,
+            learner,
+            sequence,
+            true,
+            ConfidenceDegree.CONFIDENT,
+            "explanation",
+        )
+
+        // Precondition
+        assertNull(chatGptEvaluationService.findEvaluationByResponse(response))
+
+        tGiven("A chatGPT evaluation") {
+            functionalTestingService.createChatGPTEvaluation(response)
+        }.tThen("The evaluation exist") {
+            assertEquals(it, chatGptEvaluationService.findEvaluationByResponse(response))
+            it
+        }.tWhen("The teacher removed the evaluation") {
+            chatGptEvaluationService.markAsRemoved(sequence.owner, it)
+            it
+        }.tThen("The evaluation is removed") {
+            assertNull(chatGptEvaluationService.findEvaluationByResponse(response))
+        }
+    }
+
+    @Test
+    fun `test of findEvaluationById`() {
+        // Given
+        val sequence = integrationTestingService.getAnySequence()
+        functionalTestingService.startSequence(sequence, ExecutionContext.FaceToFace)
+
+        val learner = integrationTestingService.getNLearners(3).shuffled().first()
+
+        val response = functionalTestingService.submitResponse(
+            Phase.PHASE_1,
+            learner,
+            sequence,
+            true,
+            ConfidenceDegree.CONFIDENT,
+            "explanation",
+        )
+
+        tGiven("A chatGPT evaluation") {
+            functionalTestingService.createChatGPTEvaluation(response)
+        }.tThen("The evaluation exist") {
+            assertEquals(it, chatGptEvaluationService.findEvaluationById(it.id!!))
+            it
+        }.tWhen("The teacher removed the evaluation") {
+            chatGptEvaluationService.markAsRemoved(sequence.owner, it)
+            it
+        }.tThen("The evaluation is removed") {
+            assertNull(chatGptEvaluationService.findEvaluationById(it.id!!))
+        }
+    }
+
+    @Test
+    fun `test of markAsHidden`() {
+        // Given
+        val sequence = integrationTestingService.getAnySequence()
+        functionalTestingService.startSequence(sequence, ExecutionContext.FaceToFace)
+
+        val learner = integrationTestingService.getNLearners(3).shuffled().first()
+
+        val response = functionalTestingService.submitResponse(
+            Phase.PHASE_1,
+            learner,
+            sequence,
+            true,
+            ConfidenceDegree.CONFIDENT,
+            "explanation",
+        )
+
+        tGiven("A chatGPT evaluation") {
+            functionalTestingService.createChatGPTEvaluation(response)
+        }.tWhen("The teacher hide the evaluation") {
+            assertDoesNotThrow {
+                chatGptEvaluationService.markAsHidden(it, sequence.owner)
+            }
+            it
+        }.tThen("The evaluation is hidden") {
+            assertTrue(it.hiddenByTeacher)
+            it
+        }
+    }
+
+    @Test
+    fun `test of findAllBySequence`() {
+        // Given
+        val sequence = integrationTestingService.getAnySequence()
+        functionalTestingService.startSequence(sequence, ExecutionContext.FaceToFace)
+
+        val learner = integrationTestingService.getNLearners(3).shuffled().first()
+
+        val response = functionalTestingService.submitResponse(
+            Phase.PHASE_1,
+            learner,
+            sequence,
+            true,
+            ConfidenceDegree.CONFIDENT,
+            "explanation",
+        )
+
+        // Precondition
+        assertEquals(0, chatGptEvaluationService.findAllBySequence(sequence).size)
+
+        tGiven("A chatGPT evaluation") {
+            functionalTestingService.createChatGPTEvaluation(response)
+        }.tThen("The evaluation exist") {
+            assertEquals(1, chatGptEvaluationService.findAllBySequence(sequence).size)
+            assertEquals(it, chatGptEvaluationService.findAllBySequence(sequence).first())
+            it
+        }.tWhen("The teacher removed the evaluation") {
+            chatGptEvaluationService.markAsRemoved(sequence.owner, it)
+            it
+        }.tThen("The evaluation is removed") {
+            assertEquals(0, chatGptEvaluationService.findAllBySequence(sequence).size)
+        }
+    }
+
+    @Test
+    fun `test of findAllReported`() {
+        // Given
+        val sequence = integrationTestingService.getAnySequence()
+        functionalTestingService.startSequence(sequence, ExecutionContext.FaceToFace)
+
+        val learner = integrationTestingService.getNLearners(3).shuffled().first()
+
+        val response = functionalTestingService.submitResponse(
+            Phase.PHASE_1,
+            learner,
+            sequence,
+            true,
+            ConfidenceDegree.CONFIDENT,
+            "explanation",
+        )
+
+        // Precondition
+        assertEquals(0, chatGptEvaluationService.findAllReported(sequence, true).size)
+        assertEquals(0, chatGptEvaluationService.findAllReportedRemoved(sequence).size)
+        assertEquals(0, chatGptEvaluationService.countAllReported(sequence, true))
+
+        assertEquals(0, chatGptEvaluationService.findAllReported(sequence, false).size)
+        assertEquals(0, chatGptEvaluationService.findAllReportedNotRemoved(sequence).size)
+        assertEquals(0, chatGptEvaluationService.countAllReported(sequence, false))
+
+        tGiven("A chatGPT evaluation") {
+            functionalTestingService.createChatGPTEvaluation(response)
+        }.tThen("The evaluation exist") {
+            assertEquals(0, chatGptEvaluationService.findAllReported(sequence, true).size)
+            assertEquals(0, chatGptEvaluationService.findAllReportedRemoved(sequence).size)
+            assertEquals(0, chatGptEvaluationService.countAllReported(sequence, true))
+
+            assertEquals(0, chatGptEvaluationService.findAllReported(sequence, false).size)
+            assertEquals(0, chatGptEvaluationService.findAllReportedNotRemoved(sequence).size)
+            assertEquals(0, chatGptEvaluationService.countAllReported(sequence, false))
+            it
+        }.tWhen("a learner report it") {
+            chatGptEvaluationService.reportEvaluation(it, listOf(ReportReason.INCOHERENCE.name))
+            it
+        }.tThen("The evaluation is reported") {
+            assertNotNull(it.reportReasons)
+            assertFalse(it.removedByTeacher)
+            assertEquals(0, chatGptEvaluationService.findAllReported(sequence, true).size)
+            assertEquals(0, chatGptEvaluationService.findAllReportedRemoved(sequence).size)
+            assertEquals(0, chatGptEvaluationService.countAllReported(sequence, true))
+
+            assertEquals(1, chatGptEvaluationService.findAllReported(sequence, false).size)
+            assertEquals(1, chatGptEvaluationService.findAllReportedNotRemoved(sequence).size)
+            assertEquals(1, chatGptEvaluationService.countAllReported(sequence, false))
+            it
+        }.tWhen("The teacher remove the evaluation") {
+            chatGptEvaluationService.markAsRemoved(sequence.owner, it)
+            it
+        }.tThen("The evaluation is removed") {
+            assertNotNull(it.reportReasons)
+            assertTrue(it.removedByTeacher)
+            assertEquals(1, chatGptEvaluationService.findAllReported(sequence, true).size)
+            assertEquals(1, chatGptEvaluationService.findAllReportedRemoved(sequence).size)
+            assertEquals(1, chatGptEvaluationService.countAllReported(sequence, true))
+
+            assertEquals(0, chatGptEvaluationService.findAllReported(sequence, false).size)
+            assertEquals(0, chatGptEvaluationService.findAllReportedNotRemoved(sequence).size)
+            assertEquals(0, chatGptEvaluationService.countAllReported(sequence, false))
         }
     }
 }
