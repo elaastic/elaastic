@@ -100,6 +100,8 @@ class ComponentTestingController(
 
 ) {
 
+    private val TEACHER_S_EXPLANATION = "teacher's explanation"
+
     @GetMapping("/index", "/", "")
     fun index(
         authentication: Authentication,
@@ -1409,7 +1411,7 @@ class ComponentTestingController(
                                     ),
                                     TeacherExplanationData(
                                         responseId = Random.nextLong(),
-                                        "teacher's explanation",
+                                        TEACHER_S_EXPLANATION,
                                         "Franck Sil (@fsil)",
                                         confidenceDegree = ConfidenceDegree.CONFIDENT,
                                         score = BigDecimal("100")
@@ -1503,7 +1505,7 @@ class ComponentTestingController(
                                         to listOf(
                                     TeacherExplanationData(
                                         responseId = Random.nextLong(),
-                                        "teacher's explanation",
+                                        TEACHER_S_EXPLANATION,
                                         "Franck Sil (@fsil)",
                                         3,
                                         3,
@@ -1584,7 +1586,7 @@ class ComponentTestingController(
                                         to listOf(
                                     TeacherExplanationData(
                                         responseId = Random.nextLong(),
-                                        "teacher's explanation",
+                                        TEACHER_S_EXPLANATION,
                                         "Franck Sil (@fsil)",
                                         confidenceDegree = ConfidenceDegree.CONFIDENT,
                                         score = BigDecimal("100")
@@ -2641,11 +2643,11 @@ class ComponentTestingController(
                 choices = true,
                 userHasCompletedPhase2 = false,
                 nextResponseToGrade =
-                org.elaastic.sequence.phase.evaluation.ResponseData(
-                    id = 1,
-                    choiceList = listOf(1),
-                    explanation = "1st explanation"
-                ),
+                    org.elaastic.sequence.phase.evaluation.ResponseData(
+                        id = 1,
+                        choiceList = listOf(1),
+                        explanation = "1st explanation"
+                    ),
                 lastResponseToGrade = false,
                 secondAttemptAllowed = true,
                 secondAttemptAlreadySubmitted = false,
