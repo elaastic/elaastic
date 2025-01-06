@@ -103,6 +103,8 @@ class ComponentTestingController(
 
 ) {
 
+    private val TEACHER_S_EXPLANATION = "teacher's explanation"
+
     @GetMapping("/index", "/", "")
     fun index(
         authentication: Authentication,
@@ -1412,7 +1414,7 @@ class ComponentTestingController(
                                     ),
                                     TeacherExplanationData(
                                         responseId = Random.nextLong(),
-                                        "teacher's explanation",
+                                        TEACHER_S_EXPLANATION,
                                         "Franck Sil (@fsil)",
                                         confidenceDegree = ConfidenceDegree.CONFIDENT,
                                         score = BigDecimal("100")
@@ -1506,7 +1508,7 @@ class ComponentTestingController(
                                         to listOf(
                                     TeacherExplanationData(
                                         responseId = Random.nextLong(),
-                                        "teacher's explanation",
+                                        TEACHER_S_EXPLANATION,
                                         "Franck Sil (@fsil)",
                                         3,
                                         3,
@@ -1587,7 +1589,7 @@ class ComponentTestingController(
                                         to listOf(
                                     TeacherExplanationData(
                                         responseId = Random.nextLong(),
-                                        "teacher's explanation",
+                                        TEACHER_S_EXPLANATION,
                                         "Franck Sil (@fsil)",
                                         confidenceDegree = ConfidenceDegree.CONFIDENT,
                                         score = BigDecimal("100")

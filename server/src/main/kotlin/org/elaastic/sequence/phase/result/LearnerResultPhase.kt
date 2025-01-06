@@ -35,17 +35,6 @@ class LearnerResultPhase(
 
     override fun getViewModel(): LearnerResultPhaseViewModel {
 
-        val idFirstResponse = try {
-            learnerPhaseExecution?.responseSet?.get(1)?.first()?.id
-        } catch (e: Exception) {
-            null
-        }
-        val idSecondResponse = try {
-            learnerPhaseExecution?.responseSet?.get(2)?.first()?.id
-        } catch (e: Exception) {
-            null
-        }
-
         // TODO : Fill with real data
         val explanationHasChatGPTEvaluationMap = ChatGptEvaluationResponseStore()
 
