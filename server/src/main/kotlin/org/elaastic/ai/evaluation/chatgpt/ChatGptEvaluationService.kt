@@ -96,7 +96,7 @@ class ChatGptEvaluationService(
         chatGptEvaluationRepository.findByResponse(response).takeIf { it?.removedByTeacher == false }
 
     fun findEvaluationById(id: Long): ChatGptEvaluation? {
-        return chatGptEvaluationRepository.findById(id).get().takeIf { !it.removedByTeacher }
+        return chatGptEvaluationRepository.findById(id).orElse(null)?.takeIf { !it.removedByTeacher }
     }
 
 
