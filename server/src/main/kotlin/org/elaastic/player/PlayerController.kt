@@ -273,7 +273,7 @@ class PlayerController(
     ): String {
 
         val assignment = sequence.assignment!!
-        val nbRegisteredUsers = assignmentService.getNbRegisteredUsers(assignment)
+        val nbRegisteredUsers = assignmentService.countRegisteredUsers(assignment)
 
         val learnerSequence = learnerSequenceService.getLearnerSequence(user, sequence)
         learnerPhaseService.loadPhaseList(learnerSequence)
@@ -301,7 +301,7 @@ class PlayerController(
     @GetMapping("/assignment/{id}/nbRegisteredUsers")
     @ResponseBody
     fun getNbRegisteredUsers(@PathVariable id: Long): Int {
-        return assignmentService.getNbRegisteredUsers(id)
+        return assignmentService.countRegisteredUsers(id)
     }
 
     /**

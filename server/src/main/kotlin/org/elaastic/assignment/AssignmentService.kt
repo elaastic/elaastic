@@ -2,13 +2,13 @@ package org.elaastic.assignment
 
 import org.elaastic.activity.response.ResponseService
 import org.elaastic.common.util.toDate
-import org.elaastic.sequence.Sequence
-import org.elaastic.sequence.SequenceRepository
-import org.elaastic.material.instructional.question.attachment.AttachmentService
 import org.elaastic.material.instructional.course.Course
-import org.elaastic.material.instructional.subject.Subject
+import org.elaastic.material.instructional.question.attachment.AttachmentService
 import org.elaastic.material.instructional.statement.Statement
 import org.elaastic.material.instructional.statement.StatementService
+import org.elaastic.material.instructional.subject.Subject
+import org.elaastic.sequence.Sequence
+import org.elaastic.sequence.SequenceRepository
 import org.elaastic.user.User
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.domain.Page
@@ -51,6 +51,7 @@ class AssignmentService(
         } ?: throw EntityNotFoundException("There is no assignment for id \"$id\"")
     }
 
+    // TODO Test
     fun findByUuid(uuid: UUID, fetchSequences: Boolean = false): Assignment {
         // TODO (+) i18n error message
         return when (fetchSequences) {
@@ -118,6 +119,7 @@ class AssignmentService(
         updateAllSequenceRank(assignment)
     }
 
+    // TODO remove this unused method
     fun moveUpSequence(assignment: Assignment, sequenceId: Long) {
         val idsArray = assignment.sequences.map { it.id }.toTypedArray()
         val pos = idsArray.indexOf(sequenceId)
@@ -135,6 +137,7 @@ class AssignmentService(
         ).executeUpdate()
     }
 
+    // TODO remove this unused method
     fun moveDownSequence(assignment: Assignment, sequenceId: Long) {
         val idsArray = assignment.sequences.map { it.id }.toTypedArray()
         val pos = idsArray.indexOf(sequenceId)
@@ -200,21 +203,18 @@ class AssignmentService(
         ) != null
     }
 
-    fun getNbRegisteredUsers(assignment: Assignment): Int {
+
+    fun getRegisteredUsers(assignment: Assignment): List<LearnerAssignment> =
+        learnerAssignmentRepository.findAllByAssignment(assignment)
+
+    fun getRegisteredUser(assignment: Assignment, user: User): LearnerAssignment? =
+        learnerAssignmentRepository.findByLearnerAndAssignment(user, assignment)
+
+    fun countRegisteredUsers(assignment: Assignment): Int {
         return learnerAssignmentRepository.countAllByAssignment(assignment)
     }
 
-    fun getRegisteredUsers(assignment: Assignment): List<LearnerAssignment>
-        = learnerAssignmentRepository.findAllByAssignment(assignment)
-
-    fun getRegisteredUser(assignment: Assignment, user: User): LearnerAssignment?
-        = learnerAssignmentRepository.findByLearnerAndAssignment(user, assignment)
-
-    fun countAllRegisteredUsers(assignment: Assignment): Int {
-        return learnerAssignmentRepository.countAllByAssignment(assignment)
-    }
-
-    fun getNbRegisteredUsers(assignmentId: Long): Int {
+    fun countRegisteredUsers(assignmentId: Long): Int {
         return learnerAssignmentRepository.countAllByAssignment(
             assignmentRepository.getReferenceById(assignmentId)
         )
@@ -227,26 +227,21 @@ class AssignmentService(
         }
     }
 
-    fun getCoursesAssignmentsMap(assignments: List<Assignment>): MutableMap<Course, MutableList<Assignment>> {
-
-        // TODO rewrite this code in a more functional way
-        val mapResult: MutableMap<Course, MutableList<Assignment>> = mutableMapOf()
-        for (assignment in assignments) {
-            val course: Course? = assignment.subject?.course
-            if (course != null) {
-                if (!mapResult.containsKey(course)) {
-                    mapResult[course] = mutableListOf(assignment)
-                } else {
-                    mapResult[course]!!.add(assignment)
-                }
-            }
-        }
-        return mapResult
-    }
+    /**
+     * Get a map of courses and their assignments
+     * @param assignments list of assignments
+     * @return a map who associates courses in key and a list of their assignments in value
+     */
+    fun getCoursesAssignmentsMap(assignments: List<Assignment>): MutableMap<Course, MutableList<Assignment>> =
+        assignments
+            .filter { it.subject?.course != null } // filter out assignments without course
+            .groupBy { it.subject!!.course!! }
+            .mapValues { it.value.toMutableList() }
+            .toMutableMap()
 
     fun findAllAssignmentUpdatedSince(since: LocalDateTime): List<Assignment> =
         assignmentRepository.findAllAssignmentUpdatedSince(since.toDate())
 
-fun findAllLearnersRegisteredOnWithCasUser(assignment: Assignment) =
-    learnerAssignmentRepository.findAllRegisteredLearnersOnAssignmentWithCasUser(assignment).toSet()
+    fun findAllLearnersRegisteredOnWithCasUser(assignment: Assignment) =
+        learnerAssignmentRepository.findAllRegisteredLearnersOnAssignmentWithCasUser(assignment).toSet()
 }
