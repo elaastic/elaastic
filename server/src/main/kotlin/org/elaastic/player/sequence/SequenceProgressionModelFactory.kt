@@ -44,11 +44,11 @@ class SequenceProgressionModelFactory(
     ) = SequenceInfoResolver.resolve(
         isTeacher = sequence.owner == user,
         sequence = sequence,
-        nbReportedEvaluation = getNbRerportedEvaluation(sequence, user),
+        nbReportedEvaluation = countRerportedEvaluation(sequence, user),
         messageBuilder = messageBuilder,
     )
 
-    private fun getNbRerportedEvaluation(sequence: Sequence, user: User): ReportInformation {
+    private fun countRerportedEvaluation(sequence: Sequence, user: User): ReportInformation {
         return sequenceService.getNbReportBySequence(sequence, sequence.owner == user)
     }
 
