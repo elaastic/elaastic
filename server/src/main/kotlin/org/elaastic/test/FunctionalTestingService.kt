@@ -4,6 +4,9 @@ import org.elaastic.activity.evaluation.peergrading.PeerGradingService
 import org.elaastic.activity.response.ConfidenceDegree
 import org.elaastic.activity.response.Response
 import org.elaastic.activity.response.ResponseService
+import org.elaastic.ai.evaluation.chatgpt.ChatGptEvaluation
+import org.elaastic.ai.evaluation.chatgpt.ChatGptEvaluationRepository
+import org.elaastic.ai.evaluation.chatgpt.ChatGptEvaluationStatus
 import org.elaastic.assignment.Assignment
 import org.elaastic.assignment.AssignmentService
 import org.elaastic.assignment.ReadyForConsolidation
@@ -15,8 +18,12 @@ import org.elaastic.material.instructional.statement.StatementRepository
 import org.elaastic.material.instructional.statement.StatementService
 import org.elaastic.material.instructional.subject.Subject
 import org.elaastic.material.instructional.subject.SubjectService
+import org.elaastic.moderation.UtilityGrade
 import org.elaastic.player.PlayerController
-import org.elaastic.sequence.*
+import org.elaastic.sequence.ExecutionContext
+import org.elaastic.sequence.Sequence
+import org.elaastic.sequence.SequenceService
+import org.elaastic.sequence.State
 import org.elaastic.sequence.interaction.InteractionService
 import org.elaastic.sequence.phase.evaluation.EvaluationPhaseConfig
 import org.elaastic.test.interpreter.command.*
@@ -25,6 +32,7 @@ import org.elaastic.user.UserRepository
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import java.math.BigDecimal
 import java.time.LocalDate
 import kotlin.random.Random
 
@@ -44,6 +52,7 @@ class FunctionalTestingService(
     @Autowired val interactionService: InteractionService,
     @Autowired val statementService: StatementService,
     @Autowired val statementRepository: StatementRepository,
+    private val chatGptEvaluationRepository: ChatGptEvaluationRepository,
 ) {
 
     fun createCourse(user: User, title: String = "Default course title") =
@@ -98,7 +107,7 @@ class FunctionalTestingService(
     fun addQuestion(subject: Subject, statement: Statement) =
         subjectService.addStatement(subject, statement)
 
-    fun addQuestion(subject: Subject, questionType: QuestionType, addFakeResponse: Boolean = true,) =
+    fun addQuestion(subject: Subject, questionType: QuestionType, addFakeResponse: Boolean = true) =
         subject.statements.size.let { questionIndex ->
             addQuestion(
                 subject,
@@ -480,12 +489,14 @@ class FunctionalTestingService(
      * @param teacher the teacher who owns the sequence
      */
     fun createSequence(teacher: User, addFakeResponse: Boolean = false): Sequence {
-        return generateSubjectWithQuestionsAndAssignments(teacher, addFakeResponse = addFakeResponse).assignments.first().sequences.first()
+        return generateSubjectWithQuestionsAndAssignments(
+            teacher,
+            addFakeResponse = addFakeResponse
+        ).assignments.first().sequences.first()
     }
 
     /**
-     * Create a response for the sequence.
-     * The sequence must be started and have a response submission interaction The
+     * Create a response for the sequence. The sequence must be started and have a response submission interaction The
      * response is randomly generated
      *
      * The response is saved in the database
@@ -505,5 +516,46 @@ class FunctionalTestingService(
             ConfidenceDegree.values().random(),
             "Random explanation on ${LocalDate.now()} by ${learner.username}"
         )
+    }
+
+    /**
+     * Create a ChatGPT evaluation for a response
+     *
+     * The ChatGPT evaluation is saved in the database
+     *
+     * @param response the response to evaluate
+     * @param annotation the annotation of the evaluation
+     * @param grade the grade of the evaluation
+     * @param status the status of the evaluation
+     * @param reportReasons the report reasons of the evaluation
+     * @param reportComment the report comment of the evaluation
+     * @param utilityGrade the utility grade of the evaluation
+     * @param hiddenByTeacher the hidden by teacher status of the evaluation
+     * @param removedByTeacher the removed by teacher status of the evaluation
+     */
+    fun createChatGPTEvaluation(
+        response: Response,
+        annotation: String = "annotation",
+        grade: BigDecimal? = null,
+        status: ChatGptEvaluationStatus = ChatGptEvaluationStatus.DONE,
+        reportReasons: String? = null,
+        reportComment: String? = null,
+        utilityGrade: UtilityGrade? = null,
+        hiddenByTeacher: Boolean = false,
+        removedByTeacher: Boolean = false,
+    ): ChatGptEvaluation {
+        val chatGptEvaluation = ChatGptEvaluation(
+            grade,
+            annotation,
+            status.name,
+            reportReasons,
+            reportComment,
+            utilityGrade,
+            hiddenByTeacher,
+            removedByTeacher,
+            response,
+        )
+
+        return chatGptEvaluationRepository.save(chatGptEvaluation)
     }
 }
