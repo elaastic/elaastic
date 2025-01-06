@@ -95,14 +95,14 @@
     </div>
 
     <script th:if="${context == 'aside' && dashboardModel.sequence.id != null}" th:inline="javascript">
-        (() => {
+        $(function() {
             const container = $('#layout-aside');
             const target = $('#' + [[${context}]] + '-[[${dashboardModel.sequence.id}]]');
 
             if (!elaastic.util.isVisible(target, container, 50)) {
                 elaastic.util.ensureIsVisible(target, container)
             }
-        })();
+        });
     </script>
 
     <style>
