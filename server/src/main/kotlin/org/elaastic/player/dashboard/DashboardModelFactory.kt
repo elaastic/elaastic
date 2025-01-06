@@ -92,7 +92,7 @@ class DashboardModelFactory(
 
         // Associate each learner with the number of evaluations he made
         val evaluationCountByUser = peerGradingService.countEvaluationsMadeByUsers(attendees, sequence)
-        val countResponseGradable = getCountResponseGradable(sequence)
+        val countResponseGradable = countGradableResponse(sequence)
 
         val learners: MutableList<LearnerMonitoringModel> = mutableListOf()
 
@@ -117,7 +117,7 @@ class DashboardModelFactory(
      * @param sequence the sequence
      * @return the number of responses that are gradable
      */
-    fun getCountResponseGradable(sequence: Sequence): Long {
+    fun countGradableResponse(sequence: Sequence): Long {
         return if (sequence.getResponseSubmissionInteractionOrNull() == null) {
             // If the sequence hasn't started yet, the ResponseSubmission interaction would be null
             // If the sequence hasn't started yet, no response has been produce,

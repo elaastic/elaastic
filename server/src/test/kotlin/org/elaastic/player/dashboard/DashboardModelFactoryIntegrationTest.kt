@@ -20,30 +20,30 @@ class DashboardModelFactoryIntegrationTest(
 ) {
 
     @Test
-    fun `test of getCountResponseGradable with no fake response`() {
+    fun `test of countGradableResponse with no fake response`() {
         tGiven("A sequence") {
             functionalTestingService.createSequence(integrationTestingService.getTestTeacher())
         }.tThen("there is no response gradable") { sequence ->
-            assertEquals(0, dashboardModelFactory.getCountResponseGradable(sequence), "No response gradable")
+            assertEquals(0, dashboardModelFactory.countGradableResponse(sequence), "No response gradable")
             functionalTestingService.startSequence(sequence, nbResponseToEvaluate = 1)
-            assertEquals(0, dashboardModelFactory.getCountResponseGradable(sequence), "No response gradable")
+            assertEquals(0, dashboardModelFactory.countGradableResponse(sequence), "No response gradable")
             sequence
         }.tWhen("we add a response gradable") { sequence ->
             functionalTestingService.createResponse(sequence, integrationTestingService.getTestStudent())
             sequence
         }.tThen("there is one response gradable") { sequence ->
-            assertEquals(1, dashboardModelFactory.getCountResponseGradable(sequence), "One response gradable")
+            assertEquals(1, dashboardModelFactory.countGradableResponse(sequence), "One response gradable")
         }
     }
 
     @Test
-    fun `test of getCountResponseGradable with fake response`() {
+    fun `test of countGradableResponse with fake response`() {
         tGiven("A sequence with a fake response") {
             val teacher = integrationTestingService.getTestTeacher()
             val sequence = functionalTestingService.createSequence(teacher, true)
             functionalTestingService.startSequence(sequence, nbResponseToEvaluate = 1)
         }.tThen("there is one response gradable") { sequence ->
-            assertEquals(1, dashboardModelFactory.getCountResponseGradable(sequence), "The fake response is gradable")
+            assertEquals(1, dashboardModelFactory.countGradableResponse(sequence), "The fake response is gradable")
         }
     }
 }
