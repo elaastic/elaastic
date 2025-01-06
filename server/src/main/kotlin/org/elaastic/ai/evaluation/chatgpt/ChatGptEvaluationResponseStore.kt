@@ -11,7 +11,7 @@ class ChatGptEvaluationResponseStore(responseIds: Collection<Long> = emptyList()
     private val responseIdSet: MutableSet<Long> = emptySet<Long>().toMutableSet()
 
     init {
-        responseIds.filterIsInstance<Long>().forEach { responseIdSet.add(it) }
+        responseIdSet.addAll(responseIds)
     }
 
     fun addResponseId(responseId: Long) {
