@@ -24,7 +24,7 @@ class TeacherResultDashboardService(
 
         val listIdResponse = responseSet[1].map { it.id } + responseSet[2].map { it.id }
 
-        val explanationHasChatGPTEvaluationMap: Map<Long, Boolean> =
+        val chatGptEvaluationResponseStore =
             chatGptEvaluationService.associateResponseToChatGPTEvaluationExistence(listIdResponse)
 
         return ResultsModelFactory.build(
@@ -35,7 +35,7 @@ class TeacherResultDashboardService(
             true,
             messageBuilder,
             peerGradings = peerGradingService.findAllByAttempt(sequence, 1),
-            explanationHasChatGPTEvaluationMap = explanationHasChatGPTEvaluationMap
+            chatGptEvaluationResponseStore = chatGptEvaluationResponseStore
         )
     }
 

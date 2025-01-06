@@ -357,7 +357,7 @@ internal class ChatGptEvaluationServiceIntegrationTest(
         // Given
         val response = integrationTestingService.getAnyResponse()
 
-        var expected: Map<Long, Boolean> = mapOf(response.id!! to false)
+        var expected = ChatGptEvaluationResponseStore()
         assertEquals(
             expected,
             chatGptEvaluationService.associateResponseToChatGPTEvaluationExistence(listOf(response.id))
@@ -379,7 +379,7 @@ internal class ChatGptEvaluationServiceIntegrationTest(
                 it
             }
         }.tWhen("The teacher try to unhide the evaluation") {
-            expected = mapOf(response.id!! to true)
+            expected = ChatGptEvaluationResponseStore(listOf(response.id!!))
             assertEquals(
                 expected,
                 chatGptEvaluationService.associateResponseToChatGPTEvaluationExistence(listOf(response.id))
