@@ -1,6 +1,7 @@
 package org.elaastic.player.results.learner
 
 import org.elaastic.activity.response.Response
+import org.elaastic.ai.evaluation.chatgpt.ChatGptEvaluationResponseStore
 import org.elaastic.material.instructional.question.ExclusiveChoiceSpecification
 import org.elaastic.material.instructional.question.MultipleChoiceSpecification
 import org.elaastic.material.instructional.question.QuestionType
@@ -17,105 +18,103 @@ object LearnerResultsModelFactory {
      * @param statement the statement of the sequence
      */
     fun builtLearnerResultsModel(
-        responseFirstAttempt: Response?,
-        responseSecondAttempt: Response?,
-        responseFirstTryHasChatGPTEvaluation: Boolean,
-        responseSecondTryHasChatGPTEvaluation: Boolean,
+        learnerSequenceResponses: LearnerSequenceResponses,
         statement: Statement
     ): LearnerResultsModel {
         val learnerResultsModel = when (statement.questionType) {
             QuestionType.ExclusiveChoice -> buildExclusiveChoiceResult(
-                responseFirstAttempt,
-                responseSecondAttempt,
-                responseFirstTryHasChatGPTEvaluation,
-                responseSecondTryHasChatGPTEvaluation,
+                learnerSequenceResponses,
                 statement
             )
 
             QuestionType.MultipleChoice -> buildMultipleChoiceResult(
-                responseFirstAttempt,
-                responseSecondAttempt,
-                responseFirstTryHasChatGPTEvaluation,
-                responseSecondTryHasChatGPTEvaluation,
+                learnerSequenceResponses,
                 statement
             )
 
             QuestionType.OpenEnded -> buildOpenResult(
-                responseFirstAttempt,
-                responseSecondAttempt,
-                responseFirstTryHasChatGPTEvaluation,
-                responseSecondTryHasChatGPTEvaluation,
+                learnerSequenceResponses,
             )
         }
         return learnerResultsModel
     }
 
     fun buildOpenResult(
-        responseFirstTry: Response?,
-        responseSecondTry: Response?,
-        responseFirstTryHasChatGPTEvaluation: Boolean,
-        responseSecondTryHasChatGPTEvaluation: Boolean,
-    ): LearnerOpenResults =
+        learnerSequenceResponses: LearnerSequenceResponses
+    ): LearnerOpenResults = with(learnerSequenceResponses) {
         LearnerOpenResults(
-            explanationFirstTry = if (responseFirstTry != null) ExplanationDataFactory.create(
-                responseFirstTry,
+            explanationFirstTry = if (responseFirstAttempt != null) ExplanationDataFactory.create(
+                responseFirstAttempt,
                 responseFirstTryHasChatGPTEvaluation
             ) else null,
-            explanationSecondTry = if (responseSecondTry != null) ExplanationDataFactory.create(
-                responseSecondTry,
+            explanationSecondTry = if (responseSecondAttempt != null) ExplanationDataFactory.create(
+                responseSecondAttempt,
                 responseSecondTryHasChatGPTEvaluation
             ) else null
         )
+    }
 
     fun buildMultipleChoiceResult(
-        responseFirstTry: Response?,
-        responseSecondTry: Response?,
-        responseFirstTryHasChatGPTEvaluation: Boolean,
-        responseSecondTryHasChatGPTEvaluation: Boolean,
+        learnerSequenceResponses: LearnerSequenceResponses,
         statement: Statement
-    ): LearnerMultipleChoiceResults =
+    ): LearnerMultipleChoiceResults = with(learnerSequenceResponses) {
         LearnerMultipleChoiceResults(
-            explanationFirstTry = if (responseFirstTry != null) ExplanationDataFactory.create(
-                responseFirstTry,
+            explanationFirstTry = if (responseFirstAttempt != null) ExplanationDataFactory.create(
+                responseFirstAttempt,
                 responseFirstTryHasChatGPTEvaluation
             ) else null,
-            explanationSecondTry = if (responseSecondTry != null) ExplanationDataFactory.create(
-                responseSecondTry,
+            explanationSecondTry = if (responseSecondAttempt != null) ExplanationDataFactory.create(
+                responseSecondAttempt,
                 responseSecondTryHasChatGPTEvaluation
             ) else null,
-            choiceFirstTry = responseFirstTry?.learnerChoice,
-            choiceSecondTry = responseSecondTry?.learnerChoice,
-            scoreFirstTry = responseFirstTry?.score?.intValueExact(),
-            scoreSecondTry = responseSecondTry?.score?.intValueExact(),
+            choiceFirstTry = responseFirstAttempt?.learnerChoice,
+            choiceSecondTry = responseSecondAttempt?.learnerChoice,
+            scoreFirstTry = responseFirstAttempt?.score?.intValueExact(),
+            scoreSecondTry = responseSecondAttempt?.score?.intValueExact(),
             expectedChoice = MultipleChoiceSpecification(
                 nbCandidateItem = statement.choiceSpecification?.toLegacy()?.itemCount!!,
                 expectedChoiceList = statement.choiceSpecification?.toLegacy()?.expectedChoiceList!!
             )
         )
+    }
 
     fun buildExclusiveChoiceResult(
-        responseFirstTry: Response?,
-        responseSecondTry: Response?,
-        responseFirstTryHasChatGPTEvaluation: Boolean,
-        responseSecondTryHasChatGPTEvaluation: Boolean,
+        learnerSequenceResponses: LearnerSequenceResponses,
         statement: Statement
-    ): LearnerExclusiveChoiceResults =
+    ): LearnerExclusiveChoiceResults = with(learnerSequenceResponses) {
         LearnerExclusiveChoiceResults(
-            explanationFirstTry = if (responseFirstTry != null) ExplanationDataFactory.create(
-                responseFirstTry,
+            explanationFirstTry = if (responseFirstAttempt != null) ExplanationDataFactory.create(
+                responseFirstAttempt,
                 responseFirstTryHasChatGPTEvaluation
             ) else null,
-            explanationSecondTry = if (responseSecondTry != null) ExplanationDataFactory.create(
-                responseSecondTry,
+            explanationSecondTry = if (responseSecondAttempt != null) ExplanationDataFactory.create(
+                responseSecondAttempt,
                 responseSecondTryHasChatGPTEvaluation
             ) else null,
-            choiceFirstTry = responseFirstTry?.learnerChoice,
-            choiceSecondTry = responseSecondTry?.learnerChoice,
-            scoreFirstTry = responseFirstTry?.score?.intValueExact(),
-            scoreSecondTry = responseSecondTry?.score?.intValueExact(),
+            choiceFirstTry = responseFirstAttempt?.learnerChoice,
+            choiceSecondTry = responseSecondAttempt?.learnerChoice,
+            scoreFirstTry = responseFirstAttempt?.score?.intValueExact(),
+            scoreSecondTry = responseSecondAttempt?.score?.intValueExact(),
             expectedChoice = ExclusiveChoiceSpecification(
                 nbCandidateItem = statement.choiceSpecification?.toLegacy()?.itemCount!!,
                 expectedChoice = statement.choiceSpecification?.toLegacy()?.expectedChoiceList!![0]
             )
+        )
+    }
+}
+
+data class LearnerSequenceResponses(
+    val responseFirstAttempt: Response?,
+    val responseSecondAttempt: Response?,
+    val chatGptEvaluationResponseStore: ChatGptEvaluationResponseStore
+) {
+    val responseFirstTryHasChatGPTEvaluation: Boolean
+        get() = responseFirstAttempt != null && chatGptEvaluationResponseStore.responseHasBeenEvaluatedByChatGpt(
+            responseFirstAttempt.id
+        )
+
+    val responseSecondTryHasChatGPTEvaluation: Boolean
+        get() = responseSecondAttempt != null && chatGptEvaluationResponseStore.responseHasBeenEvaluatedByChatGpt(
+            responseSecondAttempt.id
         )
 }

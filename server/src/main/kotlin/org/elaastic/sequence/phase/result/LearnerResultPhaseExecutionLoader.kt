@@ -7,6 +7,7 @@ import org.elaastic.common.web.MessageBuilder
 import org.elaastic.material.instructional.question.QuestionType
 import org.elaastic.player.evaluation.chatgpt.ChatGptEvaluationModelFactory
 import org.elaastic.player.results.learner.LearnerResultsModelFactory
+import org.elaastic.player.results.learner.LearnerSequenceResponses
 import org.elaastic.sequence.phase.LearnerPhase
 import org.elaastic.sequence.phase.LearnerPhaseExecution
 import org.elaastic.sequence.phase.LearnerPhaseExecutionLoader
@@ -35,42 +36,42 @@ class LearnerResultPhaseExecutionLoader(
             2
         )
 
-        val longBooleanMap = chatGptEvaluationService.associateResponseToChatGPTEvaluationExistence(
+        val chatGptEvaluationResponseStore = chatGptEvaluationService.associateResponseToChatGPTEvaluationExistence(
             listOf(
                 firstResponse?.id,
                 secondResponse?.id
             )
         )
 
-        val responseFirstTryHasChatGPTEvaluation: Boolean = longBooleanMap[firstResponse?.id] == true
-        val responseSecondTryHasChatGPTEvaluation: Boolean = longBooleanMap[secondResponse?.id] == true
-
 
         // Get the "My results" data for the learner
         val myResultsModel = when (learnerPhase.learnerSequence.sequence.statement.questionType) {
             QuestionType.OpenEnded ->
                 LearnerResultsModelFactory.buildOpenResult(
-                    firstResponse,
-                    secondResponse,
-                    responseFirstTryHasChatGPTEvaluation,
-                    responseSecondTryHasChatGPTEvaluation,
+                    LearnerSequenceResponses(
+                        firstResponse,
+                        secondResponse,
+                        chatGptEvaluationResponseStore,
+                    )
                 )
 
             QuestionType.ExclusiveChoice ->
                 LearnerResultsModelFactory.buildExclusiveChoiceResult(
-                    firstResponse,
-                    secondResponse,
-                    responseFirstTryHasChatGPTEvaluation,
-                    responseSecondTryHasChatGPTEvaluation,
+                    LearnerSequenceResponses(
+                        firstResponse,
+                        secondResponse,
+                        chatGptEvaluationResponseStore,
+                    ),
                     learnerPhase.learnerSequence.sequence.statement
                 )
 
             QuestionType.MultipleChoice ->
                 LearnerResultsModelFactory.buildMultipleChoiceResult(
-                    firstResponse,
-                    secondResponse,
-                    responseFirstTryHasChatGPTEvaluation,
-                    responseSecondTryHasChatGPTEvaluation,
+                    LearnerSequenceResponses(
+                        firstResponse,
+                        secondResponse,
+                        chatGptEvaluationResponseStore,
+                    ),
                     learnerPhase.learnerSequence.sequence.statement
                 )
         }

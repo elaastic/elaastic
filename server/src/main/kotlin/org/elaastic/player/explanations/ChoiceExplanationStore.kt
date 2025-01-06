@@ -4,6 +4,7 @@ import org.elaastic.material.instructional.question.ChoiceSpecification
 import org.elaastic.material.instructional.question.ExclusiveChoiceSpecification
 import org.elaastic.material.instructional.question.MultipleChoiceSpecification
 import org.elaastic.activity.response.Response
+import org.elaastic.ai.evaluation.chatgpt.ChatGptEvaluationResponseStore
 
 class ChoiceExplanationStore(choiceSpecification: ChoiceSpecification) : ExplanationStore,
     HashMap<ResponseData, MutableList<ExplanationData>>() {
@@ -44,9 +45,9 @@ class ChoiceExplanationStore(choiceSpecification: ChoiceSpecification) : Explana
     constructor(
         choiceSpecification: ChoiceSpecification,
         responseList: List<Response>,
-        explanationHasChatGPTEvaluationMap: Map<Long, Boolean>
+        chatGptEvaluationResponseStore: ChatGptEvaluationResponseStore
     ) : this(choiceSpecification) {
-        responseList.forEach { add(it, explanationHasChatGPTEvaluationMap[it.id] == true) }
+        responseList.forEach { add(it, chatGptEvaluationResponseStore.responseHasBeenEvaluatedByChatGpt(it.id)) }
     }
 
     fun add(response: Response, explanationHasChatGPTEvaluation: Boolean) {

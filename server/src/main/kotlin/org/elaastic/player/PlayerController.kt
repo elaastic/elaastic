@@ -22,6 +22,7 @@ import org.elaastic.activity.evaluation.peergrading.PeerGradingService
 import org.elaastic.activity.response.ConfidenceDegree
 import org.elaastic.activity.response.ResponseService
 import org.elaastic.activity.results.AttemptNum
+import org.elaastic.ai.evaluation.chatgpt.ChatGptEvaluationResponseStore
 import org.elaastic.ai.evaluation.chatgpt.ChatGptEvaluationService
 import org.elaastic.analytics.lrs.EventLogService
 import org.elaastic.assignment.Assignment
@@ -36,6 +37,7 @@ import org.elaastic.player.evaluation.chatgpt.ChatGptEvaluationModelFactory
 import org.elaastic.player.results.TeacherResultDashboardService
 import org.elaastic.player.results.learner.LearnerResultsModel
 import org.elaastic.player.results.learner.LearnerResultsModelFactory
+import org.elaastic.player.results.learner.LearnerSequenceResponses
 import org.elaastic.player.sequence.SequenceModelFactory
 import org.elaastic.player.steps.StepsModel
 import org.elaastic.player.steps.StepsModelFactory
@@ -768,27 +770,24 @@ class PlayerController(
         val responseFirstTry = responseService.find(learner, sequence, 1)
         val responseSecondTry = responseService.find(learner, sequence, 2)
 
-        var responseFirstTryHasChatGPTEvaluation: Boolean = false
-        var responseSecondTryHasChatGPTEvaluation: Boolean = false
+        var chatGptEvaluationResponseStore = ChatGptEvaluationResponseStore()
 
         if (sequence.chatGptEvaluationEnabled) {
-            val responseToIsChatGPTExist = chatGptEvaluationService.associateResponseToChatGPTEvaluationExistence(
+            chatGptEvaluationResponseStore = chatGptEvaluationService.associateResponseToChatGPTEvaluationExistence(
                 listOf(
                     responseFirstTry?.id,
                     responseSecondTry?.id
                 )
             )
-
-            responseFirstTryHasChatGPTEvaluation = responseToIsChatGPTExist[responseFirstTry?.id] == true
-            responseSecondTryHasChatGPTEvaluation  = responseToIsChatGPTExist[responseSecondTry?.id] == true
         }
 
 
         return LearnerResultsModelFactory.builtLearnerResultsModel(
-            responseFirstTry,
-            responseSecondTry,
-            responseFirstTryHasChatGPTEvaluation,
-            responseSecondTryHasChatGPTEvaluation,
+            LearnerSequenceResponses(
+                responseFirstTry,
+                responseSecondTry,
+                chatGptEvaluationResponseStore
+            ),
             sequence.statement
         )
     }

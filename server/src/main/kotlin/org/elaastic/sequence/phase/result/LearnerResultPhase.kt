@@ -1,5 +1,6 @@
 package org.elaastic.sequence.phase.result
 
+import org.elaastic.ai.evaluation.chatgpt.ChatGptEvaluationResponseStore
 import org.elaastic.player.results.ResultsModelFactory
 import org.elaastic.sequence.ILearnerSequence
 import org.elaastic.sequence.State
@@ -45,10 +46,8 @@ class LearnerResultPhase(
             null
         }
 
-        val explanationHasChatGPTEvaluationMap: Map<Long, Boolean> =
-            listOfNotNull(idFirstResponse, idSecondResponse)
-                //TODO Fill explanationHasChatGPTEvaluationMap with the real data
-                .associate { (it to false) }
+        // TODO : Fill with real data
+        val explanationHasChatGPTEvaluationMap = ChatGptEvaluationResponseStore()
 
 
         return LearnerResultPhaseViewModel(
@@ -61,7 +60,7 @@ class LearnerResultPhase(
                 userCanRefreshResults = learnerPhaseExecution!!.userCanRefreshResults,
                 featureManager = learnerPhaseExecution!!.featureManager,
                 messageBuilder = learnerPhaseExecution!!.messageBuilder,
-                explanationHasChatGPTEvaluationMap = explanationHasChatGPTEvaluationMap
+                chatGptEvaluationResponseStore = explanationHasChatGPTEvaluationMap
             ),
             learnerPhaseExecution!!.myChatGptEvaluationModel,
         )

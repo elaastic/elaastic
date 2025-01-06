@@ -22,6 +22,7 @@ import org.elaastic.activity.response.ResponseSet
 import org.elaastic.activity.results.ConfidenceDistributionFactory
 import org.elaastic.activity.results.GradingDistributionFactory
 import org.elaastic.activity.results.ResponsesDistributionFactory
+import org.elaastic.ai.evaluation.chatgpt.ChatGptEvaluationResponseStore
 import org.elaastic.common.abtesting.ElaasticFeatures
 import org.elaastic.common.web.MessageBuilder
 import org.elaastic.player.chart.confidence.ConfidenceDistributionChartModel
@@ -45,7 +46,7 @@ object ResultsModelFactory {
         userCanRefreshResults: Boolean,
         messageBuilder: MessageBuilder,
         peerGradings: List<PeerGrading>? = null,
-        explanationHasChatGPTEvaluationMap: Map<Long, Boolean>
+        chatGptEvaluationResponseStore: ChatGptEvaluationResponseStore
     ): ResultsModel =
         if (sequence.statement.hasChoices()) {
             val recommendationIsActive = featureManager.isActive(Feature { ElaasticFeatures.RECOMMENDATIONS.name })
@@ -68,7 +69,7 @@ object ResultsModelFactory {
                     sequence,
                     responseSet,
                     recommendationModel?.recommendedExplanationsComparator,
-                    explanationHasChatGPTEvaluationMap
+                    chatGptEvaluationResponseStore
                 ),
                 userCanRefreshResults = userCanRefreshResults,
                 userCanDisplayStudentsIdentity = teacher
@@ -79,7 +80,7 @@ object ResultsModelFactory {
             explanationViewerModel = ExplanationViewerModelFactory.buildOpen(
                 teacher,
                 responseSet[sequence.whichAttemptEvaluate()],
-                explanationHasChatGPTEvaluationMap
+                chatGptEvaluationResponseStore
             ),
             userCanRefreshResults = userCanRefreshResults,
             userCanDisplayStudentsIdentity = teacher
@@ -144,7 +145,7 @@ object ResultsModelFactory {
         sequence: Sequence,
         responseSet: ResponseSet,
         recommendedExplanations: Comparator<ExplanationData>? = null,
-        explanationHasChatGPTEvaluationMap: Map<Long, Boolean>
+        chatGptEvaluationResponseStore: ChatGptEvaluationResponseStore
     ) =
         if (sequence.getResponseSubmissionSpecification().studentsProvideExplanation)
             ExplanationViewerModelFactory.buildChoice(
@@ -152,7 +153,7 @@ object ResultsModelFactory {
                 choiceSpecification = sequence.statement.choiceSpecification!!,
                 responseList = responseSet[sequence.whichAttemptEvaluate()],
                 recommendedExplanationsComparator = recommendedExplanations,
-                explanationHasChatGPTEvaluationMap = explanationHasChatGPTEvaluationMap,
+                chatGptEvaluationResponseStore = chatGptEvaluationResponseStore,
             )
         else null
 
