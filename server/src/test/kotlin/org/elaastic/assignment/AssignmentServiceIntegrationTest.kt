@@ -659,12 +659,14 @@ internal class AssignmentServiceIntegrationTest(
                 owner = teacher
             )
         )
+        Thread.sleep(1000) // To ensure, the assignment is updated before the after date
         val after = LocalDateTime.now()
 
         assertTrue(assignmentService.findAllAssignmentUpdatedSince(before).contains(assignment))
         assertFalse(assignmentService.findAllAssignmentUpdatedSince(after).contains(assignment))
 
         assignmentService.touch(assignment)
+        Thread.sleep(1000) // To ensure, the assignment is updated before the check
 
         assertTrue(assignmentService.findAllAssignmentUpdatedSince(before).contains(assignment))
         assertTrue(assignmentService.findAllAssignmentUpdatedSince(after).contains(assignment))
