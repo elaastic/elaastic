@@ -4,24 +4,27 @@ import org.elaastic.activity.response.ConfidenceDegree
 import org.elaastic.activity.response.Response
 import org.elaastic.activity.response.ResponseRepository
 import org.elaastic.activity.response.ResponseService
-import org.elaastic.sequence.ExecutionContext
 import org.elaastic.material.instructional.question.legacy.LearnerChoice
-import org.elaastic.sequence.SequenceService
-import org.elaastic.material.instructional.subject.SubjectService
 import org.elaastic.material.instructional.statement.Statement
 import org.elaastic.material.instructional.statement.StatementRepository
 import org.elaastic.material.instructional.statement.StatementService
+import org.elaastic.material.instructional.subject.SubjectService
+import org.elaastic.sequence.ExecutionContext
+import org.elaastic.sequence.SequenceService
+import org.elaastic.sequence.interaction.Interaction
+import org.elaastic.sequence.interaction.InteractionService
+import org.elaastic.sequence.interaction.InteractionType
+import org.elaastic.test.FunctionalTestingService
 import org.elaastic.test.IntegrationTestingService
 import org.elaastic.test.directive.tExpect
 import org.elaastic.test.directive.tThen
 import org.elaastic.test.directive.tWhen
-import org.elaastic.sequence.interaction.Interaction
-import org.elaastic.sequence.interaction.InteractionService
-import org.elaastic.sequence.interaction.InteractionType
 import org.elaastic.user.User
 import org.hamcrest.CoreMatchers
 import org.hamcrest.MatcherAssert
+import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertDoesNotThrow
 import org.junit.jupiter.api.assertThrows
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
@@ -29,6 +32,7 @@ import org.springframework.context.annotation.Profile
 import org.springframework.data.domain.PageRequest
 import org.springframework.security.access.AccessDeniedException
 import java.math.BigDecimal
+import java.time.LocalDateTime
 import java.util.*
 import javax.persistence.EntityManager
 import javax.persistence.EntityNotFoundException
@@ -49,7 +53,8 @@ internal class AssignmentServiceIntegrationTest(
     @Autowired val responseService: ResponseService,
     @Autowired val interactionService: InteractionService,
     @Autowired val responseRepository: ResponseRepository,
-    @Autowired val sequenceService: SequenceService
+    @Autowired val sequenceService: SequenceService,
+    @Autowired val functionalTestingService: FunctionalTestingService,
 ) {
 
     val persistentUnitUtil: PersistenceUnitUtil by lazy {
@@ -82,6 +87,17 @@ internal class AssignmentServiceIntegrationTest(
             .tExpect {
                 MatcherAssert.assertThat(it.totalPages, CoreMatchers.equalTo(2))
             }
+    }
+
+    private fun createTestingData(owner: User, n: Int = 10) {
+        (1..n).forEach {
+            assignmentService.save(
+                Assignment(
+                    title = "Assignment n°$it",
+                    owner = owner
+                )
+            )
+        }
     }
 
     @Test
@@ -287,6 +303,21 @@ internal class AssignmentServiceIntegrationTest(
     }
 
     @Test
+    fun `delete an assignment`() {
+        val teacher = integrationTestingService.getTestTeacher()
+        val assignment = assignmentService.save(
+            Assignment(title = "An assignment", owner = teacher)
+        )
+
+        assertDoesNotThrow {
+            assignmentService.delete(teacher, assignment)
+        }
+        assertThrows<EntityNotFoundException> {
+            assignmentService.get(assignment.id!!)
+        }
+    }
+
+    @Test
     fun `count sequences of empty assignment`() {
         val teacher = integrationTestingService.getTestTeacher()
         val assignment = assignmentService.save(
@@ -477,17 +508,194 @@ internal class AssignmentServiceIntegrationTest(
         }.tExpect {
             MatcherAssert.assertThat(it, CoreMatchers.equalTo(listOf(assignment)))
         }
-
     }
 
-    private fun createTestingData(owner: User, n: Int = 10) {
-        (1..n).forEach {
-            assignmentService.save(
-                Assignment(
-                    title = "Assignment n°$it",
-                    owner = owner
-                )
+    @Test
+    fun `register the teacher to his own assignment do nothing`() {
+        val teacher = integrationTestingService.getTestTeacher()
+
+        val assignment = assignmentService.save(
+            Assignment(
+                title = "An assignment",
+                owner = teacher
             )
+        )
+
+        assertNull(assignmentService.registerUser(teacher, assignment))
+    }
+
+    @Test
+    fun `test of removeSequence when the user isn't the owner`() {
+        // given an assignment and a sequence with statement with attachment
+        val assignment = integrationTestingService.getAnyAssignment()
+
+        assertThrows<IllegalArgumentException> {
+            assignmentService.removeSequence(integrationTestingService.getAnyUser(), assignment.sequences[0])
         }
     }
+
+    @Test
+    fun `test of updateAllSequenceRank when there is no sequence`() {
+        // given an assignment with no sequence
+        val assignment = integrationTestingService.getAnyAssignment()
+        assignment.sequences.clear()
+
+        // when updating the rank of the sequences
+        assignmentService.updateAllSequenceRank(assignment)
+        // then nothing happens
+    }
+
+    @Test
+    fun `register a student to an assignment and check it`() {
+        val teacher = integrationTestingService.getTestTeacher()
+
+        // Given an assignment and a student
+        val student = integrationTestingService.getTestStudent()
+        val assignment = assignmentService.save(
+            Assignment(
+                title = "An assignment",
+                owner = teacher
+            )
+        )
+        assertFalse(assignmentService.userIsRegisteredInAssignment(student, assignment))
+
+        // When the student is registered to the assignment
+        assignmentService.registerUser(student, assignment)
+
+        // Then the student is registered to the assignment
+        assertTrue(assignmentService.userIsRegisteredInAssignment(student, assignment))
+    }
+
+    @Test
+    fun `test of getRegisteredUsers`() {
+        val teacher = integrationTestingService.getTestTeacher()
+
+        // Given an assignment and a student
+        val student = integrationTestingService.getTestStudent()
+        val assignment = assignmentService.save(
+            Assignment(
+                title = "An assignment",
+                owner = teacher
+            )
+        )
+        assertEquals(0, assignmentService.getRegisteredUsers(assignment).size)
+
+        // When one student is registered to the assignment
+        assignmentService.registerUser(student, assignment)
+
+        // Then one student is registered to the assignment
+        assertEquals(1, assignmentService.getRegisteredUsers(assignment).size)
+
+        // When another student is registered to the assignment
+        val student2: User = integrationTestingService.getNLearners(1).first()
+        assignmentService.registerUser(student2, assignment)
+
+        // Then two students are registered to the assignment
+        assertEquals(2, assignmentService.getRegisteredUsers(assignment).size)
+    }
+
+    @Test
+    fun `test of getRegisteredUser`() {
+        val teacher = integrationTestingService.getTestTeacher()
+
+        // Given an assignment and a student
+        val student = integrationTestingService.getTestStudent()
+        val assignment = assignmentService.save(
+            Assignment(
+                title = "An assignment",
+                owner = teacher
+            )
+        )
+        assertNull(assignmentService.getRegisteredUser(assignment, student))
+
+        // When the student is registered to the assignment
+        val learnerAssignment = assignmentService.registerUser(student, assignment)
+
+        // Then we can get the registered user
+        assertEquals(learnerAssignment, assignmentService.getRegisteredUser(assignment, student))
+    }
+
+    @Test
+    fun `test of countRegisteredUsers`() {
+        val teacher = integrationTestingService.getTestTeacher()
+
+        // Given an assignment and a student
+        val student = integrationTestingService.getTestStudent()
+        val assignment = assignmentService.save(
+            Assignment(
+                title = "An assignment",
+                owner = teacher
+            )
+        )
+        assertEquals(0, assignmentService.countRegisteredUsers(assignment))
+        assertEquals(0, assignmentService.countRegisteredUsers(assignment.id!!))
+
+        // When one student is registered to the assignment
+        assignmentService.registerUser(student, assignment)
+
+        // Then one student is registered to the assignment
+        assertEquals(1, assignmentService.countRegisteredUsers(assignment))
+        assertEquals(1, assignmentService.countRegisteredUsers(assignment.id!!))
+
+        // When another student is registered to the assignment
+        val student2: User = integrationTestingService.getNLearners(1).first()
+        assignmentService.registerUser(student2, assignment)
+
+        // Then two students are registered to the assignment
+        assertEquals(2, assignmentService.countRegisteredUsers(assignment))
+        assertEquals(2, assignmentService.countRegisteredUsers(assignment.id!!))
+    }
+
+    @Test
+    fun `test of findAllAssignmentUpdatedSince`() {
+        val teacher = integrationTestingService.getTestTeacher()
+
+        val before = LocalDateTime.now()
+
+        // Given an assignment
+        val assignment = assignmentService.save(
+            Assignment(
+                title = "An assignment",
+                owner = teacher
+            )
+        )
+        val after = LocalDateTime.now()
+
+        assertTrue(assignmentService.findAllAssignmentUpdatedSince(before).contains(assignment))
+        assertFalse(assignmentService.findAllAssignmentUpdatedSince(after).contains(assignment))
+
+        assignmentService.touch(assignment)
+
+        assertTrue(assignmentService.findAllAssignmentUpdatedSince(before).contains(assignment))
+        assertTrue(assignmentService.findAllAssignmentUpdatedSince(after).contains(assignment))
+    }
+
+    @Test
+    fun `test of getCoursesAssignmentsMap`() {
+        val teacher = integrationTestingService.getTestTeacher()
+        val course1 = functionalTestingService.createCourse(teacher, "Course 1")
+        val course2 = functionalTestingService.createCourse(teacher, "Course 2")
+        val subject1 = functionalTestingService.createSubject(teacher, course1, "Subject 1")
+        val subject2 = functionalTestingService.createSubject(teacher, course2, "Subject 2")
+
+        val assignment1 = functionalTestingService.createAssignment(subject1, "Assignment 1")
+        val assignment2 = functionalTestingService.createAssignment(subject2, "Assignment 2")
+        val assignment3 = functionalTestingService.createAssignment(subject1, "Assignment 3")
+        assignment1.owner = teacher
+        assignment2.owner = teacher
+        assignment3.owner = teacher
+        assignmentService.save(assignment1)
+        assignmentService.save(assignment2)
+        assignmentService.save(assignment3)
+
+
+        val result = assignmentService.getCoursesAssignmentsMap(listOf(assignment1, assignment2, assignment3))
+
+        assertEquals(2, result.size)
+        assertEquals(2, result[course1]?.size)
+        assertEquals(1, result[course2]?.size)
+        assertTrue(result[course1]!!.containsAll(listOf(assignment1, assignment3)))
+        assertEquals(assignment2, result[course2]?.get(0))
+    }
+
 }

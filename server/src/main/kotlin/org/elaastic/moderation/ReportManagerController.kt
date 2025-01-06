@@ -56,7 +56,7 @@ class ReportManagerController(
             (draxoReportedRemoved + chatGPTReportedRemoved)
                 .mapNotNull { ReportedCandidateModelFactory.build(it) }
 
-        val registeredUsers: Int = assignmentService.countAllRegisteredUsers(sequence.assignment!!)
+        val registeredUsers: Int = assignmentService.countRegisteredUsers(sequence.assignment!!)
 
         val assignmentOverviewModel = AssignmentOverviewModelFactory.buildOnSequence(
             true,
