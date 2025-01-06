@@ -22,24 +22,24 @@
 var elaastic = elaastic || {};
 
 elaastic.util = {
-  /**
-   * Test if an element is visible in a scrollable container
-   * Note : by visible, we mean the target element is in the displayed part of the container
-   * with regards to the scroll (we do not consider if the element is hidden by CSS)
-   * @param target the element to test
-   * @param container the scrollable container
-   * @param targetMinimumVisibleHeight the minimum height we want to see of the target element
-   * @returns {boolean} true if the target is visible, false otherwise
-   */
-  isVisible: function (target, container, targetMinimumVisibleHeight) {
-    var targetOffsetTop = target.offset().top;
-    var containerScrollTop = container.scrollTop();
-    var containerHeight = container.height();
+    /**
+     * Test if an element is visible in a scrollable container
+     * Note : by visible, we mean the target element is in the displayed part of the container
+     * with regards to the scroll (we do not consider if the element is hidden by CSS)
+     * @param target the element to test
+     * @param container the scrollable container
+     * @param targetMinimumVisibleHeight the minimum height we want to see of the target element
+     * @returns {boolean} true if the target is visible, false otherwise
+     */
+    isVisible: function (target, container, targetMinimumVisibleHeight) {
+        var targetOffsetTop = target.offset().top;
+        var containerScrollTop = container.scrollTop();
+        var containerHeight = container.height();
 
-    return (targetOffsetTop > containerScrollTop) &&
-      (targetOffsetTop + targetMinimumVisibleHeight < containerScrollTop + containerHeight);
-  },
-  ensureIsVisible: function (target, container) {
-    container.scrollTop(target.offset().top - (container.height() / 2));
-  }
+        return (targetOffsetTop > containerScrollTop) &&
+            (targetOffsetTop + targetMinimumVisibleHeight < containerScrollTop + containerHeight);
+    },
+    ensureIsVisible: function (target, container) {
+        container.scrollTop(target.offset().top - (container.height() / 2));
+    }
 };
