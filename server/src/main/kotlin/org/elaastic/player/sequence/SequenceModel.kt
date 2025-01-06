@@ -22,7 +22,7 @@ class TeacherSequenceModel(
     val resultsModel: ResultsModel?,
     val showResults: Boolean,
 ) : SequenceModel(
-    sequenceProgressionModel = sequenceProgressionModel,
-    activeInteractionModel = activeInteractionModel,
-    sequenceId = sequenceId,
+    sequenceProgressionModel,
+    activeInteractionModel,
+    sequenceId,
 )
