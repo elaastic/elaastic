@@ -3306,19 +3306,20 @@ class ComponentTestingController(
     fun getTestUser(
         authentication: Authentication,
         model: Model,
-        @RequestParam nbUserRequested: Int? = null,
+        @RequestParam(defaultValue = "0") nbUserRequested: Int,
     ): String {
-        val safeNbUser = nbUserRequested ?: 0
         var existingUsers: List<User> = emptyList()
-        if (0 < safeNbUser) {
+
+        if (0 < nbUserRequested) {
 
             val emailDomain = "fakeemail"
             val testPswd = "1234"
 
             existingUsers = userRepository.findUsersByEmailLike("%$emailDomain%")
-            if (safeNbUser < existingUsers.size) {
-                existingUsers = existingUsers.subList(0, safeNbUser)
-            } else if (existingUsers.size < safeNbUser) {
+
+            if (nbUserRequested < existingUsers.size) {
+                existingUsers = existingUsers.subList(0, nbUserRequested)
+            } else if (existingUsers.size < nbUserRequested) {
                 val newUsers: MutableList<User> = emptyList<User>().toMutableList()
                 val firstNames: List<String> = listOf(
                     "Emma",
@@ -3344,7 +3345,7 @@ class ComponentTestingController(
                     "Martin", "Bernard", "Dubois", "Thomas", "Robert", "Richard", "Petit", "Durand", "Leroy", "Moreau"
                 )
 
-                val nbUserToCreate = safeNbUser - existingUsers.size
+                val nbUserToCreate = nbUserRequested - existingUsers.size
 
                 for (i in 1..nbUserToCreate) {
                     val firstName = firstNames.getRandom()
@@ -3366,7 +3367,9 @@ class ComponentTestingController(
                 }
 
                 existingUsers = existingUsers + newUsers
-            }
+            }/* else {
+                existingUsers.size == nbUserRequested //, so we return existingUsers
+            }*/
         }
 
         model["user"] = authentication.principal as User
