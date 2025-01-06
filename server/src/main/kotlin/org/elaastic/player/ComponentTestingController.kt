@@ -157,7 +157,7 @@ class ComponentTestingController(
                 arrayOf(
                     choiceQuestionSituation {
                         sequenceId = 1
-                        description = "1. Question à choix, cas général"
+                        description = "1. Choice question, general case"
                         explanationsByResponse {
                             response(listOf(1), 100, true) {
                                 explanation {
@@ -194,7 +194,7 @@ class ComponentTestingController(
                     },
                     choiceQuestionSituation {
                         sequenceId = 2
-                        description = "2. Aucune explication fournie"
+                        description = "2. No explanation provided"
                         explanationsByResponse {
                             response(listOf(1), 100, true) {}
                             response(listOf(2), 0, false) {}
@@ -202,7 +202,7 @@ class ComponentTestingController(
                     },
                     choiceQuestionSituation {
                         sequenceId = 3
-                        description = "3. Uniquement 2 explications correctes"
+                        description = "3. Only 2 correct explanations"
                         explanationsByResponse {
                             response(listOf(1), 100, true) {
                                 explanation {
@@ -224,7 +224,7 @@ class ComponentTestingController(
                     },
                     choiceQuestionSituation {
                         sequenceId = 4
-                        description = "4. Seulement des explications incorrectes"
+                        description = "4. Only incorrect explanations"
                         explanationsByResponse {
                             response(listOf(1), 100, true) {}
                             response(listOf(2), 0, false) {
@@ -247,7 +247,7 @@ class ComponentTestingController(
                     },
                     openQuestionSituation {
                         sequenceId = 5
-                        description = "5. Plusieurs explications pour une question ouverte"
+                        description = "5. Multiple explanations for an open question"
                         explanations {
                             explanation {
                                 nbEvaluations = 2
@@ -280,7 +280,7 @@ class ComponentTestingController(
                     },
                     choiceQuestionSituation {
                         sequenceId = 6
-                        description = "6. Question à choix multiples"
+                        description = "6. Multiple choice question"
                         explanationsByResponse {
                             response(listOf(1, 3), 100, true) {
                                 explanation {
@@ -347,13 +347,13 @@ class ComponentTestingController(
                     },
                     choiceQuestionSituation {
                         sequenceId = 7
-                        description = "7. Uniquement l'explication de l'enseignant, pour une question a choix multiples"
+                        description = "7. Only the teacher's explanation, for a multiple choice question"
                         explanationsByResponse {
                             response(listOf(1), 100, true) {
                                 explanation {
                                     author = "Franck Sil (@fsil)"
                                     confidenceDegree = ConfidenceDegree.CONFIDENT
-                                    content = "Explication de l'enseignant"
+                                    content = "Teacher's explanation"
                                     fromTeacher = true
                                 }
                             }
@@ -362,7 +362,7 @@ class ComponentTestingController(
                     choiceQuestionSituation {
                         sequenceId = 8
                         description =
-                            "8. Plusieurs explications et explication de l'enseignant, pour une question a choix multiples"
+                            "8. Multiple explanations and explanation from the teacher, for a multiple choice question"
                         explanationsByResponse {
                             response(listOf(1, 3), 100, true) {
                                 explanation {
@@ -370,7 +370,7 @@ class ComponentTestingController(
                                     meanGrade = BigDecimal("3.25")
                                     author = "Franck Sil (@fsil)"
                                     confidenceDegree = ConfidenceDegree.CONFIDENT
-                                    content = "Explication de l'enseignant"
+                                    content = "Teacher's explanation"
                                     fromTeacher = true
                                 }
                                 explanation {
@@ -460,7 +460,7 @@ class ComponentTestingController(
             "responseDistributionChartSituations",
             listOf(
                 ResponseDistributionChartSituation(
-                    description = "1 seule tentative, 2 items, pas de sans réponse",
+                    description = "1 attempt, 2 items, no unanswered",
                     model = ResponseDistributionChartModel(
                         interactionId = 12,
                         choiceSpecification = ChoiceSpecificationData(
@@ -474,7 +474,7 @@ class ComponentTestingController(
 
                 ),
                 ResponseDistributionChartSituation(
-                    description = "1 seule tentative, 4 items, avec sans réponse",
+                    description = "1 single attempt, 4 items, with unanswered",
                     model = ResponseDistributionChartModel(
                         interactionId = 14,
                         choiceSpecification = ChoiceSpecificationData(
@@ -488,7 +488,7 @@ class ComponentTestingController(
 
                 ),
                 ResponseDistributionChartSituation(
-                    description = "1 seule tentative, 10 items, avec sans réponse",
+                    description = "1 single attempt, 10 items, with unanswered",
                     model = ResponseDistributionChartModel(
                         interactionId = 110,
                         choiceSpecification = ChoiceSpecificationData(
@@ -502,7 +502,7 @@ class ComponentTestingController(
 
                 ),
                 ResponseDistributionChartSituation(
-                    description = "2 tentatives, 2 items, pas de sans réponse",
+                    description = "2 attempts, 2 items, no unanswered",
                     model = ResponseDistributionChartModel(
                         interactionId = 22,
                         choiceSpecification = ChoiceSpecificationData(
@@ -517,7 +517,7 @@ class ComponentTestingController(
 
                 ),
                 ResponseDistributionChartSituation(
-                    description = "2 tentatives, 4 items, avec sans réponse à la 1ère tentative",
+                    description = "2 attempts, 4 items, with no response on the 1st attempt",
                     model = ResponseDistributionChartModel(
                         interactionId = 241,
                         choiceSpecification = ChoiceSpecificationData(
@@ -532,7 +532,7 @@ class ComponentTestingController(
 
                 ),
                 ResponseDistributionChartSituation(
-                    description = "2 tentatives, 4 items, avec sans réponse à la 2ème tentative",
+                    description = "2 attempts, 4 items, with no response on the 2nd attempt",
                     model = ResponseDistributionChartModel(
                         interactionId = 242,
                         choiceSpecification = ChoiceSpecificationData(
@@ -547,7 +547,7 @@ class ComponentTestingController(
 
                 ),
                 ResponseDistributionChartSituation(
-                    description = "2 tentatives, 4 items, avec sans réponse aux 2 tentatives",
+                    description = "2 attempts, 4 items, with no response to 2 attempts",
                     model = ResponseDistributionChartModel(
                         interactionId = 243,
                         choiceSpecification = ChoiceSpecificationData(
@@ -562,7 +562,7 @@ class ComponentTestingController(
 
                 ),
                 ResponseDistributionChartSituation(
-                    description = "2 tentatives, 10 items, avec sans réponse",
+                    description = "2 attempts, 10 items, with unanswered",
                     model = ResponseDistributionChartModel(
                         interactionId = 210,
                         choiceSpecification = ChoiceSpecificationData(
@@ -577,7 +577,7 @@ class ComponentTestingController(
 
                 ),
                 ResponseDistributionChartSituation(
-                    description = "Choix multiples",
+                    description = "Multiple choices",
                     model = ResponseDistributionChartModel(
                         interactionId = 999,
                         choiceSpecification = ChoiceSpecificationData(
@@ -617,9 +617,9 @@ class ComponentTestingController(
         model.addAttribute(
             "statementInfoPanelModel",
             StatementInfoPanelModel(
-                title = "Énoncé de test",
+                title = "Test statement",
                 questionType = QuestionType.ExclusiveChoice,
-                content = "Le <strong>contenu</strong> de cet énoncé de test.",
+                content = "The <strong>content</strong> od this test statement.",
                 panelClosed = panelClosed ?: false,
                 hideQuestionType = hideQuestionType ?: false,
                 hideStatement = hideStatement ?: false
@@ -641,7 +641,7 @@ class ComponentTestingController(
             "myResultsSituations",
             listOf(
                 MyResultsSituation(
-                    description = "Choix exclusif, incorrect puis correct, avec explications",
+                    description = "Exclusive choice, incorrect then correct, with explanations",
                     learnerResultsModel = LearnerExclusiveChoiceResults(
                         explanationFirstTry = ExplanationData(responseId = Random.nextLong(), content = "I was wrong"),
                         explanationSecondTry = ExplanationData(
@@ -659,7 +659,7 @@ class ComponentTestingController(
                     )
                 ),
                 MyResultsSituation(
-                    description = "Choix exclusif, incorrect puis correct, sans explications",
+                    description = "Exclusive choice, incorrect then correct, without explanation",
                     learnerResultsModel = LearnerExclusiveChoiceResults(
                         explanationFirstTry = null,
                         explanationSecondTry = null,
@@ -674,7 +674,7 @@ class ComponentTestingController(
                     )
                 ),
                 MyResultsSituation(
-                    description = "Choix exclusif, réponses identiques, sans explications",
+                    description = "Exclusive choice, identical answers, without explanations",
                     learnerResultsModel = LearnerExclusiveChoiceResults(
                         explanationFirstTry = null,
                         explanationSecondTry = null,
@@ -689,7 +689,7 @@ class ComponentTestingController(
                     )
                 ),
                 MyResultsSituation(
-                    description = "Choix multiple, résultats qui s'améliorent, avec explications",
+                    description = "Multiple choice, improving results, with explanations",
                     learnerResultsModel = LearnerMultipleChoiceResults(
                         explanationFirstTry = ExplanationData(responseId = Random.nextLong(), content = "so-so"),
                         explanationSecondTry = ExplanationData(
@@ -710,7 +710,7 @@ class ComponentTestingController(
                     )
                 ),
                 MyResultsSituation(
-                    description = "Question ouverte - 2 explanations",
+                    description = "Open question - 2 explanations",
                     learnerResultsModel = LearnerOpenResults(
                         explanationFirstTry = ExplanationData(responseId = Random.nextLong(), content = "1st guess"),
                         explanationSecondTry = ExplanationData(responseId = Random.nextLong(), content = "2nd guess")
@@ -724,7 +724,7 @@ class ComponentTestingController(
                     )
                 ),
                 MyResultsSituation(
-                    description = "Question ouverte - 2 identical explanations",
+                    description = "Open question - 2 identical explanations",
                     learnerResultsModel = LearnerOpenResults(
                         explanationFirstTry = ExplanationData(
                             responseId = Random.nextLong(),
@@ -737,7 +737,7 @@ class ComponentTestingController(
                     )
                 ),
                 MyResultsSituation(
-                    description = "Question ouverte - 2 identical explanations, second graded",
+                    description = "Open question - 2 identical explanations, second graded",
                     learnerResultsModel = LearnerOpenResults(
                         explanationFirstTry = ExplanationData(
                             responseId = Random.nextLong(),
@@ -752,14 +752,14 @@ class ComponentTestingController(
                     )
                 ),
                 MyResultsSituation(
-                    description = "Question ouverte - only the second explanation",
+                    description = "Open question - only the second explanation",
                     learnerResultsModel = LearnerOpenResults(
                         explanationFirstTry = null,
                         explanationSecondTry = ExplanationData(responseId = Random.nextLong(), content = "Just the 2nd")
                     )
                 ),
                 MyResultsSituation(
-                    description = "Question ouverte - no explanations",
+                    description = "Open question - no explanations",
                     learnerResultsModel = LearnerOpenResults(
                         explanationFirstTry = null,
                         explanationSecondTry = null
@@ -1412,7 +1412,7 @@ class ComponentTestingController(
                                     ),
                                     TeacherExplanationData(
                                         responseId = Random.nextLong(),
-                                        "explication de l'enseignant",
+                                        "teacher's explanation",
                                         "Franck Sil (@fsil)",
                                         confidenceDegree = ConfidenceDegree.CONFIDENT,
                                         score = BigDecimal("100")
@@ -1506,7 +1506,7 @@ class ComponentTestingController(
                                         to listOf(
                                     TeacherExplanationData(
                                         responseId = Random.nextLong(),
-                                        "explication de l'enseignant",
+                                        "teacher's explanation",
                                         "Franck Sil (@fsil)",
                                         3,
                                         3,
@@ -1587,7 +1587,7 @@ class ComponentTestingController(
                                         to listOf(
                                     TeacherExplanationData(
                                         responseId = Random.nextLong(),
-                                        "explication de l'enseignant",
+                                        "teacher's explanation",
                                         "Franck Sil (@fsil)",
                                         confidenceDegree = ConfidenceDegree.CONFIDENT,
                                         score = BigDecimal("100")
