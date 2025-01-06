@@ -745,7 +745,7 @@ class PlayerController(
                 sequence,
                 peerGradingService.countEvaluationsMadeByUsers(listOf(learnerAssignment), sequence)[learnerAssignment]
                     ?: 0,
-                dashboardModelFactory.getCountResponseGradable(sequence)
+                dashboardModelFactory.countGradableResponse(sequence)
             )
         }
         val learnerResultsModel = getLearnerResultsModel(learner, sequence)
