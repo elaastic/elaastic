@@ -2,7 +2,6 @@
 
 import {computed, ref} from 'vue'
 import {useI18n} from "vue-i18n";
-import utilityGradeStories from "@/stories/moderation/UtilityGrade.stories";
 
 type Grade = {
   label: string,
@@ -17,6 +16,7 @@ export interface UtilityGradeProps {
 export interface UtilityGradeEvents {
   (event: 'update:submmitUtilityGrade', value: Grade): void;
 }
+
 const props = defineProps<UtilityGradeProps>()
 const emit = defineEmits<UtilityGradeEvents>()
 
@@ -45,19 +45,21 @@ const {t} = useI18n()
 </script>
 
 <template>
+  <!-- Grade buttons -->
   <v-row>
     <v-col>
-      <v-btn-toggle v-model="selectedGrade" v-for="(grade, index) in props.possibleGrades" :key="index" variant="tonal"
-                    color="light-blue-darken-1" rounded="0">
-        <v-btn @click="setSelectedUtilityGrade(grade)" :value="grade" class="text-none text-subtitle-1">
+      <v-btn-toggle v-model="selectedGrade" variant="text" color="light-blue-darken-1" rounded="0" elevation="1">
+        <v-btn v-for="(grade, index) in props.possibleGrades" :key="index" @click="setSelectedUtilityGrade(grade)"
+               :value="grade" class="text-none text-subtitle-1">
           {{ grade.label }}
         </v-btn>
       </v-btn-toggle>
     </v-col>
   </v-row>
+  <!-- Submit button -->
   <v-row>
     <v-col>
-      <v-btn v-if="selectedGrade != null" class="text-none text-subtitle-1" @click="submitUtilityGrade()">
+      <v-btn v-if="selectedGrade != null" class="text-none text-subtitle-1" @click="submitUtilityGrade()" color="light-green-lighten-1">
         {{ t('submit') }}
       </v-btn>
     </v-col>
