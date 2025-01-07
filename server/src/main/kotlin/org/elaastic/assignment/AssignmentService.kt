@@ -51,7 +51,7 @@ class AssignmentService(
         } ?: throw EntityNotFoundException("There is no assignment for id \"$id\"")
     }
 
-    // TODO Test
+
     fun findByUuid(uuid: UUID, fetchSequences: Boolean = false): Assignment {
         // TODO (+) i18n error message
         return when (fetchSequences) {
@@ -229,6 +229,7 @@ class AssignmentService(
 
     /**
      * Get a map of courses and their assignments
+     *
      * @param assignments list of assignments
      * @return a map who associates courses in key and a list of their assignments in value
      */
