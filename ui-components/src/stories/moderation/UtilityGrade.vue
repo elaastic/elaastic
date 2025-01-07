@@ -11,14 +11,12 @@ type Grade = {
 export interface UtilityGradeProps {
   possibleGrades: Grade[]
 }
-
-/** Fired when the selected value changes */
 export interface UtilityGradeEvents {
-  (event: 'update:submmitUtilityGrade', value: Grade): void;
+  (event: 'submmitUtilityGrade', gradeSelected: Grade): void;
 }
 
-const props = defineProps<UtilityGradeProps>()
-const emit = defineEmits<UtilityGradeEvents>()
+const props = defineProps<UtilityGradeProps>();
+const emit = defineEmits<UtilityGradeEvents>();
 
 const modelValue = ref({
   selectedGradeModel: null as Grade | null,
@@ -35,11 +33,11 @@ function setSelectedUtilityGrade(itemClicked: Grade) {
   selectedGrade.value = itemClicked;
 }
 
-function submitUtilityGrade() {
+const submitUtilityGrade = () => {
   if (selectedGrade.value != null) {
-    emit('update:submmitUtilityGrade', selectedGrade.value);
+    emit("submmitUtilityGrade", selectedGrade.value)
   }
-}
+};
 
 const {t} = useI18n()
 </script>
@@ -59,7 +57,7 @@ const {t} = useI18n()
   <!-- Submit button -->
   <v-row>
     <v-col>
-      <v-btn v-if="selectedGrade != null" class="text-none text-white" @click="submitUtilityGrade()" color="#95c155" >
+      <v-btn v-if="selectedGrade != null" class="text-none text-white" @click="submitUtilityGrade" color="#95c155" >
         {{ t('submit') }}
       </v-btn>
     </v-col>
