@@ -48,23 +48,12 @@ internal class SequenceServiceIntegrationTest(
     @Autowired val integrationTestingService: IntegrationTestingService,
     @Autowired val sequenceRepository: SequenceRepository,
     @Autowired val functionalTestingService: FunctionalTestingService,
+    @Autowired val chatGptEvaluationRepository: ChatGptEvaluationRepository,
+    @Autowired val chatGptEvaluationService: ChatGptEvaluationService,
+    @Autowired val draxoPeerGradingRepository: DraxoPeerGradingRepository,
+    @Autowired val draxoPeerGradingService: DraxoPeerGradingService,
+    @Autowired val reportCandidateService: ReportCandidateService,
 ) {
-
-
-    @Autowired
-    private lateinit var chatGptEvaluationRepository: ChatGptEvaluationRepository
-
-    @Autowired
-    private lateinit var chatGptEvaluationService: ChatGptEvaluationService
-
-    @Autowired
-    private lateinit var draxoPeerGradingRepository: DraxoPeerGradingRepository
-
-    @Autowired
-    private lateinit var draxoPeerGradingService: DraxoPeerGradingService
-
-    @Autowired
-    private lateinit var reportCandidateService: ReportCandidateService
 
     @Test
     fun `get a sequence - valid`() {
@@ -257,9 +246,7 @@ internal class SequenceServiceIntegrationTest(
             chatGptEvaluationEnabled = true
         )
 
-        /**
-         * Check that the count of reported evaluation is 0 for the given sequence when the teacher is false
-         */
+        /** Check that the count of reported evaluation is 0 for the given sequence when the teacher is false */
         val checkAlways0WhenIsntTeacher = {
             assertEquals(0, sequenceService.countReportedEvaluation(sequence, teacher = false, isRemoved = true))
             assertEquals(0, sequenceService.countReportedEvaluation(sequence, teacher = false, isRemoved = false))
