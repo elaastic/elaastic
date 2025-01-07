@@ -101,18 +101,18 @@ class ChatGptEvaluationService(
 
 
     /**
-     * Mark a chatGPT evaluation as hidden by a teacher.
+     * Mark a ChatGPT evaluation as hidden by a teacher.
      *
-     * @param chatGptEvaluation the chatGPT evaluation to hide.
+     * @param chatGptEvaluation the ChatGPT evaluation to hide.
      */
     fun markAsHidden(chatGptEvaluation: ChatGptEvaluation) {
         reportCandidateService.markAsHidden(chatGptEvaluation, chatGptEvaluationRepository)
     }
 
     /**
-     * Mark a chatGPT evaluation as removed by a teacher.
+     * Mark a ChatGPT evaluation as removed by a teacher.
      *
-     * @param chatGptEvaluation the chatGPT evaluation to remove.
+     * @param chatGptEvaluation the ChatGPT evaluation to remove.
      */
     fun markAsRemoved(user: User, chatGptEvaluation: ChatGptEvaluation) {
         requireAccess(user == chatGptEvaluation.response.interaction.owner) {
@@ -123,10 +123,13 @@ class ChatGptEvaluationService(
     }
 
     /**
-     * Update the utility grade associated with a chatGPT evaluation.
+     * Update the utility grade associated with a ChatGPT evaluation.
      *
-     * @param chatGptEvaluation the chatGPT evaluation to update.
+     * @param chatGptEvaluation the ChatGPT evaluation to update.
      * @param utilityGrade the utility grade.
+     * @param isTeacher true if the user is a teacher.
+     * If it's the teacher then the teacher utility grade [teacherUtilityGrade][ChatGptEvaluation.teacherUtilityGrade] is updated,
+     * otherwise the candidate utility grade [utilityGrade][ChatGptEvaluation.utilityGrade] is updated.
      */
     fun changeUtilityGrade(
         chatGptEvaluation: ChatGptEvaluation,
@@ -142,9 +145,9 @@ class ChatGptEvaluationService(
     }
 
     /**
-     * Update the report associated with a chatGPT evaluation.
+     * Update the report associated with a ChatGPT evaluation.
      *
-     * @param chatGptEvaluation the chatGPT evaluation to update.
+     * @param chatGptEvaluation the ChatGPT evaluation to update.
      * @param reportReasons the reasons for the report.
      * @param reportComment the comment for the report.
      */
@@ -168,13 +171,13 @@ class ChatGptEvaluationService(
     }
 
     /**
-     * Check if the visibility of a chatGPT evaluation can be changed by the given user
+     * Check if the given user can change the visibility of a ChatGPT evaluation
      *
-     * A user can hide a chatGPT evaluation if the user is the teacher of the sequence and if the evaluation is done.
+     * A user can hide a ChatGPT evaluation if the user is the teacher of the sequence and if the evaluation is done.
      *
-     * @param chatGptEvaluation the chatGPT evaluation to check.
+     * @param chatGptEvaluation the ChatGPT evaluation to check.
      * @param user the user who wants to update the visibility of the evaluation.
-     * @return true if the visibility of the chatGPT evaluation can be changed, false otherwise.
+     * @return true if the visibility of the ChatGPT evaluation can be changed, false otherwise.
      */
     fun canUpdateVisibilityEvaluation(chatGptEvaluation: ChatGptEvaluation, user: User): Boolean {
         return responseService.canHidePeerGrading(
@@ -184,12 +187,12 @@ class ChatGptEvaluationService(
     }
 
     /**
-     * Hide a chatGPT evaluation.
+     * Hide a ChatGPT evaluation.
      *
      * An user must have the permission to hide the evaluation. If the user doesn't have the permission, an exception is
      * thrown.
      *
-     * @param chatGptEvaluation the chatGPT evaluation to hide.
+     * @param chatGptEvaluation the ChatGPT evaluation to hide.
      * @param user the user who wants to hide the evaluation.
      * @throws IllegalAccessException if the user doesn't have the permission to hide the evaluation.
      */
@@ -205,12 +208,12 @@ class ChatGptEvaluationService(
     }
 
     /**
-     * Unhide a chatGPT evaluation.
+     * Unhide a ChatGPT evaluation.
      *
      * An user must have the permission to unhide the evaluation. If the user doesn't have the permission, an exception
      * is thrown.
      *
-     * @param chatGPTEvaluation the chatGPT evaluation to unhide
+     * @param chatGPTEvaluation the ChatGPT evaluation to unhide
      * @param user the user who wants to unhide the evaluation.
      * @throws IllegalAccessException if the user doesn't have the permission to unhide the evaluation.
      */
