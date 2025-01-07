@@ -394,11 +394,11 @@ class SequenceService(
         return nbDRAXOEvaluationReported + nbChatGPTEvaluationReported
     }
 
-    fun getNbReportBySequence(sequences: List<Sequence>, isTeacher: Boolean): Map<Sequence, ReportInformation> {
-        return sequences.associateWith { getNbReportBySequence(it, isTeacher) }
+    fun countReportBySequence(sequences: List<Sequence>, isTeacher: Boolean): Map<Sequence, ReportInformation> {
+        return sequences.associateWith { countReportBySequence(it, isTeacher) }
     }
 
-    fun getNbReportBySequence(sequence: Sequence, isTeacher: Boolean): ReportInformation {
+    fun countReportBySequence(sequence: Sequence, isTeacher: Boolean): ReportInformation {
         // Load interactions if not already loaded
         val sequenceInteractionsFetched = if (sequence.interactions.isEmpty()) {
             loadInteractions(sequence)

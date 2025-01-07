@@ -49,7 +49,7 @@ class SequenceProgressionModelFactory(
     )
 
     private fun countRerportedEvaluation(sequence: Sequence, user: User): ReportInformation {
-        return sequenceService.getNbReportBySequence(sequence, sequence.owner == user)
+        return sequenceService.countReportBySequence(sequence, sequence.owner == user)
     }
 
     private fun getSequenceStatistics(sequence: Sequence): SequenceStatistics = sequenceService.getStatistics(sequence)

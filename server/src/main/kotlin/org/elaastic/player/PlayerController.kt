@@ -259,7 +259,7 @@ class PlayerController(
             messageBuilder = messageBuilder,
             sequenceStatistics = sequenceService.getStatistics(selectedSequence),
             teacherResultDashboardService = teacherResultDashboardService,
-            nbReportBySequence = sequenceService.getNbReportBySequence(assignment.sequences, true),
+            nbReportBySequence = sequenceService.countReportBySequence(assignment.sequences, true),
         )
 
         return "player/assignment/sequence/play-teacher"
