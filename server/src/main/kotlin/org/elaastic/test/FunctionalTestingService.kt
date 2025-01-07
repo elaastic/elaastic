@@ -1,11 +1,18 @@
 package org.elaastic.test
 
+import org.elaastic.activity.evaluation.peergrading.PeerGrading
+import org.elaastic.activity.evaluation.peergrading.PeerGradingRepository
 import org.elaastic.activity.evaluation.peergrading.PeerGradingService
+import org.elaastic.activity.evaluation.peergrading.draxo.DraxoEvaluation
+import org.elaastic.activity.evaluation.peergrading.draxo.DraxoPeerGrading
+import org.elaastic.activity.evaluation.peergrading.draxo.criteria.Criteria
+import org.elaastic.activity.evaluation.peergrading.draxo.option.OptionId
 import org.elaastic.activity.response.ConfidenceDegree
 import org.elaastic.activity.response.Response
 import org.elaastic.activity.response.ResponseService
 import org.elaastic.ai.evaluation.chatgpt.ChatGptEvaluation
 import org.elaastic.ai.evaluation.chatgpt.ChatGptEvaluationRepository
+import org.elaastic.ai.evaluation.chatgpt.ChatGptEvaluationService
 import org.elaastic.ai.evaluation.chatgpt.ChatGptEvaluationStatus
 import org.elaastic.assignment.Assignment
 import org.elaastic.assignment.AssignmentService
@@ -18,12 +25,11 @@ import org.elaastic.material.instructional.statement.StatementRepository
 import org.elaastic.material.instructional.statement.StatementService
 import org.elaastic.material.instructional.subject.Subject
 import org.elaastic.material.instructional.subject.SubjectService
+import org.elaastic.moderation.ReportCandidate
+import org.elaastic.moderation.ReportReason
 import org.elaastic.moderation.UtilityGrade
 import org.elaastic.player.PlayerController
-import org.elaastic.sequence.ExecutionContext
-import org.elaastic.sequence.Sequence
-import org.elaastic.sequence.SequenceService
-import org.elaastic.sequence.State
+import org.elaastic.sequence.*
 import org.elaastic.sequence.interaction.InteractionService
 import org.elaastic.sequence.phase.evaluation.EvaluationPhaseConfig
 import org.elaastic.test.interpreter.command.*
@@ -52,7 +58,10 @@ class FunctionalTestingService(
     @Autowired val interactionService: InteractionService,
     @Autowired val statementService: StatementService,
     @Autowired val statementRepository: StatementRepository,
-    private val chatGptEvaluationRepository: ChatGptEvaluationRepository,
+    @Autowired val chatGptEvaluationRepository: ChatGptEvaluationRepository,
+    @Autowired val peerGradingRepository: PeerGradingRepository,
+    @Autowired val chatGptEvaluationService: ChatGptEvaluationService,
+    @Autowired val sequenceRepository: SequenceRepository,
 ) {
 
     fun createCourse(user: User, title: String = "Default course title") =
@@ -557,5 +566,83 @@ class FunctionalTestingService(
         )
 
         return chatGptEvaluationRepository.save(chatGptEvaluation)
+    }
+
+    /**
+     * Create a DRAXO evaluation for a response The DRAXO evaluation is saved in the database
+     *
+     * @param response the response to evaluate
+     * @param grader the user who evaluates the response
+     * @param draxoEvaluation the DRAXO evaluation to give. By default, the evaluation is a D with a NO option and an
+     *    explanation
+     * @param lastSequencePeerGrading the last sequence peer grading status
+     */
+    fun createDRAXOEvaluation(
+        response: Response,
+        grader: User,
+        draxoEvaluation: DraxoEvaluation = DraxoEvaluation().addEvaluation(Criteria.D, OptionId.NO, "explanation"),
+        lastSequencePeerGrading: Boolean = false
+    ): DraxoPeerGrading {
+        DraxoPeerGrading(
+            grader,
+            response,
+            draxoEvaluation,
+            lastSequencePeerGrading
+        ).let {
+            return peerGradingRepository.save(it)
+        }
+    }
+
+    fun reportReportCandidate(
+        reporter: User,
+        reportCandidate: ReportCandidate,
+        reportReasons: List<ReportReason> = listOf(ReportReason.INCOHERENCE),
+        reportComment: String? = null
+    ) {
+        when (reportCandidate) {
+            is PeerGrading -> peerGradingService.updateReport(
+                reporter,
+                reportCandidate,
+                reportReasons.map { it.name },
+                reportComment
+            )
+
+            is ChatGptEvaluation -> chatGptEvaluationService.reportEvaluation(
+                reportCandidate,
+                reportReasons.map { it.name },
+                reportComment
+            )
+        }
+    }
+
+    /**
+     * Create a sequence
+     *
+     * The sequence is saved in the database
+     *
+     * @param teacher the teacher who owns the sequence
+     * @param executionContext the execution context of the sequence
+     * @param evaluationPhaseConfig the evaluation phase config of the sequence
+     * @param chatGptEvaluationEnabled the ChatGPT evaluation enabled status of the sequence
+     */
+    fun createSequence(
+        teacher: User,
+        executionContext: ExecutionContext = ExecutionContext.FaceToFace,
+        evaluationPhaseConfig: EvaluationPhaseConfig = EvaluationPhaseConfig.ALL_AT_ONCE,
+        chatGptEvaluationEnabled: Boolean = false
+    ): Sequence {
+        val subject: Subject = createSubject(teacher)
+        val assignment: Assignment = createAssignment(subject)
+
+        Sequence(
+            teacher,
+            statement = subject.statements.first(),
+            assignment = assignment,
+            executionContext = executionContext,
+            evaluationPhaseConfig = evaluationPhaseConfig,
+            chatGptEvaluationEnabled = chatGptEvaluationEnabled,
+        ).let {
+            return sequenceRepository.save(it)
+        }
     }
 }
