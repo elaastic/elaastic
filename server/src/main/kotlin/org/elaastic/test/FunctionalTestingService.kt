@@ -224,7 +224,8 @@ class FunctionalTestingService(
             executionContext,
             studentsProvideExplanation,
             nbResponseToEvaluate,
-            EvaluationPhaseConfig.ALL_AT_ONCE,
+            sequence.evaluationPhaseConfig,
+            sequence.chatGptEvaluationEnabled
         )
 
     fun submitResponse(
@@ -627,11 +628,16 @@ class FunctionalTestingService(
      */
     fun createSequence(
         teacher: User,
+        evaluationPhaseConfig: EvaluationPhaseConfig,
         executionContext: ExecutionContext = ExecutionContext.FaceToFace,
-        evaluationPhaseConfig: EvaluationPhaseConfig = EvaluationPhaseConfig.ALL_AT_ONCE,
         chatGptEvaluationEnabled: Boolean = false
     ): Sequence {
         val subject: Subject = createSubject(teacher)
+        addQuestion(subject, generateStatement(
+            owner = teacher,
+            questionType = QuestionType.OpenEnded,
+            questionIndex = 0
+        ))
         val assignment: Assignment = createAssignment(subject)
 
         Sequence(
