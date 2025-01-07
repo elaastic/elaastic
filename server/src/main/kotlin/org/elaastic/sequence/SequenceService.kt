@@ -374,7 +374,7 @@ class SequenceService(
      * @return [Int] for the reported evaluation
      * @throws IllegalStateException if the evaluation phase is not initialized
      */
-    fun getReportedEvaluation(sequence: Sequence, teacher: Boolean, isRemoved: Boolean): Int {
+    fun countReportedEvaluation(sequence: Sequence, teacher: Boolean, isRemoved: Boolean): Int {
         if (!teacher || !sequence.responseSubmissionInteractionIsInitialized()) {
             return 0
         }
@@ -405,8 +405,8 @@ class SequenceService(
         } else {
             sequence
         }
-        val nbRemovedReport = getReportedEvaluation(sequenceInteractionsFetched, isTeacher, true)
-        val nbNotRemovedReport = getReportedEvaluation(sequenceInteractionsFetched, isTeacher, false)
+        val nbRemovedReport = countReportedEvaluation(sequenceInteractionsFetched, isTeacher, true)
+        val nbNotRemovedReport = countReportedEvaluation(sequenceInteractionsFetched, isTeacher, false)
         return ReportInformation(
                 nbReportTotal = nbRemovedReport + nbNotRemovedReport,
                 nbReportToModerate = nbNotRemovedReport
