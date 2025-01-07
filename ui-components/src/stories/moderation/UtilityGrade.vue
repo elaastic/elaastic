@@ -48,7 +48,7 @@ const {t} = useI18n()
   <!-- Grade buttons -->
   <v-row>
     <v-col>
-      <v-btn-toggle v-model="selectedGrade" variant="text" color="light-blue-darken-1" rounded="0" elevation="1">
+      <v-btn-toggle v-model="selectedGrade" variant="text" color="#0e6eb8" rounded="0" elevation="1">
         <v-btn v-for="(grade, index) in props.possibleGrades" :key="index" @click="setSelectedUtilityGrade(grade)"
                :value="grade" class="text-none text-subtitle-1">
           {{ grade.label }}
@@ -59,7 +59,7 @@ const {t} = useI18n()
   <!-- Submit button -->
   <v-row>
     <v-col>
-      <v-btn v-if="selectedGrade != null" class="text-none text-subtitle-1" @click="submitUtilityGrade()" color="light-green-lighten-1">
+      <v-btn v-if="selectedGrade != null" class="text-none text-white" @click="submitUtilityGrade()" color="#95c155" >
         {{ t('submit') }}
       </v-btn>
     </v-col>
