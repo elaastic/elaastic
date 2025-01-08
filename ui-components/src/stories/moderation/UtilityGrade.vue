@@ -86,13 +86,11 @@ const {t} = useI18n()
 <i18n>
 {
   "en": {
-    "submit": "Submit",
     "peer-review-label": "I consider the above evaluation useful for my learning:",
     "chatGPT-review-student-label": "I consider the ChatGPT evaluation useful for my learning:",
     "chatGPT-review-teacher-label": "I consider the ChatGPT evaluation useful for the student's learning:"
   },
   "fr": {
-    "submit": "Soumettre",
     "peer-review-label": "Je considère que l'évaluation ci-dessus est utile pour mon apprentissage :",
     "chatGPT-review-student-label": "Je considère que l'évaluation de ChatGPT est utile pour mon apprentissage :",
     "chatGPT-review-teacher-label": "Je considère que l'évaluation de ChatGPT est utile pour l'apprentissage de l'étudiant :"
