@@ -74,12 +74,21 @@ const {t} = useI18n()
           </v-btn>
         </v-btn-toggle>
       </div>
+      <div id="vertical-grade-selector-container">
+        <v-btn-toggle v-model="selectedGrade" variant="text" color="#0e6eb8" rounded="0" elevation="1"
+                      style="margin-top: 10px;" id="vertical-grade-selector">
+          <v-btn v-for="(grade, index) in props.possibleGrades" :key="index" @click="setSelectedUtilityGrade(grade)"
+                 :value="grade" class="text-none text-subtitle-1 btn-vertical-selector">
+            {{ grade.label }}
+          </v-btn>
+        </v-btn-toggle>
+      </div>
     </v-col>
   </v-row>
   <!-- Submit button -->
   <v-row>
     <v-col>
-      <v-btn v-if="selectedGrade != null" class="text-none text-white" @click="submitUtilityGrade" color="#95c155">
+      <v-btn id="submit-btn" v-if="selectedGrade != null" class="text-none text-white" @click="submitUtilityGrade" color="#95c155">
         {{ t('submit') }}
       </v-btn>
     </v-col>
@@ -87,6 +96,30 @@ const {t} = useI18n()
 </template>
 
 <style scoped>
+@media (max-width: 600px) {
+  #horizontal-grade-selector {
+    display: none;
+  }
+  #submit-btn {
+    width: 100%;
+  }
+}
+
+@media not (max-width: 600px) {
+  #vertical-grade-selector-container {
+    display: none;
+  }
+}
+
+#vertical-grade-selector  {
+  flex-direction: column;
+  height: unset;
+  width: 100%;
+
+  .btn-vertical-selector {
+    padding: 3%;
+  }
+}
 
 </style>
 
