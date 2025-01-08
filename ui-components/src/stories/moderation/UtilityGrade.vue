@@ -76,27 +76,8 @@ const {t} = useI18n()
 
 <style scoped>
 @media (max-width: 600px) {
-  #horizontal-grade-selector {
-    display: none;
-  }
   #submit-btn {
     width: 100%;
-  }
-}
-
-@media not (max-width: 600px) {
-  #vertical-grade-selector-container {
-    display: none;
-  }
-}
-
-#vertical-grade-selector  {
-  flex-direction: column;
-  height: unset;
-  width: 100%;
-
-  .btn-vertical-selector {
-    padding: 3%;
   }
 }
 
