@@ -2,11 +2,7 @@
 
 import {computed, ref} from 'vue'
 import {useI18n} from "vue-i18n";
-
-type Grade = {
-  label: string,
-  value: string
-}
+import SelectorResponsiv, {type Selection} from "@/components/util/SelectorResponsiv.vue";
 
 export interface UtilityGradeProps {
   /**
@@ -15,7 +11,7 @@ export interface UtilityGradeProps {
    * A Grade is an object with a label and a value.
    * The label is displayed and the value is emitted when the grade is submitted
    */
-  possibleGrades: Grade[],
+  possibleGrades: Selection[],
   /**
    * Wether the evaluation has been done by ChatGPT or not
    */
@@ -34,7 +30,7 @@ const props = defineProps<UtilityGradeProps>();
 const emit = defineEmits<UtilityGradeEvents>();
 
 const modelValue = ref({
-  selectedGradeModel: null as Grade | null,
+  selectedGradeModel: null as Selection | null,
 })
 
 const selectedGrade = computed({
@@ -44,7 +40,7 @@ const selectedGrade = computed({
   }
 });
 
-function setSelectedUtilityGrade(itemClicked: Grade) {
+function setSelectedUtilityGrade(itemClicked: Selection) {
   selectedGrade.value = itemClicked;
 }
 
@@ -65,24 +61,7 @@ const {t} = useI18n()
       <div v-if=" props.isChatGPT && !props.isTeacher" readonly>{{ t('chatGPT-review-student-label') }}</div>
       <div v-if=" props.isChatGPT &&  props.isTeacher" readonly>{{ t('chatGPT-review-teacher-label') }}</div>
 
-      <div id="horizontal-grade-selector">
-        <v-btn-toggle v-model="selectedGrade" variant="text" color="#0e6eb8" rounded="0" elevation="1"
-                      style="margin-top: 10px;">
-          <v-btn v-for="(grade, index) in props.possibleGrades" :key="index" @click="setSelectedUtilityGrade(grade)"
-                 :value="grade" class="text-none text-subtitle-1">
-            {{ grade.label }}
-          </v-btn>
-        </v-btn-toggle>
-      </div>
-      <div id="vertical-grade-selector-container">
-        <v-btn-toggle v-model="selectedGrade" variant="text" color="#0e6eb8" rounded="0" elevation="1"
-                      style="margin-top: 10px;" id="vertical-grade-selector">
-          <v-btn v-for="(grade, index) in props.possibleGrades" :key="index" @click="setSelectedUtilityGrade(grade)"
-                 :value="grade" class="text-none text-subtitle-1 btn-vertical-selector">
-            {{ grade.label }}
-          </v-btn>
-        </v-btn-toggle>
-      </div>
+      <SelectorResponsiv :selections="props.possibleGrades" @changeSelection="setSelectedUtilityGrade"/>
     </v-col>
   </v-row>
   <!-- Submit button -->
