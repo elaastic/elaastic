@@ -27,14 +27,19 @@
 
     <!--/* Initialise the <confronting-viewpoint app & interact with it */-->
     <script th:inline="javascript">
-        /*[- Expose server model as JSON -]*/
-        const utilityGradePossible = /*[[${T(org.elaastic.moderation.UtilityGrade).values()}]]*/ ''
+
+        const iframe = document.getElementById('utiltiy-grade-app')
 
         /*[- Trigger the app init function on iframe loading -]*/
-        const iframe = document.getElementById('utiltiy-grade-app')
         iframe.onload = () => {
             iframe.contentWindow.elaastic.initializeUtilityGrade()
         }
+        window.addEventListener('message', (event) => {
+            if (event.data.command === 'grade-submitted') {
+                const gradeSubmitted = event.data.grade;
+                console.log(gradeSubmitted)
+            }
+        })
 
         /*[- Init iframe resize -]*/
         iframeResize({

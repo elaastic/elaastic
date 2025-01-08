@@ -22,7 +22,7 @@
 
     <head>
         <meta charset="UTF-8">
-        <title>Likert scale input</title>
+        <title>Utility Grade Selector</title>
     </head>
 
     <body>
@@ -38,8 +38,16 @@
             initializeUtilityGrade: () => {
 
                 const possibleGrades = /*[[${utilityGrade}]]*/ ''
-                console.log(possibleGrades)
-                const app = Vue.createApp(ElaasticVueComponents.UtilityGrade, {possibleGrades, })
+
+                const app = Vue.createApp(
+                        ElaasticVueComponents.UtilityGrade,
+                        {
+                            possibleGrades,
+                            onSubmitUtilityGrade(grade) {
+                                window.parent.postMessage({ command: 'grade-submitted', grade })
+                            }
+                        }
+                )
                 ElaasticVueComponents.registerPlugins(app)
                 app.mount(`#phase2-evaluation-app`)
             }
