@@ -12,7 +12,7 @@ export interface UtilityGradeProps {
   possibleGrades: Grade[]
 }
 export interface UtilityGradeEvents {
-  (event: 'submmitUtilityGrade', gradeSelected: Grade): void;
+  (event: 'submmitUtilityGrade', gradeSelected: string): void;
 }
 
 const props = defineProps<UtilityGradeProps>();
@@ -35,7 +35,7 @@ function setSelectedUtilityGrade(itemClicked: Grade) {
 
 const submitUtilityGrade = () => {
   if (selectedGrade.value != null) {
-    emit("submmitUtilityGrade", selectedGrade.value)
+    emit("submmitUtilityGrade", selectedGrade.value.value)
   }
 };
 
