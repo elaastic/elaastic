@@ -80,7 +80,6 @@ const {t} = useI18n()
     width: 100%;
   }
 }
-
 </style>
 
 <i18n>
