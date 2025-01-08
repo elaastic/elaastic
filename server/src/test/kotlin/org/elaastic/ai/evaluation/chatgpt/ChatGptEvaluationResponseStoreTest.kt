@@ -66,15 +66,6 @@ class ChatGptEvaluationResponseStoreTest {
     }
 
     @Test
-    fun `test responseHasBeenEvaluatedByChatGpt with invalid response id`() {
-        // Given a ChatGptEvaluationResponseStore with a response id
-        val chatGptEvaluationResponseStore = ChatGptEvaluationResponseStore(listOf(1))
-
-        // Then the response id should be stored
-        assertFalse(chatGptEvaluationResponseStore.responseHasBeenEvaluatedByChatGpt(null))
-    }
-
-    @Test
     fun hashCodeTest() {
         // Given two ChatGptEvaluationResponseStore with the same response ids
         val chatGptEvaluationResponseStore1 = ChatGptEvaluationResponseStore()

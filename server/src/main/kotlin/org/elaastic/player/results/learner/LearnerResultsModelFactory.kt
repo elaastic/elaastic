@@ -110,11 +110,11 @@ data class LearnerSequenceResponses(
 ) {
     val responseFirstTryHasChatGPTEvaluation: Boolean
         get() = responseFirstAttempt != null && chatGptEvaluationResponseStore.responseHasBeenEvaluatedByChatGpt(
-            responseFirstAttempt.id
+            responseFirstAttempt.id!!
         )
 
     val responseSecondTryHasChatGPTEvaluation: Boolean
         get() = responseSecondAttempt != null && chatGptEvaluationResponseStore.responseHasBeenEvaluatedByChatGpt(
-            responseSecondAttempt.id
+            responseSecondAttempt.id!!
         )
 }

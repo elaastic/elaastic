@@ -28,8 +28,8 @@ class ChatGptEvaluationResponseStore(responseIds: Collection<Long> = emptyList()
      * @param responseId the id of the response to check
      * @return true if the response has been evaluated by ChatGPT, false otherwise
      */
-    fun responseHasBeenEvaluatedByChatGpt(responseId: Long?) =
-        responseId != null && responseIdSet.contains(responseId)
+    fun responseHasBeenEvaluatedByChatGpt(responseId: Long) =
+        responseIdSet.contains(responseId)
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

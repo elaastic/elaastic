@@ -47,7 +47,7 @@ class ChoiceExplanationStore(choiceSpecification: ChoiceSpecification) : Explana
         responseList: List<Response>,
         chatGptEvaluationResponseStore: ChatGptEvaluationResponseStore
     ) : this(choiceSpecification) {
-        responseList.forEach { add(it, chatGptEvaluationResponseStore.responseHasBeenEvaluatedByChatGpt(it.id)) }
+        responseList.forEach { add(it, chatGptEvaluationResponseStore.responseHasBeenEvaluatedByChatGpt(it.id!!)) }
     }
 
     fun add(response: Response, explanationHasChatGPTEvaluation: Boolean) {
