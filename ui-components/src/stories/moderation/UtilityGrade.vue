@@ -9,8 +9,15 @@ type Grade = {
 }
 
 export interface UtilityGradeProps {
+  /**
+   * The possible grades to select from
+   *
+   * A Grade is an object with a label and a value.
+   * The label is displayed and the value is emitted when the grade is submitted
+   */
   possibleGrades: Grade[]
 }
+
 export interface UtilityGradeEvents {
   (event: 'submmitUtilityGrade', gradeSelected: string): void;
 }
@@ -57,7 +64,7 @@ const {t} = useI18n()
   <!-- Submit button -->
   <v-row>
     <v-col>
-      <v-btn v-if="selectedGrade != null" class="text-none text-white" @click="submitUtilityGrade" color="#95c155" >
+      <v-btn v-if="selectedGrade != null" class="text-none text-white" @click="submitUtilityGrade" color="#95c155">
         {{ t('submit') }}
       </v-btn>
     </v-col>

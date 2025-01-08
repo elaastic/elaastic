@@ -7,12 +7,11 @@ import UtilityGrade from '@/stories/moderation/UtilityGrade.vue';
 const meta: any = {
   title: 'Moderation/UtilityGrade',
   component: UtilityGrade,
-  tags: ['autodocs'],
   args: {
     // Has to have the name of the event with `on` in front and in camelCase
     onSubmmitUtilityGrade: fn(),
   },
-
+  tags: ['autodocs']
 } satisfies Meta<typeof UtilityGrade>;
 
 export default meta;
