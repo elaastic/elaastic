@@ -33,12 +33,12 @@
             <div></div>
         </div>
     </div>
-    <script>
+    <script th:inline="javascript">
         window.elaastic = {
-            initializeUtilityGrade: (possibleGrades) => {
-                /*
-                possibleGrades: [ "VERY_BAD", "BAD", "NEUTRAL", "GOOD", "VERY_GOOD" ]
-                 */
+            initializeUtilityGrade: () => {
+
+                const possibleGrades = /*[[${utilityGrade}]]*/ ''
+                console.log(possibleGrades)
                 const app = Vue.createApp(ElaasticVueComponents.UtilityGrade, {possibleGrades, })
                 ElaasticVueComponents.registerPlugins(app)
                 app.mount(`#phase2-evaluation-app`)
