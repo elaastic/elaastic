@@ -3,11 +3,10 @@ package org.elaastic.ai.evaluation.chatgpt
 import org.elaastic.test.IntegrationTestingService
 import org.elaastic.test.directive.tThen
 import org.elaastic.test.directive.tWhen
-import org.hamcrest.CoreMatchers
-import org.hamcrest.MatcherAssert
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.empty
 import org.hamcrest.Matchers.`is`
+import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -29,7 +28,7 @@ internal class ChatGptEvaluationRepositoryIntegrationTest(
     fun setup() {
         chatGptEvaluationRepository.deleteAll()
         // Precondition
-        assertThat(chatGptEvaluationRepository.findAll(), `is`(empty()))
+        assertTrue(chatGptEvaluationRepository.findAll().isEmpty())
     }
 
     @Test
@@ -43,20 +42,20 @@ internal class ChatGptEvaluationRepositoryIntegrationTest(
                 it
             }
             .tThen {
-                MatcherAssert.assertThat(it.id, CoreMatchers.notNullValue())
-                MatcherAssert.assertThat(it.dateCreated, CoreMatchers.notNullValue())
-                MatcherAssert.assertThat(it.lastUpdated, CoreMatchers.notNullValue())
+                assertNotNull(it.id)
+                assertNotNull(it.dateCreated)
+                assertNotNull(it.lastUpdated)
 
-                MatcherAssert.assertThat(it.annotation, CoreMatchers.nullValue())
-                MatcherAssert.assertThat(it.grade, CoreMatchers.nullValue())
-                MatcherAssert.assertThat(it.status, CoreMatchers.equalTo(ChatGptEvaluationStatus.UNKNOWN.name))
+                assertNull(it.annotation)
+                assertNull(it.grade)
+                assertEquals(it.status, ChatGptEvaluationStatus.UNKNOWN.name)
 
-                MatcherAssert.assertThat(it.reportReasons, CoreMatchers.nullValue())
-                MatcherAssert.assertThat(it.reportComment, CoreMatchers.nullValue())
-                MatcherAssert.assertThat(it.utilityGrade, CoreMatchers.nullValue())
+                assertNull(it.reportReasons)
+                assertNull(it.reportComment)
+                assertNull(it.utilityGrade)
 
-                MatcherAssert.assertThat(it.hiddenByTeacher, CoreMatchers.equalTo(false))
-                MatcherAssert.assertThat(it.removedByTeacher, CoreMatchers.equalTo(false))
+                assertFalse(it.hiddenByTeacher)
+                assertFalse(it.removedByTeacher)
             }
     }
 
