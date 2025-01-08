@@ -9,7 +9,7 @@ const meta: any = {
   component: UtilityGrade,
   args: {
     // Has to have the name of the event with `on` in front and in camelCase
-    onSubmmitUtilityGrade: fn(),
+    onSubmitUtilityGrade: fn(),
   },
   tags: ['autodocs']
 } satisfies Meta<typeof UtilityGrade>;
