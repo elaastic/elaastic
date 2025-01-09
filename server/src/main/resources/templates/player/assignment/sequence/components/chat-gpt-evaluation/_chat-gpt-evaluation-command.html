@@ -23,36 +23,26 @@
     <form class="ui form"
           style="align-items: end;"
           th:action="@{/chatGptEvaluation/sequence/{sequenceId}/submit-utility-grade(sequenceId=${chatGptEvaluationModel.sequenceId})}"
-          method="post">
+          method="post"
+          th:id="'form-utility-grade_' + ${chatGptEvaluationModel.evaluationId}">
+
         <!--/* TODO use a correct data */-->
         <input type="hidden" name="isTeacher" th:value="${chatGptEvaluationModel.viewedByTeacher}">
 
         <input type="hidden" name="evaluationId" th:value="${chatGptEvaluationModel.evaluationId}">
+        <input type="hidden" name="utilityGrade" th:value="${utilityGradeSelected}">
+
         <div class="ui grid stackable" style="align-items: end; margin-bottom: 1em;">
 
             <!--/* Utility grade selection */-->
-            <div class="field twelve wide column utilitySelectionApp"
-                 th:id="'utilitySelectionApp-' + ${chatGptEvaluationModel.evaluationId}"
-                 style="margin-bottom: 0">
-
-                <!--/* Utility grade label */-->
-                <label th:if="${chatGptEvaluationModel.viewedByTeacher}"
-                       th:text="#{player.sequence.chatGptEvaluation.utilityGrade.label.teacher}"></label>
-                <label th:unless="${chatGptEvaluationModel.viewedByTeacher}"
-                       th:text="#{player.sequence.chatGptEvaluation.utilityGrade.label}"></label>
-                <input type="hidden" name="utilityGrade" v-model="selectedUtilityGrade"/>
-
-                <!--/* Utility grade selection */-->
-                <div class="ui menu stackable fluid pagination">
-                    <a th:each="utilityGrade : ${chatGptEvaluationModel.utilityGradeValues}" class="item"
-                       th:attr="'v-on:click'=|setSelectedUtilityGrade('${utilityGrade.name()}')|,'v-bind:class'=|{ active: selectedUtilityGrade === '${utilityGrade.name()}' }|"
-                       th:text="#{|player.sequence.chatGptEvaluation.utilityGrade.${utilityGrade.name()}|}">
-                    </a>
-                </div>
-            </div>
+            <!--/* iframe allowing to load the <utility-grade> app in a isolated context */-->
+            <iframe th:id="'utiltiy-grade-app_' + ${chatGptEvaluationModel.evaluationId}"
+                    class="transparent-iframe" th:src="@{/ui/utility-grade}" width="100%"></iframe>
+            <!--/* script for activating @iframe-resizer that allow us to smoothly integrate the previous iframe within the page layout */-->
+            <script src="https://cdn.jsdelivr.net/npm/@iframe-resizer/parent@5.3.2"></script>
 
             <!--/* Report button only visible for the student */-->
-            <div th:unless="${chatGptEvaluationModel.viewedByTeacher}" class="field four wide column"
+            <div th:unless="${chatGptEvaluationModel.viewedByTeacher}" class="column" style="width: 100%;"
                  id="reportSelectionApp">
                 <div class="ui menu pagination" style="width: 100%;">
                     <a class="item" style="color: #b03060; width: 100%;"
@@ -74,18 +64,43 @@
 
 
     <script th:inline="javascript">
-        new Vue({
-            el: '#utilitySelectionApp-' + [[${chatGptEvaluationModel.evaluationId}]],
-            data: {
-                selectedUtilityGrade: [[${utilityGradeSelected?.name()}]]
-            },
-            methods: {
-                setSelectedUtilityGrade: function (clickedUtilityGrade) {
-                    this.selectedUtilityGrade = clickedUtilityGrade
-                    $('#submit-button-utility-grade[evaluationId="' + [[${chatGptEvaluationModel.evaluationId}]] + '"]').slideDown();
-                }
+        $(function () {
+            const evaluationId = /*[[${chatGptEvaluationModel.evaluationId}]]*/ '';
+            const isTeacher = /*[[${chatGptEvaluationModel.viewedByTeacher}]]*/ false;
+            const isChatGPT = true; /*[- This is a ChatGPT evaluation -]*/
+            const iframeSelector = 'utiltiy-grade-app_' + evaluationId;
+            const iframe = document.getElementById(iframeSelector);
+
+            /*[- Trigger the app init function on iframe loading -]*/
+            iframe.onload = () => {
+                iframe.contentWindow.elaastic.initializeUtilityGrade(isChatGPT, isTeacher, evaluationId)
             }
-        })
+
+            window.addEventListener('message', (event) => {
+                if (event.data.command === 'grade-submitted_' + evaluationId) {
+                    const gradeSubmitted = event.data.grade;
+                    console.log(event.data.command, gradeSubmitted)
+
+                    submitUtilityGrade(evaluationId, gradeSubmitted)
+                }
+            })
+
+            /*[- Init iframe resize -]*/
+            iframeResize({
+                license: 'GPLv3',
+                waitForLoad: true
+            }, '#' + iframeSelector)
+        });
+
+        function submitUtilityGrade(evaluationId, utilityGrade) {
+            const form = $('#form-utility-grade_' + evaluationId);
+            form.children('input[name="utilityGrade"]').val(utilityGrade);
+
+            const url = form.attr('action');
+            const data = form.serialize();
+
+            $.post(url, data, () => {})
+        }
     </script>
 
     <style>
