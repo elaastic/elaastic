@@ -32,7 +32,7 @@
 
         /*[- Trigger the app init function on iframe loading -]*/
         iframe.onload = () => {
-            iframe.contentWindow.elaastic.initializeUtilityGrade()
+            iframe.contentWindow.elaastic.initializeUtilityGrade(false, false)
         }
         window.addEventListener('message', (event) => {
             if (event.data.command === 'grade-submitted') {

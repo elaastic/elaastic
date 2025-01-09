@@ -35,12 +35,18 @@
     </div>
     <script th:inline="javascript">
         window.elaastic = {
-            initializeUtilityGrade: () => {
-
-
+            /**
+             * Initialize the utility grade component
+             * @param isChatGPT If the evaluation to grade is a ChatGPT evaluation
+             * @param isTeacher If the user is a teacher
+             * @param evaluationId The id of the evaluation to grade
+             */
+            initializeUtilityGrade: (isChatGPT, isTeacher, evaluationId) => {
                 const app = Vue.createApp(
                         ElaasticVueComponents.UtilityGrade,
                         {
+                            isChatGPT: isChatGPT,
+                            isTeacher: isTeacher,
                             onSubmitUtilityGrade(grade) {
                                 window.parent.postMessage({command: 'grade-submitted', grade})
                             }
