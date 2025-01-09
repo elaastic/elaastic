@@ -19,114 +19,97 @@
 <div xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/html"
      th:fragment="peerGradingEvaluationCommand(draxoEvaluationModel)">
 
-    <form class="ui form"
+    <!--/* iframe allowing to load the <utility-grade> app in a isolated context */-->
+    <iframe th:id="'utiltiy-grade-app_' + ${draxoEvaluationModel.draxoPeerGradingId}"
+            class="transparent-iframe" th:src="@{/ui/utility-grade}" width="100%"></iframe>
 
-          th:action="@{/peer-grading/draxo/submit-utility-grade}"
-          method="post"
-          th:id="'peerGradingEvaluationForm_' + ${draxoEvaluationModel.draxoPeerGradingId}"
-    >
-        <input type="hidden" name="evaluationId" th:value="${draxoEvaluationModel.draxoPeerGradingId}">
-        <div class="ui grid stackable" style="align-items: end;">
-            <div class="field twelve wide column" id="utilitySelectionApp">
-                <label th:text="#{player.sequence.peerGradingEvaluation.utilityGrade.label}"></label>
-                <input type="hidden"
-                       th:attr="data-evaluation-id=${draxoEvaluationModel.draxoPeerGradingId}"
-                       name="utilityGrade"
-                       id="selectedUtilityGrade"
-                />
-
-                <div class="ui menu stackable fluid pagination">
-                    <a th:each="utilityGrade : ${T(org.elaastic.moderation.UtilityGrade).values()}"
-                       class="item utilityGrade"
-                       th:classappend="${draxoEvaluationModel.isUtilityGradeSelected(utilityGrade)} ? 'active' : ''"
-                       th:attr="utilityGradeName=${utilityGrade.name()},
-                                data-evaluation-id=${draxoEvaluationModel.draxoPeerGradingId}"
-                       th:text="#{|player.sequence.chatGptEvaluation.utilityGrade.${utilityGrade.name()}|}">
-                    </a>
-                </div>
-            </div>
-            <div class="field four wide column" id="reportSelectionApp">
-                <div class="ui menu pagination" th:if="${draxoEvaluationModel.draxoEvaluation.getExplanation()}">
-                    <a class="item"
-                       th:onclick="|$('#reportModal_${draxoEvaluationModel.draxoPeerGradingId}').modal('show');|">
-
-                        <i class="exclamation triangle icon"></i>
-                        <span th:text="#{player.sequence.chatGptEvaluation.reportButton}"></span>
-                    </a>
-                </div>
-            </div>
-        </div>
-        <div id="submit-button-utility-grade"
-             th:attr="data-evaluation-id=${draxoEvaluationModel.draxoPeerGradingId}">
-            <button type="submit" value="Soumettre" class="ui primary button" th:text="#{common.submit}"></button>
-        </div>
-        <div class="ui message" th:attr="data-evaluation-id=${draxoEvaluationModel.draxoPeerGradingId}"
-             id="submit-message">
-            <div class="header" th:text="#{evaluation.submitUtilityGrade.success.header}">
-                Grade saved
-            </div>
-            <p class="content" th:text="#{evaluation.submitUtilityGrade.success.content}">
-                Your grade has been saved.
-            </p>
-        </div>
+    <form th:action="@{/peer-grading/draxo/submit-utility-grade}" th:method="post" th:id="'form-utility-grade_' + ${draxoEvaluationModel.draxoPeerGradingId}">
+        <input type="hidden" name="evaluationId" th:value="${draxoEvaluationModel.draxoPeerGradingId}"/>
+        <input type="hidden" name="utilityGrade" th:value="${draxoEvaluationModel.utilityGrade}"/>
     </form>
 
+    <!--/* script for activating @iframe-resizer that allow us to smoothly integrate the previous iframe within the page layout */-->
+    <script src="https://cdn.jsdelivr.net/npm/@iframe-resizer/parent@5.3.2"></script>
+
+    <div class="ui message" th:attr="data-evaluation-id=${draxoEvaluationModel.draxoPeerGradingId}"
+         style="display: none"
+         id="submit-message">
+        <div class="header" th:text="#{evaluation.submitUtilityGrade.success.header}">
+            Grade saved
+        </div>
+        <p class="content" th:text="#{evaluation.submitUtilityGrade.success.content}">
+            Your grade has been saved.
+        </p>
+    </div>
+
+    <!--/* Report button */-->
+    <div class="" id="reportSelectionApp">
+        <div class="ui menu pagination" th:if="${draxoEvaluationModel.draxoEvaluation.getExplanation()}">
+            <a class="item"
+               th:onclick="|$('#reportModal_${draxoEvaluationModel.draxoPeerGradingId}').modal('show');|">
+
+                <i class="exclamation triangle icon"></i>
+                <span th:text="#{player.sequence.chatGptEvaluation.reportButton}"></span>
+            </a>
+        </div>
+    </div>
+
+    <!--/* Report modal */-->
     <div th:replace="player/assignment/sequence/components/peer-grading-reaction/_peer-grading-draxo-reaction-report-modal.html :: reportModal(${draxoEvaluationModel.draxoEvaluation.getExplanation()},${draxoEvaluationModel.draxoPeerGradingId}, ${draxoEvaluationModel.responseId})"></div>
 
 
     <script th:inline="javascript">
         $(function () {
-            /*<![CDATA[*/
-            const evaluationId = [[${draxoEvaluationModel.draxoPeerGradingId}]];
-            /*]]> */
+            const evaluationId = /*[[${draxoEvaluationModel.draxoPeerGradingId}]]*/ '';
+            const isTeacher = false; /*[- Only the learner can access this page -]*/
+            const isChatGPT = false; /*[- This is not a ChatGPT evaluation -]*/
+            const iframeSelector = 'utiltiy-grade-app_' + evaluationId;
+            const iframe = document.getElementById(iframeSelector);
 
-            const submitMessage = $('#submit-message[data-evaluation-id="' + evaluationId + '"]');
-            const utilityGradeBtns = $('.utilityGrade[data-evaluation-id="' + evaluationId + '"]')
+            /*[- Trigger the app init function on iframe loading -]*/
+            iframe.onload = () => {
+                iframe.contentWindow.elaastic.initializeUtilityGrade(isChatGPT, isTeacher, evaluationId)
+            }
 
-            submitMessage.hide()
+            window.addEventListener('message', (event) => {
+                if (event.data.command === 'grade-submitted_' + evaluationId) {
+                    const gradeSubmitted = event.data.grade;
+                    console.log(event.data.command, gradeSubmitted)
 
-            utilityGradeBtns.click(function () {
-                utilityGradeBtns.removeClass("active")
-                $(this).addClass("active")
-
-                // Set the grade of the selected button in the hidden field
-                $('#selectedUtilityGrade[data-evaluation-id="' + evaluationId + '"]').val($(this).attr("utilityGradeName"))
-
-                // Show the submit button
-                $('#submit-button-utility-grade[data-evaluation-id="' + evaluationId + '"]').slideDown()
-
-                // Hide the submit message
-                submitMessage.slideUp()
+                    submitUtilityGrade(evaluationId, gradeSubmitted)
+                }
             })
 
-            $('#peerGradingEvaluationForm_' + evaluationId).submit(function (e) {
-                e.preventDefault()
-                const form = $(this)
-                const url = form.attr('action')
-                const data = form.serialize()
-
-                $('#submit-button-utility-grade[data-evaluation-id="' + evaluationId + '"]').children('button').addClass("loading")
-
-                $.post(url, data, function (response) {
-                    if (response.success) {
-                        $('#submit-button-utility-grade[data-evaluation-id="' + evaluationId + '"]').slideUp()
-                        submitMessage.addClass("positive")
-                    } else {
-                        submitMessage.addClass("negative")
-                        submitMessage.children('.header').css("color", " #9f3a38")
-                    }
-                    $('#submit-button-utility-grade[data-evaluation-id="' + evaluationId + '"]').children('button').removeClass("loading")
-                    //Update the submit message with the content of the response
-                    submitMessage.children('.header').text(response.header)
-                    submitMessage.children('.content').text(response.content)
-
-                    submitMessage.slideDown()
-                    setTimeout(function () {
-                        submitMessage.slideUp()
-                    }, 5000)
-                })
-            })
+            /*[- Init iframe resize -]*/
+            iframeResize({
+                license: 'GPLv3',
+                waitForLoad: true
+            }, '#' + iframeSelector)
         });
+
+        function submitUtilityGrade(evaluationId, utilityGrade) {
+            const form = $('#form-utility-grade_' + evaluationId);
+            const submitMessage = $('#submit-message[data-evaluation-id="' + evaluationId + '"]');
+            form.children('input[name="utilityGrade"]').val(utilityGrade);
+
+            const url = form.attr('action');
+            const data = form.serialize();
+
+            $.post(url, data, (response) => {
+                if (response.success) {
+                    submitMessage.addClass("positive")
+                } else {
+                    submitMessage.addClass("negative")
+                    submitMessage.children('.header').css("color", " #9f3a38")
+                }
+                //Update the message with the content of the response
+                submitMessage.children('.header').text(response.header)
+                submitMessage.children('.content').text(response.content)
+
+                submitMessage.slideDown()
+                setTimeout(() => {submitMessage.slideUp()}, 5000)
+            })
+        }
     </script>
 
     <style>

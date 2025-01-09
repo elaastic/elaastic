@@ -129,7 +129,6 @@ class DraxoPeerGradingController(
      * Handle the submission of a DRAXO evaluation utility grade through asynchronous request
      *
      * @param authentication the current user authentication
-     * @param model the model
      * @param evaluationId the id of the evaluation to update
      * @param utilityGrade the utility grade to set
      * @return [ResponseSubmissionAsynchronous] the response of the submission in JSON format
@@ -139,15 +138,14 @@ class DraxoPeerGradingController(
     @PostMapping("/submit-utility-grade")
     fun submitDRAXOEvaluationUtilityGrade(
         authentication: Authentication,
-        model: Model,
         @RequestParam(required = true) evaluationId: Long,
         @RequestParam(required = true) utilityGrade: UtilityGrade
     ): ResponseSubmissionAsynchronous {
-        val user: User = authentication.principal as User
+        val user = authentication.principal as User
         val evaluation: DraxoPeerGrading = draxoPeerGradingService.getDraxoPeerGrading(evaluationId)
         val locale: Locale = LocaleContextHolder.getLocale()
 
-        val responseSubmissionAsynchronous = kotlin.run {
+        val responseSubmissionAsynchronous = run {
             try {
                 peerGradingService.updateUtilityGrade(user, evaluation, utilityGrade)
 

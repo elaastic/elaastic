@@ -48,7 +48,7 @@
                             isChatGPT: isChatGPT,
                             isTeacher: isTeacher,
                             onSubmitUtilityGrade(grade) {
-                                window.parent.postMessage({command: 'grade-submitted', grade})
+                                window.parent.postMessage({command: 'grade-submitted_' + evaluationId, grade})
                             }
                         }
                 )
