@@ -28,13 +28,19 @@ export interface UtilityGradeProps {
    * Whether the user is a teacher or not
    */
   isTeacher: boolean,
+  /**
+   * The selected grade if any
+   */
+  selectedGrade: string | null
 }
 
 export interface UtilityGradeEvents {
   (event: 'submitUtilityGrade', gradeSelected: string): void;
 }
 
-const props = defineProps<UtilityGradeProps>();
+const props = withDefaults(defineProps<UtilityGradeProps>(), {
+  selectedGrade: null
+})
 const emit = defineEmits<UtilityGradeEvents>();
 
 const modelValue = ref({
@@ -67,13 +73,13 @@ const submitUtilityGrade = () => {
       <div v-if=" props.isChatGPT && !props.isTeacher" readonly>{{ t('chatGPT-review-student-label') }}</div>
       <div v-if=" props.isChatGPT &&  props.isTeacher" readonly>{{ t('chatGPT-review-teacher-label') }}</div>
 
-      <SelectorResponsiv :selections="possibleGrade" @changeSelection="setSelectedUtilityGrade"/>
+      <SelectorResponsiv :selections="possibleGrade" :selected="props.selectedGrade" @changeSelection="setSelectedUtilityGrade"/>
     </v-col>
   </v-row>
   <!-- Submit button -->
   <v-row>
     <v-col>
-      <v-btn id="submit-btn" v-if="selectedGrade != null" class="text-none text-white" @click="submitUtilityGrade"
+      <v-btn id="submit-btn" v-if="selectedGrade != null && selectedGrade.value !== props.selectedGrade" class="text-none text-white" @click="submitUtilityGrade"
              color="#95c155">
         {{ t('submit') }}
       </v-btn>
