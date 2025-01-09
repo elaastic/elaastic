@@ -28,14 +28,6 @@ type Story = StoryObj<typeof meta>;
 
 
 export const DraxoByLearner: Story = {
-  args: {
-    possibleGrades: [
-      {label: "Strongly disagree", value: "STRONGLY_DISAGREE"},
-      {label: "Disagree", value: "DISAGREE"},
-      {label: "Agree", value: "AGREE"},
-      {label: "Strongly Agree", value: "STRONGLY_AGREE"}
-    ],
-  },
   parameters: {
     docs: {
       description: {
@@ -47,12 +39,6 @@ export const DraxoByLearner: Story = {
 
 export const ChatGPTByLearner: Story = {
   args: {
-    possibleGrades: [
-      {label: "Strongly disagree", value: "STRONGLY_DISAGREE"},
-      {label: "Disagree", value: "DISAGREE"},
-      {label: "Agree", value: "AGREE"},
-      {label: "Strongly Agree", value: "STRONGLY_AGREE"}
-    ],
     isChatGPT: true
   },
   parameters: {
@@ -66,12 +52,6 @@ export const ChatGPTByLearner: Story = {
 
 export const ChatGPTByTeacher: Story = {
   args: {
-    possibleGrades: [
-      {label: "Strongly disagree", value: "STRONGLY_DISAGREE"},
-      {label: "Disagree", value: "DISAGREE"},
-      {label: "Agree", value: "AGREE"},
-      {label: "Strongly Agree", value: "STRONGLY_AGREE"}
-    ],
     isChatGPT: true,
     isTeacher: true
   },

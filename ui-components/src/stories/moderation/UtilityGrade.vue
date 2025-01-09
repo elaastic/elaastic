@@ -4,14 +4,22 @@ import {computed, ref} from 'vue'
 import {useI18n} from "vue-i18n";
 import SelectorResponsiv, {type Selection} from "@/components/util/SelectorResponsiv.vue";
 
+const {t} = useI18n()
+
+const gradeValue: string[] = [
+  "STRONGLY_DISAGREE",
+  "DISAGREE",
+  "AGREE",
+  "STRONGLY_AGREE"
+]
+
+const getSelection = (gradeValue: string): Selection => {
+  return {label: t(`utility-grade.${gradeValue}`), value: gradeValue}
+}
+
+const possibleGrade: Selection[] = gradeValue.map(getSelection)
+
 export interface UtilityGradeProps {
-  /**
-   * The possible grades to select from
-   *
-   * A Grade is an object with a label and a value.
-   * The label is displayed and the value is emitted when the grade is submitted
-   */
-  possibleGrades: Selection[],
   /**
    * Wether the evaluation has been done by ChatGPT or not
    */
@@ -49,8 +57,6 @@ const submitUtilityGrade = () => {
     emit("submitUtilityGrade", selectedGrade.value.value)
   }
 };
-
-const {t} = useI18n()
 </script>
 
 <template>
@@ -61,13 +67,14 @@ const {t} = useI18n()
       <div v-if=" props.isChatGPT && !props.isTeacher" readonly>{{ t('chatGPT-review-student-label') }}</div>
       <div v-if=" props.isChatGPT &&  props.isTeacher" readonly>{{ t('chatGPT-review-teacher-label') }}</div>
 
-      <SelectorResponsiv :selections="props.possibleGrades" @changeSelection="setSelectedUtilityGrade"/>
+      <SelectorResponsiv :selections="possibleGrade" @changeSelection="setSelectedUtilityGrade"/>
     </v-col>
   </v-row>
   <!-- Submit button -->
   <v-row>
     <v-col>
-      <v-btn id="submit-btn" v-if="selectedGrade != null" class="text-none text-white" @click="submitUtilityGrade" color="#95c155">
+      <v-btn id="submit-btn" v-if="selectedGrade != null" class="text-none text-white" @click="submitUtilityGrade"
+             color="#95c155">
         {{ t('submit') }}
       </v-btn>
     </v-col>
@@ -87,12 +94,24 @@ const {t} = useI18n()
   "en": {
     "peer-review-label": "I consider the above evaluation useful for my learning:",
     "chatGPT-review-student-label": "I consider the ChatGPT evaluation useful for my learning:",
-    "chatGPT-review-teacher-label": "I consider the ChatGPT evaluation useful for the student's learning:"
+    "chatGPT-review-teacher-label": "I consider the ChatGPT evaluation useful for the student's learning:",
+    "utility-grade": {
+      "STRONGLY_DISAGREE": "Strongly disagree",
+      "DISAGREE": "Disagree",
+      "AGREE": "Agree",
+      "STRONGLY_AGREE": "Strongly Agree"
+    }
   },
   "fr": {
     "peer-review-label": "Je considère que l'évaluation ci-dessus est utile pour mon apprentissage :",
     "chatGPT-review-student-label": "Je considère que l'évaluation de ChatGPT est utile pour mon apprentissage :",
-    "chatGPT-review-teacher-label": "Je considère que l'évaluation de ChatGPT est utile pour l'apprentissage de l'étudiant :"
+    "chatGPT-review-teacher-label": "Je considère que l'évaluation de ChatGPT est utile pour l'apprentissage de l'étudiant :",
+    "utility-grade": {
+      "STRONGLY_DISAGREE": "Pas du tout d'accord",
+      "DISAGREE": "Pas d'accord",
+      "AGREE": "D'accord",
+      "STRONGLY_AGREE": "Tout à fait d'accord"
+    }
   }
 }
 </i18n>
