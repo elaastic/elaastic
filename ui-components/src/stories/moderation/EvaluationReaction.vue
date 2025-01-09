@@ -5,12 +5,29 @@ import {useI18n} from "vue-i18n";
 
 const {t} = useI18n()
 
+export interface EvaluationReactionProps {
+  /**
+   * Wether the evaluation has been done by ChatGPT or not
+   */
+  isChatGPT: boolean
+  /**
+   * Whether the user is a teacher or not
+   */
+  isTeacher: boolean,
+  /**
+   * The selected grade if any
+   */
+  selectedGrade: string | null
+}
+
+const props = defineProps<EvaluationReactionProps>()
+
 </script>
 
 <template>
   <v-row id="evaluation-reaction-container">
     <v-col>
-      <UtilityGrade :is-chat-g-p-t="false" :is-teacher="false"/>
+      <UtilityGrade :is-chat-g-p-t="props.isChatGPT" :is-teacher="props.isTeacher" :selected-grade="props.selectedGrade"/>
     </v-col>
     <v-col align-self="center">
       <v-btn class="text-none" variant="outlined" color="#b7446f" prepend-icon="mdi-alert" id="report-btn">
