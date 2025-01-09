@@ -32,12 +32,13 @@
         <input type="hidden" name="evaluationId" th:value="${chatGptEvaluationModel.evaluationId}">
         <input type="hidden" name="utilityGrade" th:value="${utilityGradeSelected}">
 
-        <div class="ui grid stackable" style="align-items: end; margin-bottom: 1em;">
+        <div class="ui grid stackable" style="align-items: end;">
 
             <!--/* Utility grade selection */-->
             <!--/* iframe allowing to load the <utility-grade> app in a isolated context */-->
             <iframe th:id="'utiltiy-grade-app_' + ${chatGptEvaluationModel.evaluationId}"
-                    class="transparent-iframe" th:src="@{/ui/utility-grade}" width="100%"></iframe>
+                    class="transparent-iframe" th:src="@{/ui/utility-grade}" width="100%"
+                    style="margin-top: 2%;"></iframe>
             <!--/* script for activating @iframe-resizer that allow us to smoothly integrate the previous iframe within the page layout */-->
             <script src="https://cdn.jsdelivr.net/npm/@iframe-resizer/parent@5.3.2"></script>
 
@@ -99,7 +100,8 @@
             const url = form.attr('action');
             const data = form.serialize();
 
-            $.post(url, data, () => {})
+            $.post(url, data, () => {
+            })
         }
     </script>
 

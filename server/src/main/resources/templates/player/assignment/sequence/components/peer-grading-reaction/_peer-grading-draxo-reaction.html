@@ -19,38 +19,42 @@
 <div xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/html"
      th:fragment="peerGradingEvaluationCommand(draxoEvaluationModel)">
 
-    <!--/* iframe allowing to load the <utility-grade> app in a isolated context */-->
-    <iframe th:id="'utiltiy-grade-app_' + ${draxoEvaluationModel.draxoPeerGradingId}"
-            class="transparent-iframe" th:src="@{/ui/utility-grade}" width="100%"></iframe>
-
-    <form th:action="@{/peer-grading/draxo/submit-utility-grade}" th:method="post" th:id="'form-utility-grade_' + ${draxoEvaluationModel.draxoPeerGradingId}">
+    <form th:action="@{/peer-grading/draxo/submit-utility-grade}" th:method="post"
+          th:id="'form-utility-grade_' + ${draxoEvaluationModel.draxoPeerGradingId}">
         <input type="hidden" name="evaluationId" th:value="${draxoEvaluationModel.draxoPeerGradingId}"/>
         <input type="hidden" name="utilityGrade" th:value="${draxoEvaluationModel.utilityGrade}"/>
     </form>
 
-    <!--/* script for activating @iframe-resizer that allow us to smoothly integrate the previous iframe within the page layout */-->
-    <script src="https://cdn.jsdelivr.net/npm/@iframe-resizer/parent@5.3.2"></script>
+    <div class="ui grid stackable">
 
-    <div class="ui message" th:attr="data-evaluation-id=${draxoEvaluationModel.draxoPeerGradingId}"
-         style="display: none"
-         id="submit-message">
-        <div class="header" th:text="#{evaluation.submitUtilityGrade.success.header}">
-            Grade saved
+        <!--/* iframe allowing to load the <utility-grade> app in a isolated context */-->
+        <iframe th:id="'utiltiy-grade-app_' + ${draxoEvaluationModel.draxoPeerGradingId}"
+                class="transparent-iframe" th:src="@{/ui/utility-grade}" width="100%" style="margin-top: 2%;" ></iframe>
+
+        <!--/* script for activating @iframe-resizer that allow us to smoothly integrate the previous iframe within the page layout */-->
+        <script src="https://cdn.jsdelivr.net/npm/@iframe-resizer/parent@5.3.2"></script>
+
+        <div class="ui message" th:attr="data-evaluation-id=${draxoEvaluationModel.draxoPeerGradingId}"
+             style="display: none"
+             id="submit-message">
+            <div class="header" th:text="#{evaluation.submitUtilityGrade.success.header}">
+                Grade saved
+            </div>
+            <p class="content" th:text="#{evaluation.submitUtilityGrade.success.content}">
+                Your grade has been saved.
+            </p>
         </div>
-        <p class="content" th:text="#{evaluation.submitUtilityGrade.success.content}">
-            Your grade has been saved.
-        </p>
-    </div>
 
-    <!--/* Report button */-->
-    <div class="" id="reportSelectionApp">
-        <div class="ui menu pagination" th:if="${draxoEvaluationModel.draxoEvaluation.getExplanation()}">
-            <a class="item"
-               th:onclick="|$('#reportModal_${draxoEvaluationModel.draxoPeerGradingId}').modal('show');|">
+        <!--/* Report button */-->
+        <div id="reportSelectionApp" class="column" style="width: 100%;">
+            <div class="ui menu pagination" th:if="${draxoEvaluationModel.draxoEvaluation.getExplanation()}">
+                <a class="item"
+                   th:onclick="|$('#reportModal_${draxoEvaluationModel.draxoPeerGradingId}').modal('show');|">
 
-                <i class="exclamation triangle icon"></i>
-                <span th:text="#{player.sequence.chatGptEvaluation.reportButton}"></span>
-            </a>
+                    <i class="exclamation triangle icon"></i>
+                    <span th:text="#{player.sequence.chatGptEvaluation.reportButton}"></span>
+                </a>
+            </div>
         </div>
     </div>
 
@@ -107,7 +111,9 @@
                 submitMessage.children('.content').text(response.content)
 
                 submitMessage.slideDown()
-                setTimeout(() => {submitMessage.slideUp()}, 5000)
+                setTimeout(() => {
+                    submitMessage.slideUp()
+                }, 5000)
             })
         }
     </script>
