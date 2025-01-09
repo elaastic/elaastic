@@ -1,6 +1,6 @@
 {
   "name": "elaastic-vue-components",
-  "version": "0.0.10",
+  "version": "0.0.11",
   "private": true,
   "type": "module",
   "files": [
@@ -36,6 +36,7 @@
   "devDependencies": {
     "@chromatic-com/storybook": "^3.2.3",
     "@intlify/unplugin-vue-i18n": "^6.0.1",
+    "@storybook/addon-a11y": "^8.4.7",
     "@storybook/addon-essentials": "^8.4.7",
     "@storybook/addon-interactions": "^8.4.7",
     "@storybook/addon-links": "^8.4.7",
