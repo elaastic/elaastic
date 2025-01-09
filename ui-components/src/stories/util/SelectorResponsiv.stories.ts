@@ -1,7 +1,14 @@
 import type {Meta, StoryObj} from '@storybook/vue3';
+import type {Selection} from "@/components/util/SelectorResponsiv.vue";
 
 import SelectorResponsiv from "@/components/util/SelectorResponsiv.vue";
 import {expect, fn, userEvent, waitFor, within} from "@storybook/test";
+
+// Define the interface for args
+interface Args {
+  onChangeSelection: () => void;
+  selections: Selection[];
+}
 
 // More on how to set up stories at: https://storybook.js.org/docs/writing-stories
 const meta: any = {
@@ -34,6 +41,8 @@ export const Primary: Story = {
   },
 };
 
+
+
 export const PrimaryWithTest: Story = {
   args: {
     selections: [
@@ -42,9 +51,7 @@ export const PrimaryWithTest: Story = {
       {label: "Last", value: "N"}
     ],
   },
-  play: async ({args, canvasElement, step}) => {
-    const canvas = within(canvasElement);
-
+  play: async ({args, canvas, step}: {args: Args, canvas: any, step: any}) => {
     // Click the first button
     await step('Select the first button', async () => {
       await userEvent.click(canvas.getAllByRole('button')[0]);
