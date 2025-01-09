@@ -27,32 +27,11 @@ import org.springframework.ui.set
 import org.springframework.web.bind.annotation.GetMapping
 
 @Controller
-class ModerationUIController(
-    @Autowired val messageSource: MessageSource,
-) {
+class ModerationUIController() {
 
     @GetMapping("/ui/utility-grade")
-    fun utilityGrade(
-        model: Model
-    ): String {
-        val locale = LocaleContextHolder.getLocale()
-        val utilityGradeI18NKey = "player.sequence.chatGptEvaluation.utilityGrade"
-        val gradeList = UtilityGrade.values().map {
-            Grade(
-                it.name,
-                messageSource.getMessage("$utilityGradeI18NKey.${it.name}", null, locale)
-            )
-        }
-        model["utilityGrade"] = gradeList
-        return "moderation/components/utility-grade"
-    }
+    fun utilityGrade() = "moderation/components/utility-grade"
 
     @GetMapping("/ui/utility-grade/test")
     fun utilityGradeTest() = "moderation/test-utility-grade"
-
-    class Grade(val value: String, val label: String) {
-        override fun toString(): String {
-            return "{value='$value', label='$label'}"
-        }
-    }
 }

@@ -37,14 +37,12 @@
         window.elaastic = {
             initializeUtilityGrade: () => {
 
-                const possibleGrades = /*[[${utilityGrade}]]*/ ''
 
                 const app = Vue.createApp(
                         ElaasticVueComponents.UtilityGrade,
                         {
-                            possibleGrades,
                             onSubmitUtilityGrade(grade) {
-                                window.parent.postMessage({ command: 'grade-submitted', grade })
+                                window.parent.postMessage({command: 'grade-submitted', grade})
                             }
                         }
                 )
