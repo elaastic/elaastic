@@ -8,16 +8,42 @@ export type Selection = {
 }
 
 interface SelectorResponsivProps {
+  /**
+   * The list of selections to display
+   */
   selections: Selection[];
+  /**
+   * The selected value in the list
+   */
+  selected: string | null;
 }
 interface SelectorResponsivEmit {
   (event: 'changeSelection', newSelection: Selection): void;
 }
 
-const props = defineProps<SelectorResponsivProps>()
+const props = withDefaults(defineProps<SelectorResponsivProps>(), {
+  selected: null
+})
 const emit = defineEmits<SelectorResponsivEmit>()
 
-const selected = ref<Selection | null>(null)
+/**
+ * Get the selected value from the props.
+ * If the selected value is not in the selections, return null.
+ * @returns the selected value or null
+ */
+function getSelectedFromProps(): Selection | null {
+  const selected = props.selected
+
+  console.log(selected)
+
+  if (selected == null) {
+    return null
+  }
+
+  return props.selections.find(selection => selection.value === selected) ?? null
+}
+
+const selected = ref<Selection | null>(getSelectedFromProps())
 
 const setSelected = (newSelection: Selection) => {
   selected.value = newSelection

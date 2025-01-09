@@ -21,7 +21,7 @@ const meta: any = {
   parameters: {
     docs: {
       description: {
-        story: 'Change this description'
+        story: 'TODO'
       }
     }
   }
@@ -29,7 +29,6 @@ const meta: any = {
 
 export default meta;
 type Story = StoryObj<typeof meta>;
-
 
 export const Primary: Story = {
   args: {
@@ -39,11 +38,16 @@ export const Primary: Story = {
       {label: "Last", value: "N"}
     ],
   },
+  parameters: {
+    docs: {
+      description: {
+        story: 'Default state'
+      }
+    }
+  }
 };
 
-
-
-export const PrimaryWithTest: Story = {
+export const PrimaryClick: Story = {
   args: {
     selections: [
       {label: "First", value: "1"},
@@ -60,4 +64,47 @@ export const PrimaryWithTest: Story = {
     // Now we can assert that the onChangeSelection arg was called
     await waitFor(() => expect(args.onChangeSelection).toHaveBeenCalled());
   },
+  parameters: {
+    docs: {
+      description: {
+        story: 'Default state but with a click on the first button'
+      }
+    }
+  }
+};
+
+export const WithSelectedValid: Story = {
+  args: {
+    selections: [
+      {label: "First", value: "1"},
+      {label: "Second", value: "2"},
+      {label: "Last", value: "N"}
+    ],
+    selected: "N",
+  },
+  parameters: {
+    docs: {
+      description: {
+        story: 'A selected value is provided'
+      }
+    }
+  }
+};
+
+export const WithSelectedInvalid: Story = {
+  args: {
+    selections: [
+      {label: "First", value: "1"},
+      {label: "Second", value: "2"},
+      {label: "Last", value: "N"}
+    ],
+    selected: "azertyuiop",
+  },
+  parameters: {
+    docs: {
+      description: {
+        story: 'An selected value is provided but it is not in the list'
+      }
+    }
+  }
 };
