@@ -46,6 +46,7 @@ const emit = defineEmits<UtilityGradeEvents>();
 const modelValue = ref({
   selectedGradeModel: null as Selection | null,
 })
+let pastGrade = ref(props.selectedGrade)
 
 const selectedGrade = computed({
   get: () => modelValue.value.selectedGradeModel,
@@ -60,6 +61,7 @@ function setSelectedUtilityGrade(itemClicked: Selection) {
 
 const submitUtilityGrade = () => {
   if (selectedGrade.value != null) {
+    pastGrade.value = selectedGrade.value.value
     emit("submitUtilityGrade", selectedGrade.value.value)
   }
 };
@@ -79,7 +81,7 @@ const submitUtilityGrade = () => {
   <!-- Submit button -->
   <v-row>
     <v-col>
-      <v-btn id="submit-btn" v-if="selectedGrade != null && selectedGrade.value !== props.selectedGrade" class="text-none text-white" @click="submitUtilityGrade"
+      <v-btn id="submit-btn" v-if="selectedGrade != null && selectedGrade.value !== pastGrade" class="text-none text-white" @click="submitUtilityGrade"
              color="#95c155">
         {{ t('submit') }}
       </v-btn>
