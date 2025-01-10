@@ -317,9 +317,7 @@ class PlayerController(
         sequence: Sequence,
         model: Model,
     ): String {
-        val sequenceModel = sequenceModelFactory.buildForTeacher(user, sequence)
-
-        model["sequenceModel"] = sequenceModel
+        model["sequenceModel"] = sequenceModelFactory.buildForTeacher(user, sequence)
         return "player/assignment/sequence/play-sequence-teacher"
     }
 
@@ -331,10 +329,9 @@ class PlayerController(
         val learnerSequence = learnerSequenceService.getLearnerSequence(user, sequence)
         learnerPhaseService.loadPhaseList(learnerSequence)
 
-        val sequenceModel =
-            sequenceModelFactory.buildForLearner(user, learnerSequence, learnerSequence.activeInteraction)
-
-        model["sequenceModel"] = sequenceModel
+        model["sequenceModel"] = sequenceModelFactory.buildForLearner(
+            user, learnerSequence, learnerSequence.activeInteraction
+        )
         return "player/assignment/sequence/play-sequence-learner"
     }
 
