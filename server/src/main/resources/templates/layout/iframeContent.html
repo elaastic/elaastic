@@ -56,6 +56,11 @@
                     $(this).closest('.message').transition('fade')
                 })
             })
+            saveAction = function (sequenceId, action, object) {
+                if (sequenceId != null) {
+                    fetch([[${@environment.getProperty('elaastic.questions.url')}]] + 'action/' + sequenceId + '/saveAction/' + action + '/' + object)
+                }
+            }
         </script>
 
         <style>

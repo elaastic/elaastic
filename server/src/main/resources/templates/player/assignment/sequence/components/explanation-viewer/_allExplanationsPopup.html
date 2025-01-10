@@ -24,12 +24,12 @@
     <button type="button"
             class="ui button"
             th:onclick="|$('#all_explanations_for_${sequenceId}').modal({
+                onShow: function(){
+                    saveAction(${sequenceId}, 'open', 'rationales_popup')
+                },
                 onHide: function(){
                     saveAction(${sequenceId}, 'close', 'rationales_popup')
                     if(toReload) window.location.reload()
-                },
-                onShow: function(){
-                    saveAction(${sequenceId}, 'open', 'rationales_popup')
                 }
             }).modal('show');|"
             th:text="#{player.sequence.explanation.all.button}">
