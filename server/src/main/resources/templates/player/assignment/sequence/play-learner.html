@@ -89,6 +89,12 @@
 
         <div th:if="${playerModel.sequence}" th:id="|sequence_${playerModel.sequence.id}|">
 
+            <div class="loading ui segment" th:id="|loading-sequence_${playerModel.sequence.id}|">
+                <p>&amp;nbsp;</p>
+                <p>&amp;nbsp;</p>
+            </div>
+
+
             <!--/* The sequence */-->
             <iframe th:src="@{/player/sequence/{sequenceId}(sequenceId=${playerModel.sequence.id})}"
                     th:id="|iframe-sequence_${playerModel.sequence.id}|"
@@ -97,10 +103,16 @@
             <script src="https://cdn.jsdelivr.net/npm/@iframe-resizer/parent@5.3.2"></script>
 
             <script th:inline="javascript">
+                let iframeSelector = 'iframe-sequence_' + [[${playerModel.sequence.id}]];
+                const iframe = document.getElementById(iframeSelector);
+                iframe.onload = function () {
+                    // Hide loader
+                    $('#loading-sequence_' + [[${playerModel.sequence.id}]]).slideUp();
+                };
                 iframeResize({
                     license: 'GPLv3',
                     waitForLoad: true
-                }, '#iframe-sequence_' + [[${playerModel.sequence.id}]]);
+                }, '#' + iframeSelector);
             </script>
         </div>
         <!--/* The auto-reload script */-->
