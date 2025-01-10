@@ -161,11 +161,10 @@
         <script src="https://cdn.jsdelivr.net/npm/@iframe-resizer/parent@5.3.2"></script>
 
         <script th:inline="javascript">
-            const sequenceId = [[${playerModel.sequence.id}]];
             iframeResize({
                 license: 'GPLv3',
                 waitForLoad: true
-            }, '#iframe-sequence_' + sequenceId);
+            }, '#iframe-sequence_' + [[${playerModel.sequence.id}]]);
         </script>
 
         <!--/* The functional testing of the sequence */-->
