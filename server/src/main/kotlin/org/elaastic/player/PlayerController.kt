@@ -217,48 +217,43 @@ class PlayerController(
         @PathVariable assignmentId: Long,
         @PathVariable sequenceId: Long?,
     ): String {
-
         val user: User = authentication.principal as User
         val assignment: Assignment = assignmentService.get(assignmentId, true)
-        model.addAttribute("user", user)
+        model["user"] = user
 
         if (assignment.sequences.isEmpty()) {
             return "redirect:/subject/${assignment.subject!!.id}"
         }
 
-        val sequenceIdValid: Long = sequenceId ?: assignment.sequences.first().id!!
+        // Get the sequence to play
+        // If no sequenceId is provided, the first sequence is selected
+        // If the sequenceId provided is not in the assignment, the first sequence is selected
+        val selectedSequence = sequenceService.loadInteractions(
+            sequenceId?.let { itSequenceId ->
+                assignment.sequences.find { it.id == itSequenceId }
+            } ?: assignment.sequences.first()
+        )
+        val isTeacher = user == selectedSequence.owner
 
-        // TODO Improve data fetching (should start from the assignment)
-        sequenceService.get(sequenceIdValid, true).let { sequence ->
-            model.addAttribute("user", user)
-            val isTeacher = user == sequence.owner
-
-            return if (isTeacher)
-                playAssignmentForTeacher(user, model, sequence, httpServletRequest)
-            else
-                playAssignmentForLearner(user, model, sequence, httpServletRequest)
-        }
-
+        return if (isTeacher)
+            playAssignmentForTeacher(model, assignment, selectedSequence, httpServletRequest)
+        else
+            playAssignmentForLearner(user, model, assignment, selectedSequence, httpServletRequest)
     }
 
     private fun playAssignmentForTeacher(
-        user: User,
         model: Model,
+        assignment: Assignment,
         selectedSequence: Sequence,
         httpServletRequest: HttpServletRequest,
     ): String {
-        val assignment: Assignment = selectedSequence.assignment!!
         val registeredUsers: List<LearnerAssignment> = assignmentService.getRegisteredUsers(assignment)
 
         model["dashboardModel"] = dashboardModelFactory.build(selectedSequence)
         model["playerModel"] = PlayerModelFactory.buildForTeacher(
-            user = user,
             sequence = selectedSequence,
             serverBaseUrl = ControllerUtil.getServerBaseUrl(httpServletRequest),
             nbRegisteredUsers = registeredUsers.size,
-            messageBuilder = messageBuilder,
-            sequenceStatistics = sequenceService.getStatistics(selectedSequence),
-            teacherResultDashboardService = teacherResultDashboardService,
             nbReportBySequence = sequenceService.countReportBySequence(assignment.sequences, true),
         )
 
@@ -268,31 +263,20 @@ class PlayerController(
     private fun playAssignmentForLearner(
         user: User,
         model: Model,
+        assignment: Assignment,
         sequence: Sequence,
         httpServletRequest: HttpServletRequest,
     ): String {
-
-        val assignment = sequence.assignment!!
+        val userAgent = httpServletRequest.getHeader("User-Agent")
         val nbRegisteredUsers = assignmentService.countRegisteredUsers(assignment)
-
         val learnerSequence = learnerSequenceService.getLearnerSequence(user, sequence)
         learnerPhaseService.loadPhaseList(learnerSequence)
 
-        model.addAttribute(
-            "playerModel",
-            PlayerModelFactory.buildForLearner(
-                sequence = sequence,
-                nbRegisteredUsers = nbRegisteredUsers,
-                messageBuilder = messageBuilder,
-                activeInteraction = learnerSequenceService.getActiveInteractionForLearner(
-                    user,
-                    sequence
-                ),
-                learnerSequence = learnerSequence
-            )
+        model["playerModel"] = PlayerModelFactory.buildForLearner(
+            sequence = sequence,
+            nbRegisteredUsers = nbRegisteredUsers,
         )
 
-        val userAgent = httpServletRequest.getHeader("User-Agent")
         eventLogService.consultPlayer(sequence, user, learnerSequence, userAgent)
 
         return "player/assignment/sequence/play-learner"
