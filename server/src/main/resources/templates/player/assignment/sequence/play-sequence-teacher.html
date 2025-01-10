@@ -19,6 +19,7 @@
 <!--/* sequenceModel is given by the controller with this url `/sequence/{sequenceId}`*/-->
 <!DOCTYPE html>
 <div th:fragment="playSequenceTeacher(sequenceModel)"
+     style="padding: 1em 2px 0 2px;"
      xmlns:th="http://www.thymeleaf.org"
      xmlns="http://www.w3.org/1999/html"
      th:with="sequenceProgressionModel=${sequenceModel.sequenceProgressionModel}, activeInteractionModel=${sequenceModel.activeInteractionModel}">
