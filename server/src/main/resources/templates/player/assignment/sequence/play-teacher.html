@@ -141,7 +141,7 @@
 
             <div class="ui divider"></div>
 
-            <div th:replace="|${components}/_attendees-overview.html| :: attendeesOverview(${dashboardModel}, aside, ${playerModel.stepsModel})"></div>
+            <div th:replace="|${components}/_attendees-overview.html| :: attendeesOverview(${dashboardModel}, aside)"></div>
         </div>
     </aside>
 
@@ -152,19 +152,21 @@
 
     <!--/* The main content of the page */-->
     <section th:with="components=${'player/assignment/sequence/components'}">
-        <script th:inline="javascript">
-            $(function () {
-                //Initial load of the sequence
-                $('#sequence_' + [[${playerModel.sequence.id}]] + '_container').load('/player/sequence/' + [[${playerModel.sequence.id}]]);
-            });
-        </script>
 
-        <div th:id="|sequence_${playerModel.sequence.id}_container|">
-            <div class="loading ui segment">
-                <p>&amp;nbsp;</p>
-                <p>&amp;nbsp;</p>
-            </div>
-        </div>
+        <!--/* The sequence */-->
+        <iframe th:src="@{/player/sequence/{sequenceId}(sequenceId=${playerModel.sequence.id})}"
+                class="transparent-iframe" width="100%" height="100%"
+                th:id="|iframe-sequence_${playerModel.sequence.id}|">
+        </iframe>
+        <script src="https://cdn.jsdelivr.net/npm/@iframe-resizer/parent@5.3.2"></script>
+
+        <script th:inline="javascript">
+            const sequenceId = [[${playerModel.sequence.id}]];
+            iframeResize({
+                license: 'GPLv3',
+                waitForLoad: true
+            }, '#iframe-sequence_' + sequenceId);
+        </script>
 
         <!--/* The functional testing of the sequence */-->
         <div togglz:active="'FUNCTIONAL_TESTING'" th:remove="tag">
