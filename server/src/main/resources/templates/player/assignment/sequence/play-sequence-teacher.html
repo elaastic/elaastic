@@ -16,70 +16,38 @@
   ~ along with this program.  If not, see <https://www.gnu.org/licenses/>.
   -->
 <!--/* @thymesVar id="sequenceModel" type="org.elaastic.player.sequence.TeacherSequenceModel" */-->
-<!--/* sequenceModel is given by the controller with this url `/sequence/{sequenceId}`*/-->
 <!DOCTYPE html>
-<div th:fragment="playSequenceTeacher(sequenceModel)"
-     style="padding: 1em 2px 0 2px;"
-     xmlns:th="http://www.thymeleaf.org"
-     xmlns="http://www.w3.org/1999/html"
-     th:with="sequenceProgressionModel=${sequenceModel.sequenceProgressionModel}, activeInteractionModel=${sequenceModel.activeInteractionModel}">
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns="http://www.w3.org/1999/html"
+      th:replace="layout/iframeContent.html :: iframeContent(title=~{::title}, content=~{::body})"
+>
     <!--/* @thymesVar id="sequenceProgressionModel" type="org.elaastic.player.sequence.SequenceOrchestrationModel" */-->
     <!--/* @thymesVar id="activeInteractionModel" type="org.elaastic.player.activeinteraction.ActiveInteractionModel" */-->
+    <head>
+        <title th:text="${sequenceModel.activeInteractionModel.statementInfoPanelModel.title}">Page title</title>
+    </head>
 
-    <link rel="shortcut icon" th:href="@{/images/favicon.ico}" type="image/x-icon"/>
-    <link th:href="@{/semantic/dist/semantic.min.css}" type="text/css" rel="stylesheet" media="screen, projection"/>
-    <link th:href="@{/css/elaastic.css}" type="text/css" rel="stylesheet" media="screen, projection"/>
-    <link th:href="@{/css/introjs.min.css}" type="text/css" rel="stylesheet" media="screen, projection"/>
-    <script th:src="@{/js/jquery.js}"></script>
-    <script th:src="@{/semantic/dist/semantic.min.js}"></script>
-    <script th:src="@{/js/vuejs/vue.min.js}"></script>
-    <script th:src="@{/js/vuejs/vue-resource.min.js}"></script>
-    <script th:src="@{/js/js.cookie.js}"></script>
-    <script th:src="@{/js/elaastic/util.js}"></script>
-    <script th:src="@{/js/elaastic/draxo/draxo-fn.js}"></script>
-    <script th:inline="javascript">
-        elaastic.draxo.initialize(/*[[@{/peer-grading/draxo}]]*/);
-    </script>
-    <script th:src="@{/js/intro.min.js}"></script>
-    <script type="text/javascript" th:src="@{/js/vega.js}"></script>
-    <script type="text/javascript" th:src="@{/js/vega-lite.js}"></script>
-    <script type="text/javascript" th:src="@{/js/vega-embed.js}"></script>
-    <script type="text/javascript" th:src="@{/ckeditor/ckeditor.js}"></script>
-    <script type="text/javascript" th:src="@{/js/vega-min.js}"></script>
-    <script type="text/javascript" th:src="@{/js/underscore-min.js}"></script>
-    <script type="text/javascript" th:src="@{/js/graph/result-graph.js}"></script>
-    <script type="text/javascript" th:src="@{/js/elaastic/auto-reload.js}"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@iframe-resizer/child@5.3.2"></script>
+    <body th:with="sequenceProgressionModel=${sequenceModel.sequenceProgressionModel}, activeInteractionModel=${sequenceModel.activeInteractionModel}">
+    <!--/* The sequence's interactions as steps */-->
+    <div th:replace="player/assignment/sequence/components/steps/_steps.html :: steps(${sequenceProgressionModel.stepsModel}, ${sequenceProgressionModel.sequenceStatistics})"></div>
 
-    <script th:inline="javascript">
-        saveAction = function (sequenceId, action, object) {
-            if (sequenceId != null) {
-                fetch([[${@environment.getProperty('elaastic.questions.url')}]] + 'action/' + sequenceId + '/saveAction/' + action + '/' + object)
-            }
-        }
-    </script>
+    <!--/* The sequence's management via button */-->
+    <div th:replace="player/assignment/sequence/components/command/_command.html :: command(${sequenceProgressionModel.commandModel})"></div>
 
-    <div th:id="|sequence_${sequenceModel.sequenceId}|">
+    <!--/* The sequence's information */-->
+    <div th:replace="player/assignment/sequence/components/sequence-info/_sequenceInfo.html :: sequenceInfo(${sequenceProgressionModel.sequenceInfoModel},${sequenceModel.sequenceId})"></div>
 
-        <!--/* The sequence's interactions as steps */-->
-        <div th:replace="player/assignment/sequence/components/steps/_steps.html :: steps(${sequenceProgressionModel.stepsModel}, ${sequenceProgressionModel.sequenceStatistics})"></div>
+    <!--/* Recommandation given to the teacher */-->
+    <div th:if="${sequenceModel.showResults and sequenceModel.resultsModel.recommendationModel != null}"
+         th:insert="player/assignment/sequence/components/_recommendation.html :: recommendation(${sequenceModel.resultsModel},${sequenceModel.sequenceId})"></div>
 
-        <!--/* The sequence's management via button */-->
-        <div th:replace="player/assignment/sequence/components/command/_command.html :: command(${sequenceProgressionModel.commandModel})"></div>
+    <!--/* The statement of the sequence */-->
+    <div th:replace="player/assignment/sequence/components/statement/_statement.html :: statement(${activeInteractionModel.statementInfoPanelModel})"></div>
 
-        <!--/* The sequence's information */-->
-        <div th:replace="player/assignment/sequence/components/sequence-info/_sequenceInfo.html :: sequenceInfo(${sequenceProgressionModel.sequenceInfoModel},${sequenceModel.sequenceId})"></div>
-
-        <!--/* Recommandation given to the teacher */-->
-        <div th:if="${sequenceModel.showResults and sequenceModel.resultsModel.recommendationModel != null}"
-             th:insert="player/assignment/sequence/components/_recommendation.html :: recommendation(${sequenceModel.resultsModel},${sequenceModel.sequenceId})"></div>
-
-        <!--/* The statement of the sequence */-->
-        <div th:replace="player/assignment/sequence/components/statement/_statement.html :: statement(${activeInteractionModel.statementInfoPanelModel})"></div>
-
-        <!--/* The results of the sequence */-->
-        <div th:if="${sequenceModel.showResults}" th:remove="tag">
-            <div th:replace="player/assignment/sequence/components/results/_results.html :: results(${sequenceModel.resultsModel}, true)"></div>
-        </div>
+    <!--/* The results of the sequence */-->
+    <div th:if="${sequenceModel.showResults}" th:remove="tag">
+        <div th:replace="player/assignment/sequence/components/results/_results.html :: results(${sequenceModel.resultsModel}, true)"></div>
     </div>
-</div>
+    </body>
+</html>

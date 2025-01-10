@@ -21,68 +21,34 @@
 <html lang="en"
       xmlns:th="http://www.thymeleaf.org"
       xmlns="http://www.w3.org/1999/html"
-      th:with="sequenceProgressionModel=${sequenceModel.sequenceProgressionModel}, activeInteractionModel=${sequenceModel.activeInteractionModel}">
+      th:replace="layout/iframeContent.html :: iframeContent(title=~{::title}, content=~{::body})"
+>
     <!--/* @thymesVar id="sequenceProgressionModel" type="org.elaastic.player.sequence.SequenceProgressionModel" */-->
     <!--/* @thymesVar id="activeInteractionModel" type="org.elaastic.player.activeinteraction.LearnerActiveInteractionModel" */-->
     <head>
         <title th:text="|elaastic : Sequence ${sequenceModel.sequenceId}|">Page title</title>
-        <meta charset="utf-8">
-        <meta content="IE=edge,chrome=1" http-equiv="X-UA-Compatible"/>
-        <meta content="width=device-width, initial-scale=1, maximum-scale=2, user-scalable=no" name="viewport"/>
-        <meta name="description"
-              th:content="#{elaastic.description}">
-        <meta name="author" content="University Toulouse 1 Capitole, University Toulouse 3 Paul Sabatier">
-        <meta content="#ffffff" name="theme-color"/>
-        <link rel="shortcut icon" th:href="@{/images/favicon.ico}" type="image/x-icon"/>
-        <link th:href="@{/semantic/dist/semantic.min.css}" type="text/css" rel="stylesheet" media="screen, projection"/>
-        <link th:href="@{/css/elaastic.css}" type="text/css" rel="stylesheet" media="screen, projection"/>
-        <link th:href="@{/css/introjs.min.css}" type="text/css" rel="stylesheet" media="screen, projection"/>
-        <script th:src="@{/js/jquery.js}"></script>
-        <script th:src="@{/semantic/dist/semantic.min.js}"></script>
-        <script th:src="@{/js/vuejs/vue.min.js}"></script>
-        <script th:src="@{/js/vuejs/vue-resource.min.js}"></script>
-        <script th:src="@{/js/js.cookie.js}"></script>
-        <script th:src="@{/js/elaastic/util.js}"></script>
-        <script th:src="@{/js/elaastic/draxo/draxo-fn.js}"></script>
-        <script th:inline="javascript">
-            elaastic.draxo.initialize(/*[[@{/peer-grading/draxo}]]*/);
-        </script>
-        <script th:src="@{/js/intro.min.js}"></script>
-        <script type="text/javascript" th:src="@{/ckeditor/ckeditor.js}"></script>
-        <script type="text/javascript" th:src="@{/js/vega-min.js}"></script>
-        <script type="text/javascript" th:src="@{/js/underscore-min.js}"></script>
-        <script type="text/javascript" th:src="@{/js/graph/result-graph.js}"></script>
-        <script type="text/javascript" th:src="@{/js/elaastic/auto-reload.js}"></script>
-        <script src="https://cdn.jsdelivr.net/npm/@iframe-resizer/child@5.3.2"></script>
-        <script th:inline="javascript">
-            saveAction = function (sequenceId, action, object) {
-                if (sequenceId != null) {
-                    fetch([[${@environment.getProperty('elaastic.questions.url')}]] + 'action/' + sequenceId + '/saveAction/' + action + '/' + object)
-                }
-            }
-        </script>
     </head>
-    <body style="padding: 1em 2px 0 2px;">
-    <div th:id="|sequence_${sequenceModel.sequenceId}|">
 
-                <!--/* The sequence's interactions as steps */-->
-        <div th:replace="player/assignment/sequence/components/steps/_steps.html :: steps(${sequenceProgressionModel.stepsModel}, ~{})"></div>
+    <body th:with="sequenceProgressionModel=${sequenceModel.sequenceProgressionModel}, activeInteractionModel=${sequenceModel.activeInteractionModel}">
 
-        <!--/* The sequence's information */-->
-        <div th:replace="player/assignment/sequence/components/sequence-info/_sequenceInfo.html :: sequenceInfo(${sequenceProgressionModel.sequenceInfoModel},${sequenceModel.sequenceId})"></div>
+    <!--/* The sequence's interactions as steps */-->
+    <div th:replace="player/assignment/sequence/components/steps/_steps.html :: steps(${sequenceProgressionModel.stepsModel}, ~{})"></div>
 
-        <!--/* The statement of the sequence */-->
-        <div th:replace="player/assignment/sequence/components/statement/_statement.html :: statement(${activeInteractionModel.statementInfoPanelModel})"></div>
+    <!--/* The sequence's information */-->
+    <div th:replace="player/assignment/sequence/components/sequence-info/_sequenceInfo.html :: sequenceInfo(${sequenceProgressionModel.sequenceInfoModel},${sequenceModel.sequenceId})"></div>
 
-        <!--/* Each phase of the sequence */-->
-        <th:block th:each="phase : ${activeInteractionModel.phaseList}">
-            <th:block th:if="${phase.isVisible()}">
-                <div th:replace="|${phase.getPlayerTemplate().fileName}| :: ${phase.getPlayerTemplate().fragmentName}(${phase.viewModel})"></div>
-            </th:block>
+    <!--/* The statement of the sequence */-->
+    <div th:replace="player/assignment/sequence/components/statement/_statement.html :: statement(${activeInteractionModel.statementInfoPanelModel})"></div>
+
+    <!--/* Each phase of the sequence */-->
+    <th:block th:each="phase : ${activeInteractionModel.phaseList}">
+        <th:block th:if="${phase.isVisible()}">
+            <div th:replace="|${phase.getPlayerTemplate().fileName}| :: ${phase.getPlayerTemplate().fragmentName}(${phase.viewModel})"></div>
         </th:block>
+    </th:block>
 
-        <!--/* The auto-reload script */-->
-        <th:block th:replace="player/assignment/sequence/components/_auto-reload.html :: auto-reload(${sequenceModel.sequenceId})"></th:block>
-    </div>
+    <!--/* The auto-reload script */-->
+    <th:block
+            th:replace="player/assignment/sequence/components/_auto-reload.html :: auto-reload(${sequenceModel.sequenceId})"></th:block>
     </body>
 </html>
