@@ -29,7 +29,7 @@
 
         <!--/* iframe allowing to load the <utility-grade> app in a isolated context */-->
         <iframe th:id="'utiltiy-grade-app_' + ${draxoEvaluationModel.draxoPeerGradingId}"
-                class="transparent-iframe" th:src="@{/ui/utility-grade}" width="100%" style="margin-top: 2%;" ></iframe>
+                class="transparent-iframe" th:src="@{/ui/utility-grade}" width="100%" style="margin-top: 2%;"></iframe>
 
         <!--/* script for activating @iframe-resizer that allow us to smoothly integrate the previous iframe within the page layout */-->
         <script src="https://cdn.jsdelivr.net/npm/@iframe-resizer/parent@5.3.2"></script>
@@ -65,6 +65,7 @@
     <script th:inline="javascript">
         $(function () {
             const evaluationId = /*[[${draxoEvaluationModel.draxoPeerGradingId}]]*/ '';
+            const selectedGrade = /*[[${draxoEvaluationModel.utilityGrade}]]*/ null;
             const isTeacher = false; /*[- Only the learner can access this page -]*/
             const isChatGPT = false; /*[- This is not a ChatGPT evaluation -]*/
             const iframeSelector = 'utiltiy-grade-app_' + evaluationId;
@@ -72,7 +73,7 @@
 
             /*[- Trigger the app init function on iframe loading -]*/
             iframe.onload = () => {
-                iframe.contentWindow.elaastic.initializeUtilityGrade(isChatGPT, isTeacher, evaluationId)
+                iframe.contentWindow.elaastic.initializeUtilityGrade(isChatGPT, isTeacher, selectedGrade, evaluationId)
             }
 
             window.addEventListener('message', (event) => {

@@ -67,6 +67,7 @@
     <script th:inline="javascript">
         $(function () {
             const evaluationId = /*[[${chatGptEvaluationModel.evaluationId}]]*/ '';
+            const selectedGrade = /*[[${utilityGradeSelected}]]*/ null;
             const isTeacher = /*[[${chatGptEvaluationModel.viewedByTeacher}]]*/ false;
             const isChatGPT = true; /*[- This is a ChatGPT evaluation -]*/
             const iframeSelector = 'utiltiy-grade-app_' + evaluationId;
@@ -74,7 +75,7 @@
 
             /*[- Trigger the app init function on iframe loading -]*/
             iframe.onload = () => {
-                iframe.contentWindow.elaastic.initializeUtilityGrade(isChatGPT, isTeacher, evaluationId)
+                iframe.contentWindow.elaastic.initializeUtilityGrade(isChatGPT, isTeacher, selectedGrade, evaluationId)
             }
 
             window.addEventListener('message', (event) => {
