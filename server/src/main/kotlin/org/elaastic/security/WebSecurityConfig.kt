@@ -161,12 +161,10 @@ class WebSecurityConfig(
             csrf { }
         }
 
-        http.headers {
-            it.frameOptions { frameOptions ->
-                frameOptions.sameOrigin()
-
-            }
-        }
+        // To allow the use of iframe
+        http
+            .headers()
+            .frameOptions().sameOrigin()
 
         return http.build()
     }
