@@ -231,9 +231,9 @@ class PlayerController(
         // TODO Improve data fetching (should start from the assignment)
         sequenceService.get(sequenceIdValid, true).let { sequence ->
             model.addAttribute("user", user)
-            val teacher = user == sequence.owner
+            val isTeacher = user == sequence.owner
 
-            return if (teacher)
+            return if (isTeacher)
                 playAssignmentForTeacher(user, model, sequence, httpServletRequest)
             else
                 playAssignmentForLearner(user, model, sequence, httpServletRequest)
@@ -312,7 +312,7 @@ class PlayerController(
      * @param sequenceId the id of the sequence to get the view
      */
     @GetMapping("/sequence/{sequenceId}")
-    fun sequence(
+    fun playSequence(
         authentication: Authentication,
         model: Model,
         @PathVariable sequenceId: Long
@@ -322,13 +322,13 @@ class PlayerController(
         val isTeacher = user == sequence.owner
 
         return if (isTeacher) {
-            sequenceAsTeacher(user, sequence, model)
+            playSequenceAsTeacher(user, sequence, model)
         } else {
-            sequenceAsLearner(user, sequence, model)
+            playSequenceAsLearner(user, sequence, model)
         }
     }
 
-    private fun sequenceAsTeacher(
+    private fun playSequenceAsTeacher(
         user: User,
         sequence: Sequence,
         model: Model,
@@ -336,11 +336,10 @@ class PlayerController(
         val sequenceModel = sequenceModelFactory.buildForTeacher(user, sequence)
 
         model["sequenceModel"] = sequenceModel
-
         return "player/assignment/sequence/play-sequence-teacher"
     }
 
-    private fun sequenceAsLearner(
+    private fun playSequenceAsLearner(
         user: User,
         sequence: Sequence,
         model: Model,
@@ -350,8 +349,8 @@ class PlayerController(
 
         val sequenceModel =
             sequenceModelFactory.buildForLearner(user, learnerSequence, learnerSequence.activeInteraction)
-        model["sequenceModel"] = sequenceModel
 
+        model["sequenceModel"] = sequenceModel
         return "player/assignment/sequence/play-sequence-learner"
     }
 
