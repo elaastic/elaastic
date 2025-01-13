@@ -34,7 +34,7 @@
     <script th:inline="javascript">
         const sequenceId = [[${sequenceId}]];
 
-        $(document).ready(function () {
+        $(function () {
             $('#nbReportLabel-' + sequenceId).click(function (e) {
                 e.stopPropagation(); // Prevent the parent from being clicked
 
