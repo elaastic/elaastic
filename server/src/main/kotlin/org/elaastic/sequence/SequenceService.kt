@@ -66,6 +66,16 @@ class SequenceService(
     @Autowired val chatGptEvaluationService: ChatGptEvaluationService,
 ) {
 
+    /**
+     * Get a sequence by its id.
+     *
+     * If the user is not the owner of the sequence, an [AccessDeniedException] is thrown
+     * @param user [User] the user requesting the sequence
+     * @param id [Long] the id of the sequence
+     * @param fetchInteractions [Boolean] if true, fetch the interactions of the sequence
+     *
+     * @throws [AccessDeniedException] if the user is not the owner of the sequence
+     */
     fun get(user: User, id: Long, fetchInteractions: Boolean = false): Sequence =
         get(id, fetchInteractions).let {
             if (it.owner != user) throw AccessDeniedException("You are not authorized to access to this sequence")
