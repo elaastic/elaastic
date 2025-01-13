@@ -22,152 +22,150 @@
       th:with="pageSpecificMenu=${pageSpecificMenu} ?: ~{}, extraHeader=${extraHeader} ?: ~{}"
       xmlns:th="http://www.thymeleaf.org"
       xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
-  <head>
-    <meta charset="utf-8">
-    <meta content="IE=edge,chrome=1" http-equiv="X-UA-Compatible"/>
-    <meta content="width=device-width, initial-scale=1, maximum-scale=2, user-scalable=no" name="viewport"/>
-    <meta name="description"
-          th:content="#{elaastic.description}">
-    <meta name="author" content="University Toulouse 1 Capitole, University Toulouse 3 Paul Sabatier">
-    <meta content="#ffffff" name="theme-color"/>
-    <link rel="shortcut icon" th:href="@{/images/favicon.ico}" type="image/x-icon"/>
-    <title th:replace="${title}">Page title</title>
-    <link th:href="@{/semantic/dist/semantic.min.css}" type="text/css" rel="stylesheet" media="screen, projection"/>
-    <link th:href="@{/css/elaastic.css}" type="text/css" rel="stylesheet" media="screen, projection"/>
-    <link th:href="@{/css/introjs.min.css}" type="text/css" rel="stylesheet" media="screen, projection"/>
-    <script th:src="@{/js/jquery.js}"></script>
-    <script th:src="@{/semantic/dist/semantic.min.js}"></script>
-    <script th:src="@{/js/vuejs/vue.min.js}"></script>
-    <script th:src="@{/js/vuejs/vue-resource.min.js}"></script>
-    <script th:src="@{/js/js.cookie.js}"></script>
-    <script th:src="@{/js/elaastic/util.js}"></script>
-    <script th:src="@{/js/elaastic/draxo/draxo-fn.js}"></script>
-    <script th:inline="javascript">
-      elaastic.draxo.initialize(/*[[@{/peer-grading/draxo}]]*/);
-    </script>
-    <script th:src="@{/js/intro.min.js}"></script>
-    <script th:src="@{/js/onboarding.js}"></script>
-    <meta th:replace="${extraHeader}"/>
+    <head>
+        <meta charset="utf-8">
+        <meta content="IE=edge,chrome=1" http-equiv="X-UA-Compatible"/>
+        <meta content="width=device-width, initial-scale=1, maximum-scale=2, user-scalable=no" name="viewport"/>
+        <meta name="description"
+              th:content="#{elaastic.description}">
+        <meta name="author" content="University Toulouse 1 Capitole, University Toulouse 3 Paul Sabatier">
+        <meta content="#ffffff" name="theme-color"/>
+        <link rel="shortcut icon" th:href="@{/images/favicon.ico}" type="image/x-icon"/>
+        <title th:replace="${title}">Page title</title>
+        <link th:href="@{/semantic/dist/semantic.min.css}" type="text/css" rel="stylesheet" media="screen, projection"/>
+        <link th:href="@{/css/elaastic.css}" type="text/css" rel="stylesheet" media="screen, projection"/>
+        <link th:href="@{/css/introjs.min.css}" type="text/css" rel="stylesheet" media="screen, projection"/>
+        <script th:src="@{/js/jquery.js}"></script>
+        <script th:src="@{/semantic/dist/semantic.min.js}"></script>
+        <script th:src="@{/js/vuejs/vue.min.js}"></script>
+        <script th:src="@{/js/vuejs/vue-resource.min.js}"></script>
+        <script th:src="@{/js/js.cookie.js}"></script>
+        <script th:src="@{/js/elaastic/util.js}"></script>
+        <script th:src="@{/js/elaastic/draxo/draxo-fn.js}"></script>
+        <script th:inline="javascript">
+            elaastic.draxo.initialize(/*[[@{/peer-grading/draxo}]]*/);
+        </script>
+        <script th:src="@{/js/intro.min.js}"></script>
+        <script th:src="@{/js/onboarding.js}"></script>
+        <meta th:replace="${extraHeader}"/>
 
-    <style type="text/css">[v-cloak] {
-      display: none;
-    }</style>
+        <style type="text/css">[v-cloak] {
+            display: none;
+        }</style>
 
-    <script id="MathJax-script" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS_HTML"></script>
+        <script id="MathJax-script" async
+                src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS_HTML"></script>
 
-    <script>
-      $(document)
-        .ready(function () {
-          $('.message .close')
-            .on('click', function () {
-              $(this)
-                .closest('.message')
-                .transition('fade')
+        <script>
+            $(function () {
+                $('.message .close').on('click', function () {
+                    $(this).closest('.message').transition('fade')
+                })
             })
-        })
-    </script>
-  </head>
+        </script>
+    </head>
 
-  <body class="elaastic three-columns" style="background-color: #f9f9f9">
+    <body class="elaastic three-columns" style="background-color: #f9f9f9">
 
     <div class="ui left vertical inverted visible sidebar labeled icon menu"
          style="background-color: #4f7691; overflow: visible !important;">
 
-      <a th:href="@{/home}"
-         href="/home"
-         class="header item"
-         style="margin-top: 1em;">
-        <img th:src="@{/images/elaastic/logos/Elaastic_pictoRVB.png}"
-             src="/images/elaastic/logos/Elaastic_pictoRVB.png"
-             style="width: 48px"
-             alt="Elaastic logo"/>
-      </a>
+        <a th:href="@{/home}"
+           href="/home"
+           class="header item"
+           style="margin-top: 1em;">
+            <img th:src="@{/images/elaastic/logos/Elaastic_pictoRVB.png}"
+                 src="/images/elaastic/logos/Elaastic_pictoRVB.png"
+                 style="width: 48px"
+                 alt="Elaastic logo"/>
+        </a>
 
-      <div class="ui divider"></div>
+        <div class="ui divider"></div>
 
-      <a sec:authorize="hasAnyAuthority('TEACHER_ROLE', 'ADMIN_ROLE')"
-         th:href="@{/course/}"
-         href="/course"
-         class="item"
-         th:attr="data-tooltip=#{course.my.list.label}"
-         data-tooltip="My courses"
-         data-position="right center"
-         data-inverted="">
-        <i class="folder open icon"></i>
-      </a>
-
-      <a sec:authorize="hasAnyAuthority('TEACHER_ROLE', 'ADMIN_ROLE')"
-         th:href="@{/subject}"
-         href="/subjects"
-         class="item"
-         th:attr="data-tooltip=#{subject.my.list.label}"
-         data-tooltip="My subjects"
-         data-position="right center"
-         data-inverted="">
-        <i class="book icon"></i>
-      </a>
-
-      <a sec:authorize="hasAnyAuthority('TEACHER_ROLE', 'ADMIN_ROLE')"
-         th:href="@{/subject/shared_index}"
-         href="/subject/shared_index"
-         class="item"
-         th:attr="data-tooltip=#{subject.shared.my.list.label}"
-         data-tooltip="Shared subjects"
-         data-position="right center"
-         data-inverted="">
-        <i class="stacked icons">
-          <i class="large users icon"></i>
-          <i class="black bottom left attached book icon"></i>
-        </i>
-      </a>
-
-      <a sec:authorize="hasAnyAuthority('STUDENT_ROLE', 'ADMIN_ROLE')"
-         th:href="@{/player}"
-         href="/player"
-         class="item"
-         th:attr="data-tooltip=#{assignment.my.list.label}"
-         data-tooltip="My assignments"
-         data-position="right center"
-         data-inverted="">
-        <i class="travel icon"></i>
-      </a>
-
-      <a sec:authorize="hasAuthority('ADMIN_ROLE')"
-         th:href="@{/ltiConsumer}"
-         href="/ltiConsumer"
-         class="item"
-         data-tooltip="LtiConsumer"
-         data-position="right center"
-         data-inverted="">
-        <i class="settings icon"></i>
-      </a>
-
-      <style>
-          .bottom-menu {
-              position: relative;
-          }
-
-          @media (min-height: 600px) {
-              .bottom-menu {
-                  position: absolute !important;
-                  bottom: 0 !important;
-              }
-          }
-      </style>
-      <div class="bottom-menu">
-        <div sec:authorize="hasAnyAuthority('TEACHER_ROLE')" th:replace="layout/components/helpMenu :: helpMenu()"></div>
-        <div th:replace="layout/components/userMenu :: userMenu(user=${user})"></div>
-      </div>
-
-      <div class="ui divider"></div>
-
-      <div class="only mobile item"
-           onclick="$('#layout-nav-modal').modal('show')"
-           th:attr="data-tooltip=#{common.table-of-content}"
+        <a sec:authorize="hasAnyAuthority('TEACHER_ROLE', 'ADMIN_ROLE')"
+           th:href="@{/course/}"
+           href="/course"
+           class="item"
+           th:attr="data-tooltip=#{course.my.list.label}"
+           data-tooltip="My courses"
            data-position="right center"
            data-inverted="">
-        <i class="yellow browser icon"></i>
-      </div>
+            <i class="folder open icon"></i>
+        </a>
+
+        <a sec:authorize="hasAnyAuthority('TEACHER_ROLE', 'ADMIN_ROLE')"
+           th:href="@{/subject}"
+           href="/subjects"
+           class="item"
+           th:attr="data-tooltip=#{subject.my.list.label}"
+           data-tooltip="My subjects"
+           data-position="right center"
+           data-inverted="">
+            <i class="book icon"></i>
+        </a>
+
+        <a sec:authorize="hasAnyAuthority('TEACHER_ROLE', 'ADMIN_ROLE')"
+           th:href="@{/subject/shared_index}"
+           href="/subject/shared_index"
+           class="item"
+           th:attr="data-tooltip=#{subject.shared.my.list.label}"
+           data-tooltip="Shared subjects"
+           data-position="right center"
+           data-inverted="">
+            <i class="stacked icons">
+                <i class="large users icon"></i>
+                <i class="black bottom left attached book icon"></i>
+            </i>
+        </a>
+
+        <a sec:authorize="hasAnyAuthority('STUDENT_ROLE', 'ADMIN_ROLE')"
+           th:href="@{/player}"
+           href="/player"
+           class="item"
+           th:attr="data-tooltip=#{assignment.my.list.label}"
+           data-tooltip="My assignments"
+           data-position="right center"
+           data-inverted="">
+            <i class="travel icon"></i>
+        </a>
+
+        <a sec:authorize="hasAuthority('ADMIN_ROLE')"
+           th:href="@{/ltiConsumer}"
+           href="/ltiConsumer"
+           class="item"
+           data-tooltip="LtiConsumer"
+           data-position="right center"
+           data-inverted="">
+            <i class="settings icon"></i>
+        </a>
+
+        <style>
+            .bottom-menu {
+                position: relative;
+            }
+
+            @media (min-height: 600px) {
+                .bottom-menu {
+                    position: absolute !important;
+                    bottom: 0 !important;
+                }
+            }
+        </style>
+        <div class="bottom-menu">
+            <div sec:authorize="hasAnyAuthority('TEACHER_ROLE')"
+                 th:replace="layout/components/helpMenu :: helpMenu()"></div>
+            <div th:replace="layout/components/userMenu :: userMenu(user=${user})"></div>
+        </div>
+
+        <div class="ui divider"></div>
+
+        <div class="only mobile item"
+             onclick="$('#layout-nav-modal').modal('show')"
+             th:attr="data-tooltip=#{common.table-of-content}"
+             data-position="right center"
+             data-inverted="">
+            <i class="yellow browser icon"></i>
+        </div>
 
         <script>
             /**
@@ -296,43 +294,43 @@
             })
         </script>
 
-      <div th:replace="${pageSpecificMenu}"></div>
+        <div th:replace="${pageSpecificMenu}"></div>
     </div>
 
     <div class="wrap" style="margin-left: 90px;">
-      <main>
-        <aside id="layout-aside" th:replace="${aside}">
-        </aside>
+        <main>
+            <aside id="layout-aside" th:replace="${aside}">
+            </aside>
 
-        <article style="display: flex; column-gap: 30px;">
+            <article style="display: flex; column-gap: 30px;">
 
-          <section id="pane_actions"
-                   style="display: flex; flex-direction: column; row-gap: 20px; flex: none;">
+                <section id="pane_actions"
+                         style="display: flex; flex-direction: column; row-gap: 20px; flex: none;">
 
-            <button id="open_pane_button"
-                    class="ui button"
-                    style="margin-bottom: 20px;"
-                    onclick="tableOfContent.showAside()">
+                    <button id="open_pane_button"
+                            class="ui button"
+                            style="margin-bottom: 20px;"
+                            onclick="tableOfContent.showAside()">
 
               <span th:text="#{dashboard.open}">
                 open_pane_button_label</span>
-              <i class="icon angle double right"></i>
-            </button>
-          </section>
+                        <i class="icon angle double right"></i>
+                    </button>
+                </section>
 
-          <div class="ui container">
-            <div th:replace="${content}"></div>
-          </div>
-        </article>
-      </main>
+                <div class="ui container">
+                    <div th:replace="${content}"></div>
+                </div>
+            </article>
+        </main>
 
     </div>
 
     <div id="layout-nav-modal" class="ui modal">
-      <div class="content">
-        <div th:replace="${modalAside}"></div>
-      </div>
+        <div class="content">
+            <div th:replace="${modalAside}"></div>
+        </div>
     </div>
 
-  </body>
+    </body>
 </html>
