@@ -36,8 +36,8 @@
     <!--/* Reported evaluation message */-->
     <div class="ui label basic large"
          style="background-color: transparent !important; border: none"
-         th:classappend="${sequenceInfoModel.nbReportToModerate > 0 ? 'red' : 'blue'}"
-         th:if="${sequenceInfoModel.nbReportTotal > 0}">
+         th:if="${sequenceInfoModel.nbReportTotal > 0}"
+         th:classappend="${sequenceInfoModel.nbReportToModerate > 0 ? 'red' : 'blue'}">
         <!--/*To apply the red color from semantic to the text,
         the best option I found is to use a label and remove the border and the background-color */-->
         <!--/* The label from semantic makes the text a little bit smaller, so I use a large label. */-->
