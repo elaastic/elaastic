@@ -33,6 +33,38 @@
             if (!elaastic.util.isVisible($target, $container, 50)) {
                 elaastic.util.ensureIsVisible($target, $container);
             }
+
+            /**
+             * Return the url to access the player of a specific sequence of an assignment
+             * @param assignmentId The id of the assignment
+             * @param sequenceId The id of the sequence
+             * @returns {string}
+             */
+            const completeUrlOfPlayer = (assignmentId, sequenceId) => {
+                return '/player/assignment/' + assignmentId + '/play/sequence/' + sequenceId;
+            };
+            const linkClickable = [[${linkClickable}]];
+            const assignmentId = [[${assignmentOverviewModel.assignmentId}]];
+            const $sequences = $('.elaastic-sequence');
+            const iframeActiveSequence = document.getElementById('iframe-sequence_' + assignmentId);
+            const $loaderIframe = $("#loading-sequence_" + assignmentId);
+
+            if (linkClickable) {
+                $sequences.on("click", function () {
+                    const sequenceId = $(this).data('sequence-id');
+
+                    // Update the iframe with the new sequence
+                    iframeActiveSequence.src = '/player/sequence/' + sequenceId;
+                    $loaderIframe.slideDown();
+
+                    // Update the URL
+                    window.history.pushState(null, '', completeUrlOfPlayer(assignmentId, sequenceId));
+
+                    // Update the selected sequence
+                    $(".elaastic-sequence.selected").removeClass('selected');
+                    $(this).addClass('selected');
+                });
+            }
         });
 
     </script>
@@ -155,12 +187,13 @@
 
     <!--/* The sequences */-->
     <div th:each="sequenceInfo, i : ${assignmentOverviewModel.sequences}"
-         class="ui clearing attached segment"
+         class="ui clearing attached segment elaastic-sequence"
          th:classappend="|${sequenceInfo.id == assignmentOverviewModel.selectedSequenceId ? 'selected' : ''}|"
          th:id="|${context}-${sequenceInfo.id}|"
          style="padding-bottom: 1em;"
          th:styleappend="${linkClickable ? 'cursor: pointer;' : ''}"
-         th:attr="onclick=${linkClickable} ? 'window.location.href=\'/player/assignment/' + ${assignmentOverviewModel.assignmentId} + '/play/sequence/' + ${sequenceInfo.id} + '\';' : ''">
+         th:attr="data-sequence-id=${sequenceInfo.id}"
+    >
 
         <!--/* A sequence */-->
         <div class="ui grid">
