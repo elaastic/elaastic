@@ -169,95 +169,132 @@
         <i class="yellow browser icon"></i>
       </div>
 
-      <script>
-        /**
-         * if the URL param 'hideToc' has the value 'true' then the toc will be hidden by default
-         * The TOC visibility may be controlled with show/hide button in the menubar. TOC state is stored in a cookie.
-         */
+        <script>
+            /**
+             * if the URL param 'hideToc' has the value 'true' then the toc will be hidden by default
+             * The TOC visibility may be controlled with show/hide button in the menubar. TOC state is stored in a cookie.
+             */
 
-        let tableOfContent = {}
+            let tableOfContent = {}
 
-        $(document).ready(function () {
-          let layoutAside = $('#layout-aside')
-          let assignmentsPane = $("#assignments_container");
-          let attendeesPane = $("#attendees_container");
-          let showPaneBtn = $("#open_pane_button");
-          let hidePaneBtn = $("#close_pane_button");
-          let showAssignmentsBtn = $("#show_assignments_button");
-          let showAttendeesBtn = $("#show_attendees_button");
-          let urlParams = new URLSearchParams(location.search);
-          let currentPane = urlParams.get("currentPane");
+            const currentPaneKey = "currentPane";
+            const assignmentPaneKey = "assignments";
+            const attendeesPaneKey = "attendees";
+            const asideIsVisibleKey = 'asideIsVisible';
 
-          tableOfContent.showAside = function () {
-            layoutAside.show();
+            $(function () {
+                let layoutAside = $('#layout-aside')
+                let assignmentsPane = $("#assignments_container");
+                let attendeesPane = $("#attendees_container");
+                let showPaneBtn = $("#open_pane_button");
+                let hidePaneBtn = $("#close_pane_button");
+                let showAssignmentsBtn = $("#show_assignments_button");
+                let showAttendeesBtn = $("#show_attendees_button");
 
-            showPaneBtn.hide();
-            hidePaneBtn.show();
-            Cookies.set('currentPane', currentPane);
+                function activeAssignmentPane() {
+                    assignmentsPane.show();
+                    attendeesPane.hide();
+                    showAssignmentsBtn.addClass("active");
+                    showAttendeesBtn.removeClass("active");
+                }
 
-            if (!urlParams.has("currentPane")
-                || urlParams.get("currentPane") === ''
-                || urlParams.get("currentPane") !== "assignments"
-                && urlParams.get("currentPane") !== "attendees") {
+                function activeAttendeesPane() {
+                    attendeesPane.show();
+                    assignmentsPane.hide();
+                    showAttendeesBtn.addClass("active");
+                    showAssignmentsBtn.removeClass("active");
+                }
 
-              //urlParams.set("currentPane", "assignments");
-              Cookies.set("currentPane", "assignments");
-            }
+                function getCurrentPane() {
+                    let currentPane = Cookies.get(currentPaneKey);
+                    if (currentPane === assignmentPaneKey || currentPane === attendeesPaneKey) {
+                        return currentPane;
+                    } else {
+                        return assignmentPaneKey;
+                    }
+                }
 
-            //urlParams.delete('currentPane');
-            window.location.search = urlParams.toString();
-          };
+                function setCurrentPane(pane) {
+                    if (pane === assignmentPaneKey || pane === attendeesPaneKey) {
+                        Cookies.set(currentPaneKey, pane);
+                    } else {
+                        // By default, the assignments pane is shown
+                        Cookies.set(currentPaneKey, assignmentPaneKey);
+                    }
+                }
 
-          tableOfContent.hideAside = function () {
-            layoutAside.hide();
-            showPaneBtn.show();
-            hidePaneBtn.hide();
-            //urlParams.set('currentPane', 'none');
-            Cookies.set('currentPane', 'none');
-          };
+                function setAsideIsVisible(asideIsVisible) {
+                    if (asideIsVisible || !asideIsVisible) {
+                        Cookies.set(asideIsVisibleKey, asideIsVisible);
+                    } else {
+                        // By default, the aside is shown
+                        Cookies.set(asideIsVisibleKey, true);
+                    }
+                }
 
-          tableOfContent.showAssignments = function () {
-            attendeesPane.hide();
-            assignmentsPane.show();
+                function getAsideIsVisible() {
+                    let asideIsVisible = Cookies.get(asideIsVisibleKey);
+                    return asideIsVisible === 'true';
+                }
 
-            showAssignmentsBtn.addClass("active");
-            showAttendeesBtn.removeClass("active");
+                function updateAsideVisibility(isVisible) {
+                    if (isVisible) {
+                        layoutAside.show();
+                        showPaneBtn.hide();
+                        hidePaneBtn.show();
+                    } else {
+                        layoutAside.hide();
+                        showPaneBtn.show();
+                        hidePaneBtn.hide();
+                    }
+                }
 
-            //urlParams.set("currentPane", "assignments");
-            Cookies.set("currentPane", "assignments");
-            window.location.search = urlParams.toString();
-          };
+                tableOfContent.showAside = function () {
+                    updateAsideVisibility(true);
+                    setAsideIsVisible(true);
 
-          tableOfContent.showAttendees = function () {
-            assignmentsPane.hide();
-            attendeesPane.show();
+                    let currentPane = getCurrentPane();
+                    if (currentPane === assignmentPaneKey) {
+                        activeAssignmentPane();
+                    } else if (currentPane === attendeesPaneKey) {
+                        activeAttendeesPane();
+                    }
+                };
 
-            showAttendeesBtn.addClass("active");
-            showAssignmentsBtn.removeClass("active");
+                tableOfContent.hideAside = function () {
+                    updateAsideVisibility(false);
+                    setAsideIsVisible(false);
+                };
 
-            //urlParams.set("currentPane", "attendees");
-            Cookies.set("currentPane", "attendees");
-            window.location.search = urlParams.toString();
-          };
+                tableOfContent.showAssignments = function () {
+                    setAsideIsVisible(true);
+                    setCurrentPane(assignmentPaneKey);
+                    activeAssignmentPane();
+                };
 
-          showPaneBtn.hide();
+                tableOfContent.showAttendees = function () {
+                    setAsideIsVisible(true);
+                    setCurrentPane(attendeesPaneKey);
+                    activeAttendeesPane();
+                };
 
-          if (!Cookies.get("currentPane") || Cookies.get("currentPane") === "assignments") {
-            assignmentsPane.show();
-            showAssignmentsBtn.addClass("active");
-            showAttendeesBtn.removeClass("active");
-          } else if (Cookies.get("currentPane") === "attendees") {
-            attendeesPane.show();
-            showAttendeesBtn.addClass("active");
-            showAssignmentsBtn.removeClass("active");
-          } else if (Cookies.get("currentPane") === "none") {
-            layoutAside.hide();
-            showPaneBtn.show();
-            hidePaneBtn.hide();
-          }
+                // Initialize the visibility of the different panes
+                if (getAsideIsVisible()) {
+                    updateAsideVisibility(true);
 
-        })
-      </script>
+                    let currentPane = getCurrentPane();
+                    console.log("currentPane: " + currentPane);
+                    if (currentPane === assignmentPaneKey) {
+                        activeAssignmentPane();
+                    } else if (currentPane === attendeesPaneKey) {
+                        activeAttendeesPane();
+                    }
+                } else {
+                    console.log("aside is hidden");
+                    updateAsideVisibility(false);
+                }
+            })
+        </script>
 
       <div th:replace="${pageSpecificMenu}"></div>
     </div>
