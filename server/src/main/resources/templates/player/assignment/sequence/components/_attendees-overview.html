@@ -55,8 +55,8 @@
 </div>
 
 <div th:fragment="attendeesOverview(dashboardModel, context)"
-     th:remove="tag"
-     xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/html">
+     xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/html"
+     th:id="attendees-overview">
 
     <!--/* Header */-->
     <div class="ui top attached block header" style="display: flex; align-items: center">
@@ -68,7 +68,7 @@
             th:text="#{attendees.sectionTitle(${#lists.size(dashboardModel.sequenceMonitoringModel.learners)})}"></h3>
 
         <!--/* Refresh button */-->
-        <button class="ui button" style="height: 30px; flex: none; padding: 10px;" onclick="window.location.reload()">
+        <button class="ui button" style="height: 30px; flex: none; padding: 10px;" onclick="refreshAttendees()">
             <i class="icon refresh"></i>
             <span th:text="#{attendees.refresh}">refresh_button</span>
         </button>
@@ -95,7 +95,7 @@
     </div>
 
     <script th:if="${context == 'aside' && dashboardModel.sequence.id != null}" th:inline="javascript">
-        $(function() {
+        $(function () {
             const container = $('#layout-aside');
             const target = $('#' + [[${context}]] + '-[[${dashboardModel.sequence.id}]]');
 

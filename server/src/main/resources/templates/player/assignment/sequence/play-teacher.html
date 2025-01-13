@@ -141,6 +141,24 @@
 
             <div class="ui divider"></div>
 
+            <script th:inline="javascript">
+                function refreshAttendees() {
+                    const $attendeesOverview = $("#attendees-overview");
+                    const url = '/dashboard/' + [[${dashboardModel.sequence.id}]] + '/attendees';
+
+                    $attendeesOverview.load(url);
+                }
+
+                $(function () {
+                    // Refresh the attendees every 5 minutes
+                    const fiveMinuteInMillisecond = 300000;
+                    setInterval(() => {
+                        console.log('Auto-refreshing attendees every 5 minutes');
+                        refreshAttendees()
+                    }, fiveMinuteInMillisecond);
+                });
+            </script>
+
             <div th:replace="|${components}/_attendees-overview.html| :: attendeesOverview(${dashboardModel}, aside)"></div>
         </div>
     </aside>
