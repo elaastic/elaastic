@@ -2,6 +2,7 @@
 
 import UtilityGrade from "@/stories/moderation/UtilityGrade.vue";
 import {useI18n} from "vue-i18n";
+import ReportModal from '@/stories/moderation/ReportModal.vue'
 
 const {t} = useI18n()
 
@@ -18,21 +19,35 @@ export interface EvaluationReactionProps {
    * The selected grade if any
    */
   selectedGrade: string | null
+  /**
+   * The content to report
+   */
+  contentToReport: string
+}
+export interface EvaluationReactionEvents {
+  (event: 'submitUtilityGrade', gradeSelected: string): void;
+  (event: 'submitReport', reportReason: string[], reportDetail: string): void
 }
 
 const props = defineProps<EvaluationReactionProps>()
+const emit = defineEmits<EvaluationReactionEvents>()
+
+function submitUtilityGrade(gradeSelected: string) {
+  emit('submitUtilityGrade', gradeSelected)
+}
+function submitReport(reportReason: string[], reportDetail: string) {
+  emit('submitReport', reportReason, reportDetail)
+}
 
 </script>
 
 <template>
   <v-row id="evaluation-reaction-container">
     <v-col>
-      <UtilityGrade :is-chat-g-p-t="props.isChatGPT" :is-teacher="props.isTeacher" :selected-grade="props.selectedGrade"/>
+      <UtilityGrade :is-chat-g-p-t="props.isChatGPT" :is-teacher="props.isTeacher" :selected-grade="props.selectedGrade" @submitUtilityGrade="submitUtilityGrade"/>
     </v-col>
     <v-col align-self="center">
-      <v-btn class="text-none" variant="outlined" color="#b7446f" prepend-icon="mdi-alert" id="report-btn">
-        {{ t('report') }}
-      </v-btn>
+      <ReportModal :content-to-report="contentToReport" @submitReport="submitReport"/>
     </v-col>
   </v-row>
 </template>
