@@ -68,7 +68,7 @@
             th:text="#{attendees.sectionTitle(${#lists.size(dashboardModel.sequenceMonitoringModel.learners)})}"></h3>
 
         <!--/* Refresh button */-->
-        <button class="ui button" style="height: 30px; flex: none; padding: 10px;" onclick="refreshAttendees()">
+        <button id="dashboard-refresh-btn" class="ui button" style="height: 30px; flex: none; padding: 10px;" onclick="refreshAttendees()">
             <i class="icon refresh"></i>
             <span th:text="#{attendees.refresh}">refresh_button</span>
         </button>

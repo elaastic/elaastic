@@ -143,10 +143,10 @@
 
             <script th:inline="javascript">
                 function refreshAttendees() {
-                    const $attendeesOverview = $("#attendees-overview");
                     const url = '/dashboard/' + [[${dashboardModel.sequence.id}]] + '/attendees';
 
-                    $attendeesOverview.load(url);
+                    $('#dashboard-refresh-btn').addClass('loading');
+                    $("#attendees-overview").load(url);
                 }
 
                 $(function () {
