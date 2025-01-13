@@ -75,7 +75,8 @@ const submitUtilityGrade = () => {
       <div v-if=" props.isChatGPT && !props.isTeacher" readonly>{{ t('chatGPT-review-student-label') }}</div>
       <div v-if=" props.isChatGPT &&  props.isTeacher" readonly>{{ t('chatGPT-review-teacher-label') }}</div>
 
-      <SelectorResponsiv :selections="possibleGrade" :selected="props.selectedGrade" @changeSelection="setSelectedUtilityGrade"/>
+      <SelectorResponsiv :selections="possibleGrade" :selected="props.selectedGrade"
+                         @changeSelection="setSelectedUtilityGrade"/>
     </v-col>
   </v-row>
   <!-- Submit button -->
