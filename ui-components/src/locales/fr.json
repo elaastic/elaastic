@@ -1,22 +1,3 @@
 {
-    "Example": "Ceci est un exemple.",
-    "submit": "Soumettre",
-    "reportReason": {
-        "FALSE_INFORMATION": {
-            "short":"Information Fausse",
-            "long": "Le propos contient de fausses informations"
-        },
-        "INCOHERENCE": {
-            "short":"Incohérence",
-            "long": "Le propos contient des incohérences"
-        },
-        "PERSONAL_JUDGMENT": {
-            "short":"Jugement Personnel",
-            "long": "Le propos contient un jugement sur des caractéristiques personnelles"
-        },
-        "OTHER": {
-            "short":"Autre",
-            "long": "Autre raison"
-        }
-    }
+    "Example": "Ceci est un exemple."
 }

@@ -1,22 +1,3 @@
 {
-    "Example": "This is an example.",
-    "submit": "Submit",
-    "reportReason": {
-        "FALSE_INFORMATION": {
-            "short":"False Information",
-            "long": "The statement contains false information"
-        },
-        "INCOHERENCE": {
-            "short":"Incoherence",
-            "long": "The statement contains inconsistencies"
-        },
-        "PERSONAL_JUDGMENT": {
-            "short":"Personal Judgment",
-            "long": "The statement contains a judgment about personal characteristics"
-        },
-        "OTHER": {
-            "short":"Other",
-            "long": "Other reason"
-        }
-    }
+    "Example": "This is an example."
 }
