@@ -21,15 +21,17 @@ package org.elaastic.moderation
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.stereotype.Controller
 import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.RequestMapping
 
 
 @Controller
+@RequestMapping("/ui/moderation")
 @PreAuthorize("@featureManager.isActive(@featureResolver.getFeature('FUNCTIONAL_TESTING'))")
 class ModerationUiTestController {
 
-    @GetMapping("/ui/utility-grade/test")
+    @GetMapping("/utility-grade/test")
     fun utilityGradeTest() = "moderation/test/test-utility-grade"
 
-    @GetMapping("/ui/evaluation-reaction/test")
+    @GetMapping("/evaluation-reaction/test")
     fun evaluationReactionTest() = "moderation/test/test-evaluation-reaction"
 }
