@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import {useI18n} from 'vue-i18n'
 import { computed, ref, onMounted, onUnmounted } from 'vue'
-import { ref } from 'vue'
+
 const {t} = useI18n()
 
 class ReportReason {
@@ -62,10 +62,26 @@ function submitReport() {
   dialog.value = false
 }
 
+const isSmallScreen = ref(window.innerWidth < 600)
+
+// Ajouter un écouteur pour mettre à jour isSmallScreen quand la fenêtre change de taille
+onMounted(() => {
+  window.addEventListener('resize', () => {
+    isSmallScreen.value = window.innerWidth < 600
+  })
+})
+
+// Nettoyer l'écouteur quand le composant est détruit
+onUnmounted(() => {
+  window.removeEventListener('resize', () => {
+    isSmallScreen.value = window.innerWidth < 600
+  })
+})
+
 </script>
 
 <template>
-  <v-dialog v-model="dialog" max-width="600">
+  <v-dialog v-model="dialog" max-width="600" :fullscreen="isSmallScreen">
     <template v-slot:activator="{ props: activatorProps }">
       <v-btn class="text-none" variant="outlined" color="#b7446f"
              prepend-icon="mdi-alert" id="report-btn" v-bind="activatorProps">
@@ -108,6 +124,11 @@ function submitReport() {
 </template>
 
 <style scoped>
+@media (max-width: 600px) {
+  #report-btn {
+    width: 100%;
+  }
+}
 
 </style>
 <i18n>
