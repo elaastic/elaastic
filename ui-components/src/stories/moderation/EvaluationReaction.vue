@@ -24,8 +24,10 @@ export interface EvaluationReactionProps {
    */
   contentToReport: string
 }
+
 export interface EvaluationReactionEvents {
   (event: 'submitUtilityGrade', gradeSelected: string): void;
+
   (event: 'submitReport', reportReason: string[], reportDetail: string): void
 }
 
@@ -35,6 +37,7 @@ const emit = defineEmits<EvaluationReactionEvents>()
 function submitUtilityGrade(gradeSelected: string) {
   emit('submitUtilityGrade', gradeSelected)
 }
+
 function submitReport(reportReason: string[], reportDetail: string) {
   emit('submitReport', reportReason, reportDetail)
 }
@@ -44,9 +47,10 @@ function submitReport(reportReason: string[], reportDetail: string) {
 <template>
   <v-row id="evaluation-reaction-container">
     <v-col>
-      <UtilityGrade :is-chat-g-p-t="props.isChatGPT" :is-teacher="props.isTeacher" :selected-grade="props.selectedGrade" @submitUtilityGrade="submitUtilityGrade"/>
+      <UtilityGrade :is-chat-g-p-t="props.isChatGPT" :is-teacher="props.isTeacher" :selected-grade="props.selectedGrade"
+                    @submitUtilityGrade="submitUtilityGrade"/>
     </v-col>
-    <v-col align-self="center">
+    <v-col align-self="center" v-if="!props.isTeacher">
       <ReportModal :content-to-report="contentToReport" @submitReport="submitReport"/>
     </v-col>
   </v-row>
@@ -56,9 +60,6 @@ function submitReport(reportReason: string[], reportDetail: string) {
 @media (max-width: 600px) {
   #evaluation-reaction-container {
     flex-direction: column;
-  }
-  #report-btn {
-    width: 100%;
   }
 }
 
