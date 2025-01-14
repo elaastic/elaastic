@@ -54,10 +54,12 @@
                 </div>
             </div>
         </div>
-        <!-- Submit Utility grade button -->
-        <div id="submit-button-utility-grade" style="display: none"
-             th:attr="evaluationId=${chatGptEvaluationModel.evaluationId}">
-            <input type="submit" value="Soumettre" class="ui primary button">
+        <div class="ui message error" th:id="'error-message_' + ${chatGptEvaluationModel.evaluationId}"
+             style="display: none;">
+            <i class="close icon"></i>
+            <div class="header" th:text="#{evaluation.submitUtilityGrade.error.header}">Error</div>
+            <p th:text="#{evaluation.submitUtilityGrade.error.content}">There was an error while submitting the grade.
+                Please try again later.</p>
         </div>
     </form>
 
@@ -96,13 +98,20 @@
 
         function submitUtilityGrade(evaluationId, utilityGrade) {
             const form = $('#form-utility-grade_' + evaluationId);
+            const $errorMessage = $('#error-message_' + evaluationId);
             form.children('input[name="utilityGrade"]').val(utilityGrade);
 
             const url = form.attr('action');
             const data = form.serialize();
 
-            $.post(url, data, () => {
-            })
+            $.post(url, data)
+                    .fail(() => {
+                        $errorMessage.slideDown();
+                        setTimeout(function () {
+                            console.log("Close the error");
+                            $errorMessage.slideUp();
+                        }, 5000)
+                    })
         }
     </script>
 
