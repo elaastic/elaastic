@@ -1,66 +1,82 @@
 @echo off
 setlocal enabledelayedexpansion
 
-:: Check that you are in the scripts folder of ui-components
-for %%I in ("%CD%") do set CURRENT_DIR=%%~nxI
-for %%I in ("%CD%\..") do set PARENT_DIR=%%~nxI
+:: Check if version parameter is provided
+if "%1"=="" (
+    echo Error: Version parameter is required
+    echo Usage: %0 ^<version^>
+    exit /b 1
+)
+
+set VERSION=%1
+echo Using version: %VERSION%
+
+:: Check if we are in the correct directory (scripts folder of ui-components)
+for %%I in (.) do set CURRENT_DIR=%%~nxI
+for %%I in (..) do set PARENT_DIR=%%~nxI
 
 if not "%CURRENT_DIR%"=="scripts" (
     echo Error: This script must be executed from the 'scripts' folder of ui-components
-    echo Current folder: %CD%
+    echo Current directory: %CD%
     exit /b 1
 )
 
 if not "%PARENT_DIR%"=="ui-components" (
-    echo Error: Parent folder must be 'ui-components'
-    echo Parent folder: %PARENT_DIR%
+    echo Error: Parent directory must be 'ui-components'
+    echo Parent directory: %PARENT_DIR%
     exit /b 1
 )
 
 if not exist "..\package.json" (
-    echo Error: package.json not found in parent folder
+    echo Error: package.json not found in parent directory
     exit /b 1
 )
 
-:: Go to parent folder (ui-components)
+:: Go to parent directory (ui-components)
 cd ..
 
-:: 1. Get version from package.json
-for /f "tokens=*" %%a in ('powershell -Command "(Get-Content package.json | ConvertFrom-Json).version"') do (
-    set VERSION=%%a
-)
-echo Version detected: %VERSION%
-
-:: 2. Build the bundle
-call npm run build
+:: Update version in package.json
+call npm version %VERSION% --git-tag-version false --allow-same-version true
 if errorlevel 1 (
-    echo Error during build
+    echo Error updating version in package.json
     exit /b 1
 )
 
-:: 3. Check the existence of generated files
+echo Successfully updated version to %VERSION% in package.json
+
+:: Build the bundle
+call npm run build
+if errorlevel 1 (
+    echo Error during build process
+    exit /b 1
+)
+
+:: Check if generated files exist
 if not exist "dist\elaastic-vue-components-v%VERSION%.umd.min.js" (
     echo JS file not found: elaastic-vue-components-v%VERSION%.umd.min.js
     exit /b 1
 )
+
 if not exist "dist\style-v%VERSION%.css" (
     echo CSS file not found: style-v%VERSION%.css
     exit /b 1
 )
 
-:: 4. Delete old bundle
+:: Check/Create destination directory and clean its content
 cd ..
-if exist "server\src\main\resources\static\vue-components" (
-    echo Removing content from old bundle...
-    del /q "server\src\main\resources\static\vue-components\*.*"
+set "TARGET_DIR=server\src\main\resources\static\vue-components"
+
+if not exist "%TARGET_DIR%" (
+    mkdir "%TARGET_DIR%"
 ) else (
-    :: Create the folder if it does not exist
-    mkdir "server\src\main\resources\static\vue-components"
+    del /Q "%TARGET_DIR%\*"
 )
 
-:: 5. Copy new files
-copy "ui-components\dist\elaastic-vue-components-v%VERSION%.umd.min.js" "server\src\main\resources\static\vue-components\"
-copy "ui-components\dist\style-v%VERSION%.css" "server\src\main\resources\static\vue-components\"
+:: Copy the new files
+copy "ui-components\dist\elaastic-vue-components-v%VERSION%.umd.min.js" "%TARGET_DIR%\"
+copy "ui-components\dist\style-v%VERSION%.css" "%TARGET_DIR%\"
 
 echo Update completed successfully!
-echo New files copied to server\src\main\resources\static\vue-components
+echo New files copied to %TARGET_DIR%
+
+endlocal

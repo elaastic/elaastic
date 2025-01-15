@@ -1,5 +1,15 @@
 #!/bin/bash
 
+# Check if version parameter is provided
+if [ -z "$1" ]; then
+    echo "Error: Version parameter is required"
+    echo "Usage: $0 <version>"
+    exit 1
+fi
+
+VERSION=$1
+echo "Using version: $VERSION"
+
 # Check if we are in the correct directory (scripts folder of ui-components)
 CURRENT_DIR=${PWD##*/}
 PARENT_DIR=${PWD%/*}
@@ -25,17 +35,21 @@ fi
 # Go to parent directory (ui-components)
 cd ..
 
-# 1. Get version from package.json
-VERSION=$(node -p "require('./package.json').version")
-echo "Detected version: $VERSION"
+# Update version in package.json
+if ! npm version "$VERSION" --git-tag-version false --allow-same-version true; then
+    echo "Error updating version in package.json"
+    exit 1
+fi
 
-# 2. Build the bundle
+echo "Successfully updated version to $VERSION in package.json"
+
+# Build the bundle
 if ! npm run build; then
     echo "Error during build process"
     exit 1
 fi
 
-# 3. Check if generated files exist
+# Check if generated files exist
 if [ ! -f "dist/elaastic-vue-components-v$VERSION.umd.min.js" ]; then
     echo "JS file not found: elaastic-vue-components-v$VERSION.umd.min.js"
     exit 1
@@ -46,7 +60,7 @@ if [ ! -f "dist/style-v$VERSION.css" ]; then
     exit 1
 fi
 
-# 4. Check/Create destination directory and clean its content
+# Check/Create destination directory and clean its content
 cd ..
 TARGET_DIR="server/src/main/resources/static/vue-components"
 
@@ -56,7 +70,7 @@ else
     rm -f "$TARGET_DIR"/*
 fi
 
-# 5. Copy the new files
+# Copy the new files
 cp "ui-components/dist/elaastic-vue-components-v$VERSION.umd.min.js" "$TARGET_DIR/"
 cp "ui-components/dist/style-v$VERSION.css" "$TARGET_DIR/"
 
