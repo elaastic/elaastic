@@ -89,7 +89,7 @@
 
         <div th:if="${playerModel.sequence}" th:id="|sequence_${playerModel.sequence.id}|">
 
-            <div class="loading ui segment" th:id="|loading-sequence_${playerModel.sequence.id}|">
+            <div class="loading ui segment" th:id="|loading-sequence_${playerModel.assignment.id}|">
                 <p>&amp;nbsp;</p>
                 <p>&amp;nbsp;</p>
             </div>
@@ -97,17 +97,17 @@
 
             <!--/* The sequence */-->
             <iframe th:src="@{/player/sequence/{sequenceId}(sequenceId=${playerModel.sequence.id})}"
-                    th:id="|iframe-sequence_${playerModel.sequence.id}|"
+                    th:id="|iframe-sequence_${playerModel.assignment.id}|"
                     class="transparent-iframe" width="100%" height="100%" style="border: 0;">
             </iframe>
             <script src="https://cdn.jsdelivr.net/npm/@iframe-resizer/parent@5.3.2"></script>
 
             <script th:inline="javascript">
-                let iframeSelector = 'iframe-sequence_' + [[${playerModel.sequence.id}]];
+                let iframeSelector = 'iframe-sequence_' + [[${playerModel.assignment.id}]];
                 const iframe = document.getElementById(iframeSelector);
                 iframe.onload = function () {
                     // Hide loader
-                    $('#loading-sequence_' + [[${playerModel.sequence.id}]]).slideUp();
+                    $('#loading-sequence_' + [[${playerModel.assignment.id}]]).slideUp();
                 };
                 iframeResize({
                     license: 'GPLv3',
