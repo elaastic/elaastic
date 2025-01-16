@@ -19,20 +19,28 @@
 <div xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/html"
      th:fragment="peerGradingEvaluationCommand(draxoEvaluationModel)">
 
+    <!--/* To be able to have a valid csrf token, we add this form then fill it with JS,
+    serialize it to get all the data for an asynchronus request */-->
+    <!--/* Utility grade form */-->
     <form th:action="@{/peer-grading/draxo/submit-utility-grade}" th:method="post"
           th:id="'form-utility-grade_' + ${draxoEvaluationModel.draxoPeerGradingId}">
         <input type="hidden" name="evaluationId" th:value="${draxoEvaluationModel.draxoPeerGradingId}"/>
         <input type="hidden" name="utilityGrade" th:value="${draxoEvaluationModel.utilityGrade}"/>
     </form>
+    <!--/* Report evaluation form */-->
+    <form th:action="@{/peer-grading/draxo/report-draxo-evaluation}" th:method="post"
+          th:id="'form-report-evaluation_' + ${draxoEvaluationModel.draxoPeerGradingId}">
+        <input type="hidden" name="evaluationId" th:value="${draxoEvaluationModel.draxoPeerGradingId}"/>
+        <input type="hidden" name="reason"/>
+        <input type="hidden" name="other-reason-comment"/>
+    </form>
 
     <div class="ui grid stackable">
 
         <!--/* iframe allowing to load the <utility-grade> app in a isolated context */-->
-        <iframe th:id="'utiltiy-grade-app_' + ${draxoEvaluationModel.draxoPeerGradingId}"
-                class="transparent-iframe" th:src="@{/ui/moderation/utility-grade}" width="100%" style="margin-top: 2%;"></iframe>
-
-        <!--/* script for activating @iframe-resizer that allow us to smoothly integrate the previous iframe within the page layout */-->
-        <script src="https://cdn.jsdelivr.net/npm/@iframe-resizer/parent@5.3.2"></script>
+        <iframe th:id="'evaluation-reaction-app_' + ${draxoEvaluationModel.draxoPeerGradingId}"
+                class="transparent-iframe" th:src="@{/ui/moderation/evaluation-reaction}" width="100%"
+                style="margin-top: 2%;"></iframe>
 
         <div class="ui message" th:attr="data-evaluation-id=${draxoEvaluationModel.draxoPeerGradingId}"
              style="display: none"
@@ -44,36 +52,31 @@
                 Your grade has been saved.
             </p>
         </div>
-
-        <!--/* Report button */-->
-        <div id="reportSelectionApp" class="column" style="width: 100%;">
-            <div class="ui menu pagination" th:if="${draxoEvaluationModel.draxoEvaluation.getExplanation()}">
-                <a class="item"
-                   th:onclick="|$('#reportModal_${draxoEvaluationModel.draxoPeerGradingId}').modal('show');|">
-
-                    <i class="exclamation triangle icon"></i>
-                    <span th:text="#{player.sequence.chatGptEvaluation.reportButton}"></span>
-                </a>
-            </div>
-        </div>
     </div>
-
-    <!--/* Report modal */-->
-    <div th:replace="player/assignment/sequence/components/peer-grading-reaction/_peer-grading-draxo-reaction-report-modal.html :: reportModal(${draxoEvaluationModel.draxoEvaluation.getExplanation()},${draxoEvaluationModel.draxoPeerGradingId}, ${draxoEvaluationModel.responseId})"></div>
-
 
     <script th:inline="javascript">
         $(function () {
             const evaluationId = /*[[${draxoEvaluationModel.draxoPeerGradingId}]]*/ '';
             const selectedGrade = /*[[${draxoEvaluationModel.utilityGrade}]]*/ null;
+            const contentToReport = /*[[${draxoEvaluationModel.draxoEvaluation.getExplanation()}]]*/'';
+
             const isTeacher = false; /*[- Only the learner can access this page -]*/
             const isChatGPT = false; /*[- This is not a ChatGPT evaluation -]*/
-            const iframeSelector = 'utiltiy-grade-app_' + evaluationId;
+            const beADialog = false; /*[- For now, we don't want a dialog as it's broken due to the iframe -]*/
+
+            const iframeSelector = 'evaluation-reaction-app_' + evaluationId;
             const iframe = document.getElementById(iframeSelector);
 
             /*[- Trigger the app init function on iframe loading -]*/
             iframe.onload = () => {
-                iframe.contentWindow.elaastic.initializeUtilityGrade(isChatGPT, isTeacher, selectedGrade, evaluationId)
+                iframe.contentWindow.elaastic.initializeEvaluationReaction(
+                        isChatGPT,
+                        isTeacher,
+                        selectedGrade,
+                        contentToReport,
+                        beADialog,
+                        evaluationId
+                )
             }
 
             window.addEventListener('message', (event) => {
@@ -82,6 +85,12 @@
                     console.log(event.data.command, gradeSubmitted)
 
                     submitUtilityGrade(evaluationId, gradeSubmitted)
+                } else if (event.data.command === 'report-submitted_' + evaluationId) {
+                    const reportReason = event.data.reportReason;
+                    const reportDetail = event.data.reportDetail;
+                    console.log(event.data.command, reportReason, reportDetail)
+
+                    reportEvaluation(evaluationId, reportReason, reportDetail)
                 }
             })
 
@@ -117,45 +126,20 @@
                 }, 5000)
             })
         }
+
+        function reportEvaluation(evaluationId, reasons, otherReasonComment) {
+            const form = $('#form-report-evaluation_' + evaluationId);
+            form.children('input[name="reason"]').val(reasons);
+            form.children('input[name="other-reason-comment"]').val(otherReasonComment);
+
+            const url = form.attr('action');
+            let data = form.serialize();
+
+            $.post(url, data, (response) => {
+                window.location.reload()
+            })
+        }
     </script>
-
-    <style>
-        .item {
-            justify-content: center;
-        }
-
-        #utilitySelectionApp .item {
-            width: 25%;
-        }
-
-        #utilitySelectionApp .item:not(:first-child) {
-            border-left: 1px solid #dededf;
-        }
-
-        #utilitySelectionApp .active.item {
-            background-color: #dff0ff;
-            color: #0e6eb8;
-        }
-
-        #reportSelectionApp {
-            margin-bottom: 1em;
-        }
-
-        #reportSelectionApp > .menu {
-            width: 100%;
-            border-color: #b03060
-        }
-
-        #reportSelectionApp > .menu > .item {
-            color: #b03060;
-            width: 100%;
-            justify-content: center;
-        }
-
-        #submit-button-utility-grade {
-            display: none;
-        }
-    </style>
 
 </div>
 
