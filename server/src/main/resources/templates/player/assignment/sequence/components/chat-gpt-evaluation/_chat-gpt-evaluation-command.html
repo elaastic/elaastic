@@ -20,64 +20,60 @@
      th:fragment="chatGptEvaluationCommand(chatGptEvaluationModel)"
      th:with="utilityGradeSelected=${chatGptEvaluationModel.viewedByTeacher ? chatGptEvaluationModel.teacherUtilityGrade : chatGptEvaluationModel.utilityGrade}">
 
-    <form class="ui form"
-          style="align-items: end;"
-          th:action="@{/chatGptEvaluation/sequence/{sequenceId}/submit-utility-grade(sequenceId=${chatGptEvaluationModel.sequenceId})}"
-          method="post"
-          th:id="'form-utility-grade_' + ${chatGptEvaluationModel.evaluationId}">
+    <form class="ui form" style="align-items: end;" method="post"
+          th:id="'form-utility-grade_' + ${chatGptEvaluationModel.evaluationId}"
+          th:action="@{/chatGptEvaluation/sequence/{sequenceId}/submit-utility-grade(sequenceId=${chatGptEvaluationModel.sequenceId})}">
 
-        <!--/* TODO use a correct data */-->
         <input type="hidden" name="isTeacher" th:value="${chatGptEvaluationModel.viewedByTeacher}">
-
         <input type="hidden" name="evaluationId" th:value="${chatGptEvaluationModel.evaluationId}">
         <input type="hidden" name="utilityGrade" th:value="${utilityGradeSelected}">
-
-        <div class="ui grid stackable" style="align-items: end;">
-
-            <!--/* Utility grade selection */-->
-            <!--/* iframe allowing to load the <utility-grade> app in a isolated context */-->
-            <iframe th:id="'utiltiy-grade-app_' + ${chatGptEvaluationModel.evaluationId}"
-                    class="transparent-iframe" th:src="@{/ui/moderation/utility-grade}" width="100%"
-                    style="margin-top: 2%;"></iframe>
-            <!--/* script for activating @iframe-resizer that allow us to smoothly integrate the previous iframe within the page layout */-->
-            <script src="https://cdn.jsdelivr.net/npm/@iframe-resizer/parent@5.3.2"></script>
-
-            <!--/* Report button only visible for the student */-->
-            <div th:unless="${chatGptEvaluationModel.viewedByTeacher}" class="column" style="width: 100%;"
-                 id="reportSelectionApp">
-                <div class="ui menu pagination" style="width: 100%;">
-                    <a class="item" style="color: #b03060; width: 100%;"
-                       th:onclick="|$('#reportModal_${chatGptEvaluationModel.sequenceId}').modal('show');|">
-                        <i class="exclamation triangle icon"></i>
-                        <span th:text="#{player.sequence.chatGptEvaluation.reportButton}"></span>
-                    </a>
-                </div>
-            </div>
-        </div>
-        <div class="ui message error" th:id="'error-message_' + ${chatGptEvaluationModel.evaluationId}"
-             style="display: none;">
-            <i class="close icon"></i>
-            <div class="header" th:text="#{evaluation.submitUtilityGrade.error.header}">Error</div>
-            <p th:text="#{evaluation.submitUtilityGrade.error.content}">There was an error while submitting the grade.
-                Please try again later.</p>
-        </div>
     </form>
 
-    <div th:replace="player/assignment/sequence/components/chat-gpt-evaluation/_chat-gpt-evaluation-report-modal.html :: reportModal(${chatGptEvaluationModel.sequenceId},${chatGptEvaluationModel.annotation},${chatGptEvaluationModel.reportValues},${chatGptEvaluationModel.evaluationId})"></div>
+    <form th:id="'form-report-evaluation-chatGPT_' + ${chatGptEvaluationModel.evaluationId}" method="post"
+          th:action="@{/chatGptEvaluation/sequence/{sequenceId}/report-chat-gpt-evaluation(sequenceId=${chatGptEvaluationModel.sequenceId})}">
+        <input type="hidden" name="evaluationId" th:value="${chatGptEvaluationModel.evaluationId}">
+        <input type="hidden" name="reason"/>
+        <input type="hidden" name="other-reason-comment"/>
+    </form>
 
+    <!--/* iframe allowing to load the <evaluation-reaction> app in an isolated context */-->
+    <iframe th:id="'chatgpt-evaluation-reaction-app_' + ${chatGptEvaluationModel.evaluationId}"
+            class="transparent-iframe" th:src="@{/ui/moderation/evaluation-reaction}" width="100%">
+    </iframe>
+
+    <div class="ui message error" style="display: none;"
+         th:id="'error-message_' + ${chatGptEvaluationModel.evaluationId}">
+        <i class="close icon"></i>
+        <div class="header" th:text="#{evaluation.submitUtilityGrade.error.header}">Error</div>
+        <p th:text="#{evaluation.submitUtilityGrade.error.content}">
+            There was an error while submitting the grade.
+            Please try again later.
+        </p>
+    </div>
 
     <script th:inline="javascript">
         $(function () {
             const evaluationId = /*[[${chatGptEvaluationModel.evaluationId}]]*/ '';
             const selectedGrade = /*[[${utilityGradeSelected}]]*/ null;
+            const contentToReport = /*[[${chatGptEvaluationModel.annotation}]]*/'';
+
             const isTeacher = /*[[${chatGptEvaluationModel.viewedByTeacher}]]*/ false;
             const isChatGPT = true; /*[- This is a ChatGPT evaluation -]*/
-            const iframeSelector = 'utiltiy-grade-app_' + evaluationId;
+            const beADialog = false; /*[- For now, we don't want a dialog as it's broken due to the iframe -]*/
+
+            const iframeSelector = 'chatgpt-evaluation-reaction-app_' + evaluationId;
             const iframe = document.getElementById(iframeSelector);
 
             /*[- Trigger the app init function on iframe loading -]*/
             iframe.onload = () => {
-                iframe.contentWindow.elaastic.initializeUtilityGrade(isChatGPT, isTeacher, selectedGrade, evaluationId)
+                iframe.contentWindow.elaastic.initializeEvaluationReaction(
+                        isChatGPT,
+                        isTeacher,
+                        selectedGrade,
+                        contentToReport,
+                        beADialog,
+                        evaluationId
+                )
             }
 
             window.addEventListener('message', (event) => {
@@ -86,6 +82,12 @@
                     console.log(event.data.command, gradeSubmitted)
 
                     submitUtilityGrade(evaluationId, gradeSubmitted)
+                } else if (event.data.command === 'report-submitted_' + evaluationId) {
+                    const reportReason = event.data.reportReason;
+                    const reportDetail = event.data.reportDetail;
+                    console.log(event.data.command, reportReason, reportDetail)
+
+                    reportEvaluation(evaluationId, reportReason, reportDetail)
                 }
             })
 
@@ -108,27 +110,28 @@
                     .fail(() => {
                         $errorMessage.slideDown();
                         setTimeout(function () {
-                            console.log("Close the error");
                             $errorMessage.slideUp();
                         }, 5000)
-                    })
+                    });
+        }
+
+        function reportEvaluation(evaluationId, reasons, otherReasonComment) {
+            const form = $('#form-report-evaluation-chatGPT_' + evaluationId);
+            form.children('input[name="reason"]').val(reasons);
+            form.children('input[name="other-reason-comment"]').val(otherReasonComment);
+
+            console.log(form);
+
+            const url = form.attr('action');
+            const data = form.serialize();
+
+            console.log(url, data);
+
+            $.post(url, data, (response) => {
+                window.location.reload()
+            })
         }
     </script>
-
-    <style>
-        .item {
-            justify-content: center;
-        }
-
-        .utilitySelectionApp .item {
-            width: 25%;
-        }
-
-        .utilitySelectionApp .active.item {
-            background-color: #dff0ff !important;
-            color: #0e6eb8 !important;
-        }
-    </style>
 
 </div>
 

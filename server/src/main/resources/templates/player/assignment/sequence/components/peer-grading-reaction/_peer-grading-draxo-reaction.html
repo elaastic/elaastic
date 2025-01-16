@@ -35,23 +35,21 @@
         <input type="hidden" name="other-reason-comment"/>
     </form>
 
-    <div class="ui grid stackable">
 
-        <!--/* iframe allowing to load the <utility-grade> app in a isolated context */-->
-        <iframe th:id="'evaluation-reaction-app_' + ${draxoEvaluationModel.draxoPeerGradingId}"
-                class="transparent-iframe" th:src="@{/ui/moderation/evaluation-reaction}" width="100%"
-                style="margin-top: 2%;"></iframe>
+    <!--/* iframe allowing to load the <utility-grade> app in a isolated context */-->
+    <iframe th:id="'evaluation-reaction-app_' + ${draxoEvaluationModel.draxoPeerGradingId}"
+            class="transparent-iframe" th:src="@{/ui/moderation/evaluation-reaction}" width="100%">
+    </iframe>
 
-        <div class="ui message" th:attr="data-evaluation-id=${draxoEvaluationModel.draxoPeerGradingId}"
-             style="display: none"
-             id="submit-message">
-            <div class="header" th:text="#{evaluation.submitUtilityGrade.success.header}">
-                Grade saved
-            </div>
-            <p class="content" th:text="#{evaluation.submitUtilityGrade.success.content}">
-                Your grade has been saved.
-            </p>
+    <div class="ui message" th:attr="data-evaluation-id=${draxoEvaluationModel.draxoPeerGradingId}"
+         style="display: none"
+         id="submit-message">
+        <div class="header" th:text="#{evaluation.submitUtilityGrade.success.header}">
+            Grade saved
         </div>
+        <p class="content" th:text="#{evaluation.submitUtilityGrade.success.content}">
+            Your grade has been saved.
+        </p>
     </div>
 
     <script th:inline="javascript">
