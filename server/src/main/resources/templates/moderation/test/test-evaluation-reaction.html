@@ -24,29 +24,30 @@
             width="100%"></iframe>
     <iframe id="evaluation-reaction-app-teacher" class="transparent-iframe" th:src="@{/ui/moderation/evaluation-reaction}"
             width="100%"></iframe>
-
-    <!--/* script for activating @iframe-resizer that allow us to smoothly integrate the previous iframe within the page layout */-->
-    <script src="https://cdn.jsdelivr.net/npm/@iframe-resizer/parent@5.3.2"></script>
+    <iframe id="evaluation-reaction-app-dialog" class="transparent-iframe" th:src="@{/ui/moderation/evaluation-reaction}"
+            width="100%"></iframe>
 
     <!--/* Initialise the <confronting-viewpoint app & interact with it */-->
     <script th:inline="javascript">
-
-        const iframe = document.getElementById('evaluation-reaction-app')
-        const iframeTeacher = document.getElementById('evaluation-reaction-app-teacher')
+        const iframe = document.getElementById('evaluation-reaction-app');
+        const iframeTeacher = document.getElementById('evaluation-reaction-app-teacher');
+        const iframeDialog = document.getElementById('evaluation-reaction-app-dialog');
 
         /*[- Trigger the app init function on iframe loading -]*/
         iframe.onload = () => {
-            iframe.contentWindow.elaastic.initializeEvaluationReaction(false, false, null, "Content to report", 1)
+            iframe.contentWindow.elaastic.initializeEvaluationReaction(false, false, null, "Content to report",false, 1)
         }
         iframeTeacher.onload = () => {
-            iframeTeacher.contentWindow.elaastic.initializeEvaluationReaction(true, true, null, "", 1)
+            iframeTeacher.contentWindow.elaastic.initializeEvaluationReaction(true, true, null, "", false, 1)
+        }
+        iframeDialog.onload = () => {
+            iframeDialog.contentWindow.elaastic.initializeEvaluationReaction(false, false, null, "This is a contnent to report", true, 1)
         }
         window.addEventListener('message', (event) => {
             if (event.data.command === 'grade-submitted_1') {
                 const gradeSubmitted = event.data.grade;
                 console.log(gradeSubmitted)
             } else if (event.data.command === 'report-submitted_1') {
-                console.log(event.data)
                 const reportReason = event.data.reportReason;
                 const reportDetail = event.data.reportDetail;
                 console.log(reportReason)
@@ -58,8 +59,7 @@
             license: 'GPLv3',
             waitForLoad: true
         };
-        /*[- Init iframe resize -]*/
-        iframeResize(optionIframeResiser, '#evaluation-reaction-app')
-        iframeResize(optionIframeResiser, '#evaluation-reaction-app-teacher')
+        /*[- Init iframe resize. AS we didn't specify one iframe, it will select all -]*/
+        iframeResize(optionIframeResiser)
     </script>
 </div>
