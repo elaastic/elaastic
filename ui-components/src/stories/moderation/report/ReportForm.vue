@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import {useI18n} from 'vue-i18n'
-import { computed, ref, onMounted, onUnmounted } from 'vue'
+
+import {useI18n} from "vue-i18n";
+import {ref} from "vue";
 
 const {t} = useI18n()
 
@@ -37,9 +38,9 @@ export interface ReportModalProps {
    */
   contentToReport: string
 }
-
 export interface ReportModalEvents {
   (event: 'submitReport', reportReason: string[], reportDetail: string): void
+  (event: 'cancel'): void
 }
 
 const props = defineProps<ReportModalProps>()
@@ -48,7 +49,6 @@ const emit = defineEmits<ReportModalEvents>()
 const reportReasonsAvailable: ReportReason[] = ReportReason.values()
 let selectedReportReason = ref<string[]>([])
 const reportDetail = ref<string>()
-const dialog = ref<boolean>(false)
 
 const detailMandatory = () => {
   return selectedReportReason.value.includes(ReportReason.OTHER.key)
@@ -57,84 +57,58 @@ const canSubmit = () => {
   return selectedReportReason.value.length > 0 && (!detailMandatory() || reportDetail.value)
 }
 
-function submitReport() {
+const submitReport = () => {
   emit('submitReport', selectedReportReason.value, reportDetail.value ?? '')
-  dialog.value = false
 }
-
-const isSmallScreen = ref(window.innerWidth < 600)
-
-// Ajouter un écouteur pour mettre à jour isSmallScreen quand la fenêtre change de taille
-onMounted(() => {
-  window.addEventListener('resize', () => {
-    isSmallScreen.value = window.innerWidth < 600
-  })
-})
-
-// Nettoyer l'écouteur quand le composant est détruit
-onUnmounted(() => {
-  window.removeEventListener('resize', () => {
-    isSmallScreen.value = window.innerWidth < 600
-  })
-})
-
+const cancel = () => {
+  // Reset the form
+  selectedReportReason.value = []
+  reportDetail.value = ''
+  emit('cancel')
+}
 </script>
 
 <template>
-  <v-dialog v-model="dialog" max-width="600" :fullscreen="isSmallScreen">
-    <template v-slot:activator="{ props: activatorProps }">
-      <v-btn class="text-none" variant="outlined" color="#b7446f"
-             prepend-icon="mdi-alert" id="report-btn" v-bind="activatorProps">
-        {{ t('report') }}
-      </v-btn>
-    </template>
-    <v-card :title="t('title')">
-      <v-card-text>
-        <!-- Content to report -->
-        <h4>{{ t('content-to-report') }}</h4>
-        <p>
-          {{ props.contentToReport }}
-        </p>
-        <br>
+  <v-card :title="t('title')">
+    <v-card-text>
+      <!-- Content to report -->
+      <h4>{{ t('content-to-report') }}</h4>
+      <p>
+        {{ props.contentToReport }}
+      </p>
+      <br>
 
-        <!-- Report reason -->
-        <h4>{{ t('report-reason-title') }}</h4>
-        <v-checkbox-btn v-model="selectedReportReason" v-for="reason in reportReasonsAvailable" :key="reason.key"
-                        :value="reason.key" :label="reason.longLabel()"/>
-        <br>
+      <!-- Report reason -->
+      <h4>{{ t('report-reason-title') }}</h4>
+      <v-checkbox-btn v-model="selectedReportReason" v-for="reason in reportReasonsAvailable" :key="reason.key"
+                      :value="reason.key" :label="reason.longLabel()"/>
+      <br>
 
-        <!-- Report detail -->
-        <h4>{{ t('report-detail') }}</h4>
-        <v-textarea v-model="reportDetail" variant="outlined" rows="2"
-                    :placeholder="t('report-detail-placeholder')"></v-textarea>
-      </v-card-text>
-      <v-divider></v-divider>
+      <!-- Report detail -->
+      <h4>{{ t('report-detail') }}</h4>
+      <v-textarea v-model="reportDetail" variant="outlined" rows="2"
+                  :placeholder="t('report-detail-placeholder')"></v-textarea>
+    </v-card-text>
+    <v-divider></v-divider>
 
-      <v-card-actions>
-        <v-spacer></v-spacer>
+    <v-card-actions>
+      <v-spacer></v-spacer>
 
-        <v-btn :text="t('submit')" @click="submitReport" :disabled="!canSubmit()" variant="flat"
-               class="text-none text-white"
-               color="#95c155"></v-btn>
-        <v-btn :text="t('cancel')" @click="dialog = false" variant="flat" class="text-none"></v-btn>
+      <v-btn :text="t('submit')" @click="submitReport" :disabled="!canSubmit()" variant="flat"
+             class="text-none text-white"
+             color="#95c155"></v-btn>
+      <v-btn :text="t('cancel')" @click="cancel" variant="flat" class="text-none"></v-btn>
 
-      </v-card-actions>
-    </v-card>
-  </v-dialog>
+    </v-card-actions>
+  </v-card>
 </template>
 
 <style scoped>
-@media (max-width: 600px) {
-  #report-btn {
-    width: 100%;
-  }
-}
 
 </style>
 <i18n>
 {
   "en": {
-    "report": "Report",
     "title": "Report content",
     "content-to-report": "Content to report:",
     "report-reason-title": "Report reason:",
@@ -162,7 +136,6 @@ onUnmounted(() => {
     }
   },
   "fr": {
-    "report": "Signaler",
     "title": "Signaler le contenu",
     "content-to-report": "Contenu à signaler :",
     "report-reason-title": "Motif(s) du signalement :",
