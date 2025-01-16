@@ -36,7 +36,7 @@
     <script th:inline="javascript">
         window.elaastic = {
 
-            initializeEvaluationReaction: (isChatGPT, isTeacher, selectedGrade, contentToReport, evaluationId) => {
+            initializeEvaluationReaction: (isChatGPT, isTeacher, selectedGrade, contentToReport,beADialog, evaluationId) => {
                 const app = Vue.createApp(
                         ElaasticVueComponents.EvaluationReaction,
                         {
@@ -44,6 +44,7 @@
                             isTeacher: isTeacher,
                             selectedGrade: selectedGrade,
                             contentToReport: contentToReport,
+                            beADialog: beADialog,
                             onSubmitUtilityGrade(grade) {
                                 window.parent.postMessage({command: 'grade-submitted_' + evaluationId, grade})
                             },
