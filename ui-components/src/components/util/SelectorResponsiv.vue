@@ -1,6 +1,6 @@
 <script setup lang="ts">
 
-import {ref} from "vue";
+import {computed, ref} from "vue";
 
 export type Selection = {
   label: string,
@@ -31,7 +31,7 @@ const emit = defineEmits<SelectorResponsivEmit>()
  * If the selected value is not in the selections, return null.
  * @returns the selected value or null
  */
-function getSelectedFromProps(): Selection | null {
+const getSelectedFromProps = (): Selection | null => {
   const selected = props.selected
 
   console.log(selected)
@@ -56,14 +56,16 @@ const onChangeSelection = () => {
   }
 }
 
+// Compute the button width based on the number of selections
+const buttonWidth =`${100 / props.selections.length}%`;
 </script>
 
 <template>
-  <div id="horizontal-grade-selector">
+  <div id="horizontal-grade-selector-container">
     <v-btn-toggle v-model="selected" variant="text" color="#0e6eb8" rounded="0" elevation="1"
-                  style="margin-top: 10px;">
+                  style="margin-top: 10px;" id="horizontal-grade-selector">
       <v-btn v-for="(selection, index) in props.selections" :key="index" @click="setSelected(selection)"
-             :value="selection" class="text-none text-subtitle-1">
+             :value="selection" class="text-none text-subtitle-1" :style="{ width: buttonWidth}">
         {{ selection.label }}
       </v-btn>
     </v-btn-toggle>
@@ -81,7 +83,7 @@ const onChangeSelection = () => {
 
 <style scoped>
 @media (max-width: 600px) {
-  #horizontal-grade-selector {
+  #horizontal-grade-selector-container {
     display: none;
   }
 }
@@ -100,5 +102,10 @@ const onChangeSelection = () => {
   .btn-vertical-selector {
     padding: 3%;
   }
+}
+
+#horizontal-grade-selector {
+  flex-direction: row;
+  width: 100%;
 }
 </style>
