@@ -33,7 +33,6 @@ export interface UtilityGradeProps {
    */
   selectedGrade: string | null
 }
-
 export interface UtilityGradeEvents {
   (event: 'submitUtilityGrade', gradeSelected: string): void;
 }
@@ -55,7 +54,7 @@ const selectedGrade = computed({
   }
 });
 
-function setSelectedUtilityGrade(itemClicked: Selection) {
+const setSelectedUtilityGrade = (itemClicked: Selection) => {
   selectedGrade.value = itemClicked;
 }
 
