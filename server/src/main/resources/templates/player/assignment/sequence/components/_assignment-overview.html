@@ -45,6 +45,7 @@
             };
             const linkClickable = [[${linkClickable}]];
             const assignmentId = [[${assignmentOverviewModel.assignmentId}]];
+            const isTeacher = [[${assignmentOverviewModel.teacher}]];
             const $sequences = $('.elaastic-sequence');
             const iframeActiveSequence = document.getElementById('iframe-sequence_' + assignmentId);
             const $loaderIframe = $("#loading-sequence_" + assignmentId);
@@ -53,16 +54,26 @@
                 $sequences.on("click", function () {
                     const sequenceId = $(this).data('sequence-id');
 
-                    // Update the iframe with the new sequence
-                    iframeActiveSequence.src = '/player/sequence/' + sequenceId;
-                    $loaderIframe.slideDown();
-
                     // Update the URL
                     window.history.pushState(null, '', completeUrlOfPlayer(assignmentId, sequenceId));
 
-                    // Update the selected sequence
-                    $(".elaastic-sequence.selected").removeClass('selected');
-                    $(this).addClass('selected');
+                    if (isTeacher) {
+                        /*
+                        When changing the current sequence, the Dashboard also needs to be updated.
+                        For now, it's not really easy to asynchronously update the dashboard.
+                        So we reload the page to update the dashboard.
+                        */
+                        // Refresh the page
+                        location.reload(true);
+                    } else {
+                        // Update the iframe with the new sequence
+                        iframeActiveSequence.src = '/player/sequence/' + sequenceId;
+                        $loaderIframe.slideDown();
+
+                        // Update the selected sequence
+                        $(".elaastic-sequence.selected").removeClass('selected');
+                        $(this).addClass('selected');
+                    }
                 });
             }
         });
