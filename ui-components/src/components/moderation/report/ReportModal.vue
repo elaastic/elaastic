@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import {useI18n} from 'vue-i18n'
 import {onMounted, onUnmounted, ref} from 'vue'
-import ReportForm from "@/stories/moderation/report/ReportForm.vue";
+import ReportForm from "@/components/moderation/report/ReportForm.vue";
 
 const {t} = useI18n()
 

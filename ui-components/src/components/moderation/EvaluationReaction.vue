@@ -1,8 +1,8 @@
 <script setup lang="ts">
 
-import UtilityGrade from "@/stories/moderation/UtilityGrade.vue";
+import UtilityGrade from "@/components/moderation/UtilityGrade.vue";
 import {useI18n} from "vue-i18n";
-import ReportModal from '@/stories/moderation/report/ReportModal.vue'
+import ReportModal from '@/components/moderation/report/ReportModal.vue'
 
 const {t} = useI18n()
 

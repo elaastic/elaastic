@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useDisplay } from 'vuetify'
-import type { LikertValue } from '@/stories/evaluation/Likert'
+import type { LikertValue } from '@/components/evaluation/Likert'
 import { useI18n } from 'vue-i18n'
 
 export interface LikertScaleProps {

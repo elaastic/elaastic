@@ -1,7 +1,7 @@
 import {expect, fn, userEvent, waitFor} from '@storybook/test';
 import type {Meta, StoryObj} from '@storybook/vue3';
 
-import UtilityGrade from '@/stories/moderation/UtilityGrade.vue';
+import UtilityGrade from '@/components/moderation/UtilityGrade.vue';
 
 // More on how to set up stories at: https://storybook.js.org/docs/writing-stories
 const meta: any = {

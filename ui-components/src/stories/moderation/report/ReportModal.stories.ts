@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/vue3'
-import ReportModal from '@/stories/moderation/report/ReportModal.vue'
+import ReportModal from '@/components/moderation/report/ReportModal.vue'
 import { fn } from '@storybook/test'
 
 const lorem =

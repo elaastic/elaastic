@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import ChoiceChip from '@/stories/response/ChoiceChip.vue'
-import LikertScale from '@/stories/evaluation/LikertScale.vue'
+import ChoiceChip from '@/components/response/ChoiceChip.vue'
+import LikertScale from '@/components/evaluation/LikertScale.vue'
 import { computed } from 'vue'
-import type { LikertValue } from '@/stories/evaluation/Likert'
+import type { LikertValue } from '@/components/evaluation/Likert'
 import { type AnyResponse } from '@/models/Response'
 import { useI18n } from 'vue-i18n'
 

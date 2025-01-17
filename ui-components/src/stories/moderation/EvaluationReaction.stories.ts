@@ -1,7 +1,7 @@
 import {expect, fn, waitFor} from '@storybook/test'
 import type { Meta, StoryObj } from '@storybook/vue3'
 
-import EvaluationReaction from '@/stories/moderation/EvaluationReaction.vue'
+import EvaluationReaction from '@/components/moderation/EvaluationReaction.vue'
 
 // More on how to set up stories at: https://storybook.js.org/docs/writing-stories
 const meta: any = {

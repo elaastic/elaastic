@@ -1,9 +1,9 @@
 <script setup lang="ts">
 
-import EvaluationCard from '@/stories/evaluation/EvaluationCard.vue'
+import EvaluationCard from '@/components/evaluation/EvaluationCard.vue'
 import { reactive } from 'vue'
 import type { AnyResponse } from '@/models/Response'
-import type { LikertValue } from '@/stories/evaluation/Likert'
+import type { LikertValue } from '@/components/evaluation/Likert'
 import { useI18n } from 'vue-i18n'
 
 type ResponseId = number

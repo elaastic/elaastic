@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/vue3'
 
-import ConfrontingViewpoint from '@/stories/evaluation/ConfrontingViewpoint.vue'
+import ConfrontingViewpoint from '@/components/evaluation/ConfrontingViewpoint.vue'
 
 const meta = {
   title: 'Evaluation/ConfrontingViewpoints',
