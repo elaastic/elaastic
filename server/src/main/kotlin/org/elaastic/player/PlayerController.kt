@@ -716,8 +716,8 @@ class PlayerController(
 
         val learnerAssignment: LearnerAssignment? = assignmentService.getRegisteredUser(sequence.assignment!!, learner)
 
-        // If the learner a fake one, the learnerAssignment will be null.
-        // Monitoring what the fake learner has done is not relevant.
+        // If the learner is fake, the learnerAssignment will be null.
+        // Monitoring what a fake learner has done is not relevant.
         // So we don't display the monitoring model.
         if (learnerAssignment != null) {
             model["learnerMonitoringModel"] = dashboardModelFactory.buildLearnerMonitoringModel(
@@ -732,8 +732,7 @@ class PlayerController(
         }
         val learnerResultsModel = getLearnerResultsModel(learner, sequence)
         model["learnerResultsModel"] = learnerResultsModel
-        // The accordionId is used to initialize the accordion in the view.
-        // So to discriminate between all accordions in the page, we use the learnerId
+        // To discriminate between all accordions in the page, we use the userId
         model["userId"] = userId
         model["seenByTeacher"] = isTeacher
         model["seenByOwner"] = isOwnerOfResponse
