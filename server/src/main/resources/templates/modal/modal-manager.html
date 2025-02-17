@@ -29,6 +29,7 @@
             const showDetailsModal = 'show-details-modal';
             const showReportModal = 'show-report-modal';
             const showConfigSequenceModal = 'show-config-sequence-modal';
+            const showAllExplanationsModal = 'show-all-explanations-modal';
 
             window.addEventListener('message', (event) => {
                 console.log('Received message: ' + event.data.command);
@@ -44,6 +45,12 @@
                     case showConfigSequenceModal:
                         console.log('Config sequence modal');
                         showConfigSequence(event.data.sequenceId);
+                        break;
+                    case showAllExplanationsModal:
+                        console.log('All explanations modal');
+                        let selector = '#all_explanations_for_' + event.data.sequenceId;
+                        let urlToFetch = '/modal-manager/all-explanations/' + event.data.sequenceId;
+                        showOrFetchModal(selector, urlToFetch);
                         break;
                     default:
                         console.log('Unknown command: ' + event.data.command);
@@ -128,8 +135,6 @@
                 saveAction(sequenceId, 'open', 'configure_popup')
                 showOrFetchModal(selector, urlModal);
             }
-
-
 
         });
     </script>

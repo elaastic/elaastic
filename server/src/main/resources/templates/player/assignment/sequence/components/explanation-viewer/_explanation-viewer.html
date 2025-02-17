@@ -44,21 +44,23 @@
     <div th:if="${explanationViewerModel.hasMoreThanExcerpt or explanationViewerModel.hasHiddenByTeacherExplanations}">
         <button type="button" th:id="|btn_all_explanations_for_${sequenceId}|"
                 class="ui button"
-                th:onclick="|$('#all_explanations_for_${sequenceId}').modal({
-                onShow: function(){
-                    saveAction(${sequenceId}, 'open', 'rationales_popup')
-                },
-                onHide: function(){
-                    saveAction(${sequenceId}, 'close', 'rationales_popup')
-                    if(toReload) window.location.reload()
-                }
-                }).modal('show');|"
                 th:text="#{player.sequence.explanation.all.button}">
             See all explanations
         </button>
         <div th:replace="|${components}/_all-explanations-modal|::allExplanationsPopup(${sequenceId}, ${explanationViewerModel}, ${isTeacher})"></div>
 
         <script th:inline="javascript">
+            $(function () {
+                let sequenceId = /*[[${sequenceId}]]*/ '';
+
+                $('#btn_all_explanations_for_' + sequenceId).on("click", function () {
+                    // TODO save action in the database
+                    window.parent.postMessage({
+                        command: 'show-all-explanations-modal',
+                        sequenceId: sequenceId
+                    }, '*');
+                });
+            })
         </script>
     </div>
 
