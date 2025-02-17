@@ -114,6 +114,13 @@
                     waitForLoad: true
                 }, '#' + iframeSelector);
             </script>
+
+            <!--/*
+            As the sequence player is in an iframe,
+            we want to display every modal in the main page so the modal could be displayed correctly.
+            */-->
+            <div th:replace="modal/modal-manager.html :: modalManager">
+            </div>
         </div>
         <!--/* The auto-reload script */-->
         <th:block th:replace="|${components}/_auto-reload.html| :: auto-reload(${playerModel.sequence.id})"></th:block>

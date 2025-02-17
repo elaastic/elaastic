@@ -197,6 +197,14 @@
             }, '#' + iframeSelector);
         </script>
 
+
+        <!--/*
+        As the sequence player is in an iframe,
+        we want to display every modal in the main page so the modal could be displayed correctly.
+        */-->
+        <div th:replace="modal/modal-manager.html :: modalManager">
+        </div>
+
         <!--/* The functional testing of the sequence */-->
         <div togglz:active="'FUNCTIONAL_TESTING'" th:remove="tag">
             <div th:replace="|${components}/functional-testing/functional-test.html| :: functionalTesting(${playerModel.assignment.id},${playerModel.sequence.id})"></div>

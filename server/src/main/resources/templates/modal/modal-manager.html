@@ -1,0 +1,67 @@
+<!--
+  ~ Elaastic - formative assessment system
+  ~ Copyright (C) 2019. University Toulouse 1 Capitole, University Toulouse 3 Paul Sabatier
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Affero General Public License as
+  ~ published by the Free Software Foundation, either version 3 of the
+  ~ License, or (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU Affero General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Affero General Public License
+  ~ along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  -->
+<!--/* This fragment handles the display of modal. It should be called in the most upper level of the HTML */-->
+<div th:fragment="modalManager">
+    <div id="modal-container"></div>
+
+    <script th:inline="javascript">
+        const modalContainer = $('#modal-container');
+        const showDetailsModal = 'show-details-modal';
+
+        window.addEventListener('message', (event) => {
+            console.log('Received message: ' + event.data.command);
+            switch (event.data.command) {
+                case showDetailsModal:
+                    console.log('Show details modal');
+                    showDetails(event.data.userId, event.data.sequenceId);
+                    break;
+                default:
+                    console.log('Unknown command: ' + event.data.command);
+                    break;
+            }
+        })
+
+        /**
+         * Show the results modal for a given user
+         * @param userId
+         * @param sequenceId
+         */
+        function showDetails(userId, sequenceId) {
+            let loader = $("#loading_modal_detail_" + userId);
+            let $detailModal = modalContainer.find("#myResultsModal_" + userId);
+            if ($detailModal.length) {
+                // If the modal already exists, we show it
+                $detailModal.modal('show');
+            } else {
+                // TODO show a loader
+                // If the modal doesn't exist, we fetch it
+                const urlModal = '/player/' + sequenceId + '/result/' + userId + '/modal';
+                $.get(urlModal)
+                        .done(function (data) {
+                            // TODO hide the loader
+                            modalContainer.append(data);
+                            modalContainer.find("#myResultsModal_" + userId).modal('show');
+                        })
+                        .fail(function () {
+                            // TODO hide the loader
+                            console.log("An error occurred while fetching the results");
+                        })
+            }
+        }
+    </script>
+</div>

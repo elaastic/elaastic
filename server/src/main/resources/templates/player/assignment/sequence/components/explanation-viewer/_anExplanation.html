@@ -231,29 +231,11 @@
         }
 
         function showDetails(userId, sequenceId) {
-            let loader = $("#loading_modal_detail_" + userId);
-            let $detailModal = $("#myResultsModal_" + userId);
-            if ($detailModal.length) {
-                // If the modal already exists, we show it
-                $detailModal.modal('show');
-            } else {
-                loader.show();
-                loader.siblings('a').hide();
-                // If the modal doesn't exist, we fetch it
-                const urlModal = '/player/' + sequenceId + '/result/' + userId + '/modal';
-                $.get(urlModal)
-                    .done(function (data) {
-                        loader.hide();
-                        loader.siblings('a').show()
-                        $('body').append(data);
-                        $("#myResultsModal_" + userId).modal('show');
-                    })
-                    .fail(function () {
-                        loader.hide();
-                        loader.siblings('a').show()
-                        console.log("An error occurred while fetching the results");
-                    })
-            }
+            window.parent.postMessage({
+                command: 'show-details-modal',
+                userId: userId,
+                sequenceId: sequenceId
+            }, '*');
         }
 
         function toggleVisibilityByTeacher(responseId, isVisible) {
