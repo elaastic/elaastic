@@ -28,17 +28,22 @@
             const loader = $('#loading_modal');
             const showDetailsModal = 'show-details-modal';
             const showReportModal = 'show-report-modal';
+            const showConfigSequenceModal = 'show-config-sequence-modal';
 
             window.addEventListener('message', (event) => {
                 console.log('Received message: ' + event.data.command);
                 switch (event.data.command) {
                     case showDetailsModal:
-                        console.log('Show details modal');
+                        console.log('Details modal');
                         showDetails(event.data.userId, event.data.sequenceId);
                         break;
                     case showReportModal:
-                        console.log('Show report modal');
+                        console.log('Report modal');
                         showReport(event.data.evaluationId, event.data.evaluationType);
+                        break;
+                    case showConfigSequenceModal:
+                        console.log('Config sequence modal');
+                        showConfigSequence(event.data.sequenceId);
                         break;
                     default:
                         console.log('Unknown command: ' + event.data.command);
@@ -56,7 +61,28 @@
                 // So to "fix" this, we add a delay before hiding the loader
                 setTimeout(function () {
                     loader.modal('hide');
-                }, 500);
+                }, 1000);
+            }
+
+            function showOrFetchModal(modalSelector, urlToFetch) {
+                let $modal = $(modalSelector);
+                if ($modal.length) {
+                    // If the modal already exists, we show it
+                    $modal.modal('show');
+                } else {
+                    loader.modal('show');
+                    // If the modal doesn't exist, we fetch it
+                    $.get(urlToFetch)
+                            .done(function (data) {
+                                $("body").append(data);
+                                $(modalSelector).modal('show');
+                                hideLoaderWithDelay();
+                            })
+                            .fail(function () {
+                                loader.modal('hide');
+                                console.log("An error occurred while fetching the modal");
+                            })
+                }
             }
 
             /**
@@ -65,25 +91,9 @@
              * @param sequenceId
              */
             function showDetails(userId, sequenceId) {
-                let $detailModal = $("#myResultsModal_" + userId);
-                if ($detailModal.length) {
-                    // If the modal already exists, we show it
-                    $detailModal.modal('show');
-                } else {
-                    loader.modal('show');
-                    // If the modal doesn't exist, we fetch it
-                    const urlModal = '/player/' + sequenceId + '/result/' + userId + '/modal';
-                    $.get(urlModal)
-                            .done(function (data) {
-                                $("body").append(data);
-                                $("#myResultsModal_" + userId).modal('show');
-                                hideLoaderWithDelay();
-                            })
-                            .fail(function () {
-                                loader.modal('hide');
-                                console.log("An error occurred while fetching the results");
-                            })
-                }
+                const selector = "#myResultsModal_" + userId;
+                const urlModal = '/player/' + sequenceId + '/result/' + userId + '/modal';
+                showOrFetchModal(selector, urlModal);
             }
 
             /**
@@ -105,26 +115,22 @@
                     urlModal += 'draxo/' + evaluationId;
                 }
 
-                let $reportModal = $(reportModalToFind);
-                if ($reportModal.length) {
-                    // If the modal already exists, we show it
-                    $reportModal.modal('show');
-                } else {
-                    loader.modal('show');
-                    // If the modal doesn't exist, we fetch it
-                    $.get(urlModal)
-                            .done(function (data) {
-                                $("body").append(data);
-                                console.log(reportModalToFind)
-                                $(reportModalToFind).modal('show');
-                                hideLoaderWithDelay();
-                            })
-                            .fail(function () {
-                                loader.modal('hide');
-                                console.log("An error occurred while fetching the report modal");
-                            })
-                }
+                showOrFetchModal(reportModalToFind, urlModal);
             }
+
+            /**
+             * Show the configuration modal for a given sequence
+             * @param sequenceId The ID of the sequence
+             */
+            function showConfigSequence(sequenceId) {
+                const selector = "#sequenceSpec_" + sequenceId;
+                const urlModal = '/modal-manager/config-sequence/' + sequenceId;
+                saveAction(sequenceId, 'open', 'configure_popup')
+                showOrFetchModal(selector, urlModal);
+            }
+
+
+
         });
     </script>
 </div>

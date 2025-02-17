@@ -33,11 +33,11 @@
     </script>
 
     <!--/* Start sequence */-->
-    <a class="item"
+    <a th:if="${commandModel.actionStartSequence.name() == 'ENABLED'}"
+       class="item"
        href="#"
-       th:if="${commandModel.actionStartSequence.name() == 'ENABLED'}"
        style="width: 100%; text-align: center; display: block; outline: none;"
-       th:onclick="|$('#sequenceSpec_${commandModel.sequenceId}').modal('show');saveAction(${sequenceId}, 'open', 'configure_popup')|">
+       th:id="'start-sequence-' + ${sequenceId}">
 
         <i class="green play icon"></i>
         <span th:text="#{player.sequence.start}">Start sequence</span>
@@ -130,10 +130,17 @@
 
     </div>
 
-    <!--/* Configuration of the sequence */-->
-    <div th:if="${commandModel.actionStartSequence.name() == 'ENABLED'}" th:remove="tag">
-        <div th:replace="player/assignment/sequence/components/command/_config-sequence.html :: configSequence(${commandModel.sequenceId}, ${commandModel.statementId}, ${commandModel.questionType}, ${commandModel.hasExpectedExplanation})"></div>
-    </div>
+    <script th:inline="javascript" th:if="${commandModel.actionStartSequence.name() == 'ENABLED'}">
+        $(function () {
+            let sequenceId = [[${sequenceId}]];
 
-
+            $("#start-sequence-" + sequenceId).on("click", function () {
+                console.log("Start sequence " + sequenceId);
+                window.parent.postMessage({
+                    command: "show-config-sequence-modal",
+                    sequenceId: sequenceId
+                }, "*");
+            });
+        });
+    </script>
 </div>
