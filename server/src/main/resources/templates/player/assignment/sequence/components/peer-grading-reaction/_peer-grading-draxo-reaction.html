@@ -47,8 +47,7 @@
             </div>
             <div class="field four wide column" id="reportSelectionApp">
                 <div class="ui menu pagination" th:if="${draxoEvaluationModel.draxoEvaluation.getExplanation()}">
-                    <a class="item"
-                       th:onclick="|$('#reportModal_${draxoEvaluationModel.draxoPeerGradingId}').modal('show');|">
+                    <a class="item" th:id="'reportButton_' + ${draxoEvaluationModel.draxoPeerGradingId}">
 
                         <i class="exclamation triangle icon"></i>
                         <span th:text="#{player.sequence.chatGptEvaluation.reportButton}"></span>
@@ -71,9 +70,6 @@
         </div>
     </form>
 
-    <div th:replace="player/assignment/sequence/components/peer-grading-reaction/_peer-grading-draxo-reaction-report-modal.html :: reportModal(${draxoEvaluationModel.draxoEvaluation.getExplanation()},${draxoEvaluationModel.draxoPeerGradingId}, ${draxoEvaluationModel.responseId})"></div>
-
-
     <script th:inline="javascript">
         $(function () {
             /*<![CDATA[*/
@@ -82,8 +78,17 @@
 
             const submitMessage = $('#submit-message[data-evaluation-id="' + evaluationId + '"]');
             const utilityGradeBtns = $('.utilityGrade[data-evaluation-id="' + evaluationId + '"]')
+            const reportButton = $('#reportButton_' + evaluationId)
 
             submitMessage.hide()
+
+            reportButton.on("click", () => {
+                console.log("report button clicked")
+                window.parent.postMessage({
+                    command: 'show-report-modal',
+                    evaluationId: evaluationId
+                }, '*')
+            })
 
             utilityGradeBtns.click(function () {
                 utilityGradeBtns.removeClass("active")

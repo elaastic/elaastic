@@ -22,6 +22,7 @@
     <script th:inline="javascript">
         const modalContainer = $('#modal-container');
         const showDetailsModal = 'show-details-modal';
+        const showReportModal = 'show-report-modal';
 
         window.addEventListener('message', (event) => {
             console.log('Received message: ' + event.data.command);
@@ -30,8 +31,13 @@
                     console.log('Show details modal');
                     showDetails(event.data.userId, event.data.sequenceId);
                     break;
+                case showReportModal:
+                    console.log('Show report modal');
+                    showReport(event.data.evaluationId);
+                    break;
                 default:
                     console.log('Unknown command: ' + event.data.command);
+                    console.log(event.data);
                     break;
             }
         })
@@ -62,6 +68,26 @@
                             console.log("An error occurred while fetching the results");
                         })
             }
+        }
+
+        function showReport(evaluationId) {
+            let $reportModal = modalContainer.find("#reportModal_" + evaluationId);
+            if ($reportModal.length) {
+                // If the modal already exists, we show it
+                $reportModal.modal('show');
+            } else {
+                // If the modal doesn't exist, we fetch it
+                const urlModal = "/modal-manager/report/draxo/" + evaluationId
+                $.get(urlModal)
+                        .done(function (data) {
+                            modalContainer.append(data);
+                            modalContainer.find("#reportModal_" + evaluationId).modal('show');
+                        })
+                        .fail(function () {
+                            console.log("An error occurred while fetching the report modal");
+                        })
+            }
+
         }
     </script>
 </div>
