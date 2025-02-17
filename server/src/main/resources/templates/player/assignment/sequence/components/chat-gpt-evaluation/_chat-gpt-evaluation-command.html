@@ -57,7 +57,7 @@
                  id="reportSelectionApp">
                 <div class="ui menu pagination" style="width: 100%;">
                     <a class="item" style="color: #b03060; width: 100%;"
-                       th:onclick="|$('#reportModal_${chatGptEvaluationModel.sequenceId}').modal('show');|">
+                       th:id="'reportIABtn_' + ${chatGptEvaluationModel.evaluationId}">
                         <i class="exclamation triangle icon"></i>
                         <span th:text="#{player.sequence.chatGptEvaluation.reportButton}"></span>
                     </a>
@@ -71,34 +71,47 @@
         </div>
     </form>
 
-    <div th:replace="player/assignment/sequence/components/chat-gpt-evaluation/_chat-gpt-evaluation-report-modal.html :: reportModal(${chatGptEvaluationModel.sequenceId},${chatGptEvaluationModel.annotation},${chatGptEvaluationModel.reportValues},${chatGptEvaluationModel.evaluationId})"></div>
-
-
     <script th:inline="javascript">
         new Vue({
             el: '#utilitySelectionApp-' + [[${chatGptEvaluationModel.evaluationId}]],
             data: {
-                selectedUtilityGrade: [[${utilityGradeSelected?.name()}]]
-            },
-            methods: {
-                setSelectedUtilityGrade: function (clickedUtilityGrade) {
-                    this.selectedUtilityGrade = clickedUtilityGrade
-                    $('#submit-button-utility-grade[evaluationId="' + [[${chatGptEvaluationModel.evaluationId}]] + '"]').slideDown();
-                }
+                selectedUtilityGrade: [[${utilityGradeSelected?.name()
             }
+        ]]
+        },
+        methods: {
+            setSelectedUtilityGrade: function (clickedUtilityGrade) {
+                this.selectedUtilityGrade = clickedUtilityGrade
+                $('#submit-button-utility-grade[evaluationId="' + [[${
+                    chatGptEvaluationModel
+                    .evaluationId
+                }]] + '"]').slideDown();
+            }
+        }
         })
 
         $(function () {
-            $("#utilityGradeForm_" + [[${chatGptEvaluationModel.evaluationId}]]).on("submit", function (event) {
+            const evaluationId = [[${chatGptEvaluationModel.evaluationId}]];
+
+            $('#reportIABtn_' + evaluationId).on("click", () => {
+                console.log("report button clicked")
+                window.parent.postMessage({
+                    command: 'show-report-modal',
+                    evaluationId: evaluationId,
+                    evaluationType: 'IA'
+                }, "*");
+            });
+
+            $("#utilityGradeForm_" + evaluationId).on("submit", function (event) {
                 event.preventDefault();
                 let $form = $(this);
                 $.post($form.attr('action'), $form.serialize())
-                    .done(function () {
-                        window.location.reload();
-                    })
-                    .fail(function () {
-                        console.log("An error occurred while submitting the utility grade");
-                    });
+                        .done(function () {
+                            window.location.reload();
+                        })
+                        .fail(function () {
+                            console.log("An error occurred while submitting the utility grade");
+                        });
             });
         });
     </script>

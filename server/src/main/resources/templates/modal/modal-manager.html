@@ -33,7 +33,7 @@
                     break;
                 case showReportModal:
                     console.log('Show report modal');
-                    showReport(event.data.evaluationId);
+                    showReport(event.data.evaluationId, event.data.evaluationType);
                     break;
                 default:
                     console.log('Unknown command: ' + event.data.command);
@@ -70,22 +70,32 @@
             }
         }
 
-        function showReport(evaluationId) {
-            let $reportModal = modalContainer.find("#reportModal_" + evaluationId);
+        function showReport(evaluationId, evaluationType) {
+            let evaluationToFind;
+            let urlModal = "/modal-manager/report/";
+            if (evaluationType === 'IA') {
+                evaluationToFind = '#reportIAModal_' + evaluationId;
+                urlModal += 'ia/' + evaluationId;
+            } else {
+                evaluationToFind = '#reportDRAXOModal_' + evaluationId;
+                urlModal += 'draxo/' + evaluationId;
+            }
+
+            let $reportModal = modalContainer.find(evaluationToFind);
             if ($reportModal.length) {
                 // If the modal already exists, we show it
                 $reportModal.modal('show');
             } else {
                 // If the modal doesn't exist, we fetch it
-                const urlModal = "/modal-manager/report/draxo/" + evaluationId
                 $.get(urlModal)
-                        .done(function (data) {
-                            modalContainer.append(data);
-                            modalContainer.find("#reportModal_" + evaluationId).modal('show');
-                        })
-                        .fail(function () {
-                            console.log("An error occurred while fetching the report modal");
-                        })
+                    .done(function (data) {
+                        modalContainer.append(data);
+                        console.log(evaluationToFind)
+                        modalContainer.find(evaluationToFind).modal('show');
+                    })
+                    .fail(function () {
+                        console.log("An error occurred while fetching the report modal");
+                    })
             }
 
         }

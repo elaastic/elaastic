@@ -47,7 +47,7 @@
             </div>
             <div class="field four wide column" id="reportSelectionApp">
                 <div class="ui menu pagination" th:if="${draxoEvaluationModel.draxoEvaluation.getExplanation()}">
-                    <a class="item" th:id="'reportButton_' + ${draxoEvaluationModel.draxoPeerGradingId}">
+                    <a class="item" th:id="'reportDRAXOBtn_' + ${draxoEvaluationModel.draxoPeerGradingId}">
 
                         <i class="exclamation triangle icon"></i>
                         <span th:text="#{player.sequence.chatGptEvaluation.reportButton}"></span>
@@ -78,7 +78,7 @@
 
             const submitMessage = $('#submit-message[data-evaluation-id="' + evaluationId + '"]');
             const utilityGradeBtns = $('.utilityGrade[data-evaluation-id="' + evaluationId + '"]')
-            const reportButton = $('#reportButton_' + evaluationId)
+            const reportButton = $('#reportDRAXOBtn_' + evaluationId)
 
             submitMessage.hide()
 
@@ -86,7 +86,8 @@
                 console.log("report button clicked")
                 window.parent.postMessage({
                     command: 'show-report-modal',
-                    evaluationId: evaluationId
+                    evaluationId: evaluationId,
+                    evaluationType: 'DRAXO'
                 }, '*')
             })
 

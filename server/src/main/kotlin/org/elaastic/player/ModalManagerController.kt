@@ -59,7 +59,6 @@ class ModalManagerController(
 
         model["sequenceId"] = iaEvaluation.response.interaction.sequence.id!!
         model["reportContent"] = iaEvaluation.annotation!!
-        model["reportReasons"] = iaEvaluation.reportReasons!!
         model["evaluationId"] = iaEvaluation.id!!
         return "player/assignment/sequence/components/chat-gpt-evaluation/_chat-gpt-evaluation-report-modal.html :: reportModal"
     }

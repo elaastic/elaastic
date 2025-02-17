@@ -17,9 +17,9 @@
   -->
 
 <div xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/html"
-     th:fragment="reportModal(sequenceId, reportContent, reportReasons, evaluationId)"
+     th:fragment="reportModal(sequenceId, reportContent, evaluationId)"
      class="ui small modal"
-     th:id="|reportModal_${sequenceId}|">
+     th:id="|reportIAModal_${evaluationId}|">
 
     <div class="header"
          style="border-bottom: 1px solid rgba(14, 110, 184, .15);"
@@ -29,7 +29,7 @@
 
     <div class="content">
         <form th:id="${'report-form-' + evaluationId}"
-              th:action="@{/chatGptEvaluation/sequence/{sequenceId}/report-chat-gpt-evaluation(sequenceId=${chatGptEvaluationModel.sequenceId})}"
+              th:action="@{/chatGptEvaluation/sequence/{sequenceId}/report-chat-gpt-evaluation}"
               method="post">
             <div class="ui form">
                 <input type="hidden" name="evaluationId" th:value="${evaluationId}">
@@ -40,11 +40,15 @@
                 <div class="field">
                     <label th:text="#{player.sequence.chatGptEvaluation.reportModal.reportReason}"></label>
                     <div class="grouped fields">
-                        <div th:each="reportReason : ${reportReasons}"
+                        <div th:each="reportReason : ${T(org.elaastic.moderation.ReportReason).values()}"
                              class="field">
                             <div class="ui checkbox">
-                                <input type="checkbox" name="reason" th:value="${reportReason}">
-                                <label th:text="#{|player.sequence.chatGptEvaluation.reportReason.${reportReason.name()}|}"></label>
+                                <!--/* To distinguish between the different checkboxes, we add the ID of the evaluation to their current ID, so that each checkbox has a unique ID */-->
+                                <input type="checkbox" name="reason" th:value="${reportReason}"
+                                       th:id="${reportReason + '_' + evaluationId}"
+                                       th:attr="data-modal-id=${evaluationId}">
+                                <label th:text="#{|player.sequence.chatGptEvaluation.reportReason.${reportReason.name()}|}"
+                                       th:for="${reportReason + '_' + evaluationId}"></label>
                             </div>
                         </div>
                     </div>
