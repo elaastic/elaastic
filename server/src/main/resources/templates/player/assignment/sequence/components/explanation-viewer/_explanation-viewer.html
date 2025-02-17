@@ -56,7 +56,7 @@
                 th:text="#{player.sequence.explanation.all.button}">
             See all explanations
         </button>
-        <div th:replace="|${components}/_allExplanationsPopup|::allExplanationsPopup(${sequenceId}, ${explanationViewerModel}, ${isTeacher})"></div>
+        <div th:replace="|${components}/_all-explanations-modal|::allExplanationsPopup(${sequenceId}, ${explanationViewerModel}, ${isTeacher})"></div>
 
         <script th:inline="javascript">
         </script>
