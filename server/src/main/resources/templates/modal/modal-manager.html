@@ -50,7 +50,12 @@
                         console.log('All explanations modal');
                         let selector = '#all_explanations_for_' + event.data.sequenceId;
                         let urlToFetch = '/modal-manager/all-explanations/' + event.data.sequenceId;
-                        showOrFetchModal(selector, urlToFetch);
+                        showOrFetchModal(
+                                selector,
+                                urlToFetch,
+                                () => saveAction(event.data.sequenceId, 'open', 'rationales_popup'),
+                                () => saveAction(event.data.sequenceId, 'close', 'rationales_popup')
+                        );
                         break;
                     default:
                         console.log('Unknown command: ' + event.data.command);
@@ -71,18 +76,53 @@
                 }, 1000);
             }
 
-            function showOrFetchModal(modalSelector, urlToFetch) {
+            /**
+             * Show a modal.
+             *
+             * If the action provided is a function, it will be executed when the modal is shown or hidden.
+             * Any other type of action will be ignored.
+             *
+             * @param modalSelector The selector of the modal to show
+             * @param actionOnShow The action to execute when the modal is shown
+             * @param actionOnHide The action to execute when the modal is hidden
+             */
+            function showModal(modalSelector, actionOnShow = null, actionOnHide = null) {
+                $(modalSelector).modal({
+                    onShow: function () {
+                        // If an action is provided, we execute it
+                        if (actionOnShow && typeof actionOnShow === 'function') actionOnShow()
+                    },
+                    onHide: function () {
+                        // If an action is provided, we execute it
+                        if (actionOnHide && typeof actionOnHide === 'function') actionOnHide()
+                    }
+                }).modal('show');
+            }
+
+            /**
+             * Show a modal.
+             * If the modal doesn't exist yet, it will be fetched from the server.
+             *
+             * If the action provided is a function, it will be executed when the modal is shown or hidden.
+             * Any other type of action will be ignored.
+             *
+             * @param modalSelector The selector of the modal to show
+             * @param urlToFetch The URL to fetch the modal
+             * @param actionOnShow The action to execute when the modal is shown
+             * @param actionOnHide The action to execute when the modal is hidden
+             */
+            function showOrFetchModal(modalSelector, urlToFetch, actionOnShow = null, actionOnHide = null) {
                 let $modal = $(modalSelector);
                 if ($modal.length) {
                     // If the modal already exists, we show it
-                    $modal.modal('show');
+                    showModal(modalSelector, actionOnShow, actionOnHide);
                 } else {
                     loader.modal('show');
                     // If the modal doesn't exist, we fetch it
                     $.get(urlToFetch)
                             .done(function (data) {
                                 $("body").append(data);
-                                $(modalSelector).modal('show');
+                                showModal(modalSelector, actionOnShow, actionOnHide);
                                 hideLoaderWithDelay();
                             })
                             .fail(function () {
