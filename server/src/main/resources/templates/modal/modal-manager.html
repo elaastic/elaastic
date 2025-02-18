@@ -30,6 +30,7 @@
             const showReportModal = 'show-report-modal';
             const showConfigSequenceModal = 'show-config-sequence-modal';
             const showAllExplanationsModal = 'show-all-explanations-modal';
+            const recommendationModal = 'show-recommendation-modal';
 
             window.addEventListener('message', (event) => {
                 switch (event.data.command) {
@@ -59,6 +60,15 @@
                             '/modal-manager/all-explanations/' + event.data.sequenceId,
                             () => saveAction(event.data.sequenceId, 'open', 'rationales_popup'),
                             () => saveAction(event.data.sequenceId, 'close', 'rationales_popup')
+                        );
+                        break;
+                    case recommendationModal:
+                        console.log('Recommendation modal');
+                        showOrFetchModal(
+                                '#recommendation_explanation_for_' + event.data.sequenceId,
+                                '/modal-manager/recommendation/' + event.data.sequenceId,
+                                () => saveAction(event.data.sequenceId, 'open', 'explanation_popup'),
+                                () => saveAction(event.data.sequenceId, 'close', 'explanation_popup')
                         );
                         break;
                     default:

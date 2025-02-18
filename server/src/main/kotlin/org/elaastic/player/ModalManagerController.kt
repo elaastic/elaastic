@@ -1,6 +1,7 @@
 package org.elaastic.player
 
 import org.elaastic.ai.evaluation.chatgpt.ChatGptEvaluationService
+import org.elaastic.common.util.requireAccessThrowDenied
 import org.elaastic.player.command.CommandModelFactory
 import org.elaastic.player.sequence.SequenceModelFactory
 import org.elaastic.questions.assignment.sequence.peergrading.draxo.DraxoPeerGradingService
@@ -125,5 +126,25 @@ class ModalManagerController(
         model["explanationViewerModel"] = explanationViewerModel!!
         model["isTeacher"] = isTeacher
         return "player/assignment/sequence/components/explanation-viewer/_all-explanations-modal.html :: allExplanationsPopup"
+    }
+
+    @GetMapping("/recommendation/{sequenceId}")
+    fun recommendation(
+        authentication: Authentication,
+        model: Model,
+        @PathVariable sequenceId: Long
+    ): String {
+        val user = authentication.principal as User
+        val sequence = sequenceService.get(sequenceId)
+
+        requireAccessThrowDenied(sequence.owner == user) {
+            "You are not allowed to access this modal"
+        }
+
+        val resultModel = sequenceModelFactory.buildForTeacher(user, sequence).resultsModel
+
+        model["sequenceId"] = sequenceId
+        model["resultsModel"] = resultModel!!
+        return "/player/assignment/sequence/components/_recommendationExplanationPopup.html :: recommendationExplanationPopup"
     }
 }

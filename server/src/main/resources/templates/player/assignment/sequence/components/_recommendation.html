@@ -23,14 +23,9 @@
     <div class="ui bottom attached message" th:classappend="green">
         <span th:text="${recommendationModel.message}" th:remove="tag"></span>
         <span style="cursor: pointer;text-decoration: underline;"
-              th:onclick="|$('#recommendation_explanation_for_${sequenceId}').modal({
-                onHide: function(){
-                    saveAction(${sequenceId}, 'close', 'explanation_popup')
-                    },
-                onShow: function(){
-                    saveAction(${sequenceId}, 'open', 'explanation_popup')
-                    }
-                }).modal('show');|"
-              th:text="#{player.sequence.recommendation.know_more.button}">Know more...</span>
-        <div th:replace="|${components}/_recommendationExplanationPopup|::recommendationExplanationPopup(${sequenceId}, ${resultsModel})"></div>
+              th:text="#{player.sequence.recommendation.know_more.button}"
+              th:onclick="|window.parent.postMessage({command: 'show-recommendation-modal', sequenceId: ${sequenceId}}, '*')|">
+            Know more...
+        </span>
     </div>
+</div>
