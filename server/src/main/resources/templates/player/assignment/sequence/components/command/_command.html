@@ -135,7 +135,6 @@
             let sequenceId = [[${sequenceId}]];
 
             $("#start-sequence-" + sequenceId).on("click", function () {
-                console.log("Start sequence " + sequenceId);
                 window.parent.postMessage({
                     command: "show-config-sequence-modal",
                     sequenceId: sequenceId

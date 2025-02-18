@@ -83,7 +83,6 @@
             submitMessage.hide()
 
             reportButton.on("click", () => {
-                console.log("report button clicked")
                 window.parent.postMessage({
                     command: 'show-report-modal',
                     evaluationId: evaluationId,
