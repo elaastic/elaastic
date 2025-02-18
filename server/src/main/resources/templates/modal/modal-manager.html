@@ -26,26 +26,26 @@
     <script th:inline="javascript">
         $(function () {
             const loader = $('#loading_modal');
-            const detailsModal = 'show-details-modal';
-            const reportModal = 'show-report-modal';
-            const configSequenceModal = 'show-config-sequence-modal';
-            const allExplanationsModal = 'show-all-explanations-modal';
-            const recommendationModal = 'show-recommendation-modal';
+            const DETAILS_MODAL = 'show-details-modal';
+            const REPORT_MODAL = 'show-report-modal';
+            const CONFIG_SEQUENCE_MODAL = 'show-config-sequence-modal';
+            const ALL_EXPLANATIONS_MODAL = 'show-all-explanations-modal';
+            const RECOMMENDATION_MODAL = 'show-recommendation-modal';
 
             window.addEventListener('message', (event) => {
                 switch (event.data.command) {
-                    case detailsModal:
+                    case DETAILS_MODAL:
                         console.log('Details modal');
                         showOrFetchModal(
                                 "#myResultsModal_" + event.data.userId,
                                 '/player/' + event.data.sequenceId + '/result/' + event.data.userId + '/modal'
                         );
                         break;
-                    case reportModal:
+                    case REPORT_MODAL:
                         console.log('Report modal');
                         showReport(event.data.evaluationId, event.data.evaluationType);
                         break;
-                    case configSequenceModal:
+                    case CONFIG_SEQUENCE_MODAL:
                         console.log('Config sequence modal');
                         showOrFetchModal(
                                 "#sequenceSpec_" + event.data.sequenceId,
@@ -53,7 +53,7 @@
                                 () => saveAction(event.data.sequenceId, 'open', 'configure_popup')
                         );
                         break;
-                    case allExplanationsModal:
+                    case ALL_EXPLANATIONS_MODAL:
                         console.log('All explanations modal');
                         showOrFetchModal(
                                 '#all_explanations_for_' + event.data.sequenceId,
@@ -62,7 +62,7 @@
                                 () => saveAction(event.data.sequenceId, 'close', 'rationales_popup')
                         );
                         break;
-                    case recommendationModal:
+                    case RECOMMENDATION_MODAL:
                         console.log('Recommendation modal');
                         showOrFetchModal(
                                 '#recommendation_explanation_for_' + event.data.sequenceId,
