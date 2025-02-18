@@ -65,6 +65,9 @@ import org.elaastic.sequence.Sequence
 import org.elaastic.sequence.SequenceGenerator
 import org.elaastic.sequence.State
 import org.elaastic.sequence.config.ResponseSubmissionSpecification
+import org.elaastic.activity.response.ExclusiveChoiceResponseData
+import org.elaastic.activity.response.MultipleChoiceResponseData
+import org.elaastic.activity.response.OpenEndedResponseData
 import org.elaastic.sequence.phase.evaluation.all_at_once.AllAtOnceLearnerEvaluationPhase
 import org.elaastic.sequence.phase.evaluation.all_at_once.AllAtOnceLearnerEvaluationPhaseViewModel
 import org.elaastic.sequence.phase.evaluation.draxo.DraxoLearnerEvaluationPhase
@@ -2594,16 +2597,20 @@ class ComponentTestingController(
                 choices = true,
                 userHasCompletedPhase2 = false,
                 responsesToGrade = listOf(
-                    org.elaastic.sequence.phase.evaluation.ResponseData(
+                    ExclusiveChoiceResponseData(
                         id = 1,
-                        choiceList = listOf(1),
+                        choice = 1,
                         explanation = "1st explanation"
                     ),
-                    org.elaastic.sequence.phase.evaluation.ResponseData(
+                    MultipleChoiceResponseData(
                         id = 2,
-                        choiceList = listOf(2),
+                        choices = listOf(2, 3),
                         explanation = "2nd explanation"
-                    )
+                    ),
+                    OpenEndedResponseData(
+                        id = 4,
+                        explanation = "3rd explanation"
+                    ),
                 ),
                 secondAttemptAllowed = true,
                 secondAttemptAlreadySubmitted = false,
@@ -2647,9 +2654,9 @@ class ComponentTestingController(
                 choices = true,
                 userHasCompletedPhase2 = false,
                 nextResponseToGrade =
-                org.elaastic.sequence.phase.evaluation.ResponseData(
+                ExclusiveChoiceResponseData(
                     id = 1,
-                    choiceList = listOf(1),
+                    choice = 1,
                     explanation = "1st explanation"
                 ),
                 lastResponseToGrade = false,
@@ -3374,9 +3381,4 @@ class ComponentTestingController(
 
         return "test/get-test-user"
     }
-
-    @GetMapping("/ui-components")
-    fun testUiComponents() =
-        "uiComponents/test-ui-components"
-
 }

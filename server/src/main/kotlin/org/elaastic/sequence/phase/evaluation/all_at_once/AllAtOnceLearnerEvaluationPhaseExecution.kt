@@ -4,7 +4,7 @@ import org.elaastic.sequence.Sequence
 import org.elaastic.sequence.interaction.Interaction
 import org.elaastic.activity.response.Response
 import org.elaastic.sequence.phase.evaluation.AbstractLearnerEvaluationPhaseExecution
-import org.elaastic.sequence.phase.evaluation.ResponseData
+import org.elaastic.activity.response.ResponseData
 
 class AllAtOnceLearnerEvaluationPhaseExecution(
     userHasCompletedPhase2: Boolean,

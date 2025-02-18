@@ -5,7 +5,7 @@ import org.elaastic.activity.response.ResponseService
 import org.elaastic.sequence.phase.LearnerPhase
 import org.elaastic.sequence.phase.LearnerPhaseExecution
 import org.elaastic.sequence.phase.evaluation.AbstractLearnerEvaluationPhaseExecutionLoader
-import org.elaastic.sequence.phase.evaluation.ResponseData
+import org.elaastic.activity.response.ResponseDataFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 
@@ -37,7 +37,7 @@ class DraxoLearnerEvaluationPhaseExecutionLoader(
                     attempt = sequence.whichAttemptEvaluate(),
                     user = learner,
                     excludedIds = responseIdAlreadyGradedList,
-                )?.let { ResponseData(it) }
+                )?.let { ResponseDataFactory.build(it) }
             } else null
 
         return DraxoLearnerEvaluationPhaseExecution(

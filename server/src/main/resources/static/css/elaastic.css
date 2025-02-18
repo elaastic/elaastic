@@ -89,3 +89,9 @@ html.elaastic.three-columns, .elaastic.three-columns body {
 .detail a.detail-link:hover {
   color: yellow;
 }
+
+iframe.transparent-iframe {
+  border: none;
+  box-shadow: none;
+  overflow: hidden;
+}

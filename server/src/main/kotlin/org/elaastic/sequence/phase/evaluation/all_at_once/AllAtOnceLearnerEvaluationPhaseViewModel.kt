@@ -2,7 +2,7 @@ package org.elaastic.sequence.phase.evaluation.all_at_once
 
 import org.elaastic.sequence.State
 import org.elaastic.sequence.phase.evaluation.AbstractLearnerEvaluationPhaseViewModel
-import org.elaastic.sequence.phase.evaluation.ResponseData
+import org.elaastic.activity.response.ResponseData
 import org.elaastic.sequence.phase.response.LearnerResponseFormViewModel
 
 class AllAtOnceLearnerEvaluationPhaseViewModel(
