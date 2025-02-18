@@ -23,6 +23,9 @@ import org.elaastic.activity.evaluation.peergrading.draxo.DraxoGrading
 import org.elaastic.activity.evaluation.peergrading.draxo.criteria.Criteria
 import org.elaastic.activity.evaluation.peergrading.draxo.option.OptionId
 import org.elaastic.activity.response.ConfidenceDegree
+import org.elaastic.activity.response.ExclusiveChoiceResponseData
+import org.elaastic.activity.response.MultipleChoiceResponseData
+import org.elaastic.activity.response.OpenEndedResponseData
 import org.elaastic.activity.results.*
 import org.elaastic.ai.evaluation.chatgpt.ChatGptEvaluationStatus
 import org.elaastic.common.abtesting.ElaasticFeatures
@@ -64,9 +67,6 @@ import org.elaastic.sequence.Sequence
 import org.elaastic.sequence.SequenceGenerator
 import org.elaastic.sequence.State
 import org.elaastic.sequence.config.ResponseSubmissionSpecification
-import org.elaastic.activity.response.ExclusiveChoiceResponseData
-import org.elaastic.activity.response.MultipleChoiceResponseData
-import org.elaastic.activity.response.OpenEndedResponseData
 import org.elaastic.sequence.phase.evaluation.all_at_once.AllAtOnceLearnerEvaluationPhase
 import org.elaastic.sequence.phase.evaluation.all_at_once.AllAtOnceLearnerEvaluationPhaseViewModel
 import org.elaastic.sequence.phase.evaluation.draxo.DraxoLearnerEvaluationPhase
@@ -1633,8 +1633,7 @@ class ComponentTestingController(
                             message = messageBuilder.message("player.sequence.recommendation.skipPhase2.message"),
                             popupDetailedExplanation = PopupDetailedExplanation.NO_EXPLANATION_FOR_CORRECT_ANSWERS
                         )
-                    ),
-                    sequenceId = 1
+                    )
                 ),
                 RecommendationSituation(
                     description = "2. End sequence because p1 > 70%",
@@ -1656,8 +1655,7 @@ class ComponentTestingController(
                             explanationP1 = ExplanationP1.VERY_HIGH,
                             popupDetailedExplanation = PopupDetailedExplanation.WEAK_BENEFITS
                         )
-                    ),
-                    sequenceId = 2
+                    )
                 ),
                 RecommendationSituation(
                     description = "3. Skip phase 2 because p1 < 30% and pconf < 0",
@@ -1695,8 +1693,7 @@ class ComponentTestingController(
                             explanationPConf = ExplanationPConf.PCONF_NEG,
                             popupDetailedExplanation = PopupDetailedExplanation.NON_SIGNIFICANT_BENEFITS
                         )
-                    ),
-                    sequenceId = 3
+                    )
                 ),
                 RecommendationSituation(
                     description = "4. Provide hint because p1 < 30% and pconf > 0",
@@ -1734,8 +1731,7 @@ class ComponentTestingController(
                             explanationPConf = ExplanationPConf.PCONF_POS,
                             popupDetailedExplanation = PopupDetailedExplanation.WEAK_BENEFITS
                         )
-                    ),
-                    sequenceId = 4
+                    )
                 ),
                 RecommendationSituation(
                     description = "5. Provide hint because p1 < 30% and pconf = 0",
@@ -1773,8 +1769,7 @@ class ComponentTestingController(
                             explanationPConf = ExplanationPConf.PCONF_ZERO,
                             popupDetailedExplanation = PopupDetailedExplanation.WEAK_BENEFITS
                         )
-                    ),
-                    sequenceId = 5
+                    )
                 ),
                 RecommendationSituation(
                     description = "6. Provide hint because p1 < 30% and pconf is null",
@@ -1796,8 +1791,7 @@ class ComponentTestingController(
                             explanationP1 = ExplanationP1.TOO_LOW,
                             popupDetailedExplanation = PopupDetailedExplanation.WEAK_BENEFITS
                         )
-                    ),
-                    sequenceId = 6
+                    )
                 ),
                 RecommendationSituation(
                     description = "7. Phase 2 was skipped: no explanations for correct answers",
@@ -1819,8 +1813,7 @@ class ComponentTestingController(
                             message = messageBuilder.message("player.sequence.recommendation.focus_on_incorrect_detailed"),
                             popupDetailedExplanation = PopupDetailedExplanation.POPULAR_ANSWERS_INCORRECT
                         )
-                    ),
-                    sequenceId = 7
+                    )
                 ),
                 RecommendationSituation(
                     description = "8. Phase 2 was skipped: discussion must be brief and focus on incorrect answers because p1 > 70% and pConf < 0",
@@ -1858,8 +1851,7 @@ class ComponentTestingController(
                             explanationPConf = ExplanationPConf.PCONF_NEG_SKIP,
                             popupDetailedExplanation = PopupDetailedExplanation.POPULAR_ANSWERS_INCORRECT
                         )
-                    ),
-                    sequenceId = 8
+                    )
                 ),
                 RecommendationSituation(
                     description = "9. Phase 2 was skipped: discussion must focus on incorrect answers because p1 > 70% and pConf > 0",
@@ -1897,8 +1889,7 @@ class ComponentTestingController(
                             explanationPConf = ExplanationPConf.PCONF_POS_SKIP,
                             popupDetailedExplanation = PopupDetailedExplanation.POPULAR_ANSWERS_CORRECT
                         )
-                    ),
-                    sequenceId = 9
+                    )
                 ),
                 RecommendationSituation(
                     description = "10. Phase 2 was skipped: discussion must be detailed and focus on incorrect answers because p1 > 70% and pConf = 0",
@@ -1936,8 +1927,7 @@ class ComponentTestingController(
                             explanationPConf = ExplanationPConf.PCONF_ZERO_SKIP,
                             popupDetailedExplanation = PopupDetailedExplanation.POPULAR_ANSWERS_CORRECT
                         )
-                    ),
-                    sequenceId = 10
+                    )
                 ),
                 RecommendationSituation(
                     description = "11. Phase 2 was skipped: discussion must focus on correct answers because p1 > 70% and pConf is null",
@@ -1959,8 +1949,7 @@ class ComponentTestingController(
                             explanationP1 = ExplanationP1.VERY_HIGH_SKIP,
                             popupDetailedExplanation = PopupDetailedExplanation.POPULAR_ANSWERS_CORRECT
                         )
-                    ),
-                    sequenceId = 11
+                    )
                 ),
                 RecommendationSituation(
                     description = "12. Phase 2 was skipped: discussion must be detailed and focus on correct answers because p1 < 30% and pConf < 0",
@@ -1998,8 +1987,7 @@ class ComponentTestingController(
                             explanationPConf = ExplanationPConf.PCONF_NEG_SKIP,
                             popupDetailedExplanation = PopupDetailedExplanation.POPULAR_ANSWERS_INCORRECT
                         )
-                    ),
-                    sequenceId = 12
+                    )
                 ),
                 RecommendationSituation(
                     description = "13. Phase 2 was skipped: discussion must be detailed and focus on incorrect answers because p1 < 30% and pConf > 0",
@@ -2037,8 +2025,7 @@ class ComponentTestingController(
                             explanationPConf = ExplanationPConf.PCONF_POS_SKIP,
                             popupDetailedExplanation = PopupDetailedExplanation.POPULAR_ANSWERS_CORRECT
                         )
-                    ),
-                    sequenceId = 13
+                    )
                 ),
                 RecommendationSituation(
                     description = "14. Phase 2 was skipped: discussion must be detailed and focus on incorrect answers because p1 < 30% and pConf = 0",
@@ -2076,8 +2063,7 @@ class ComponentTestingController(
                             explanationPConf = ExplanationPConf.PCONF_ZERO_SKIP,
                             popupDetailedExplanation = PopupDetailedExplanation.POPULAR_ANSWERS_CORRECT
                         )
-                    ),
-                    sequenceId = 14
+                    )
                 ),
                 RecommendationSituation(
                     description = "15. Phase 2 was skipped: discussion must be detailed and focus on incorrect answers because p1 < 30% and pConf is null",
@@ -2099,8 +2085,7 @@ class ComponentTestingController(
                             explanationP1 = ExplanationP1.TOO_LOW_SKIP,
                             popupDetailedExplanation = PopupDetailedExplanation.POPULAR_ANSWERS_INCORRECT
                         )
-                    ),
-                    sequenceId = 15
+                    )
                 ),
                 RecommendationSituation(
                     description = "16. Phase 2 was played: discussion must be detailed and focus on correct answers because pPeer > 0 and d < 0",
@@ -2139,8 +2124,7 @@ class ComponentTestingController(
                             explanationPPeer = ExplanationPPeer.PPEER_POS,
                             popupDetailedExplanation = PopupDetailedExplanation.POPULAR_ANSWERS_CORRECT
                         )
-                    ),
-                    sequenceId = 16
+                    )
                 ),
                 RecommendationSituation(
                     description = "17. Phase 2 was played: discussion must focus on incorrect answers because pPeer < 0 and d = 0",
@@ -2179,8 +2163,7 @@ class ComponentTestingController(
                             explanationPPeer = ExplanationPPeer.PPEER_NEG,
                             popupDetailedExplanation = PopupDetailedExplanation.POPULAR_ANSWERS_INCORRECT
                         )
-                    ),
-                    sequenceId = 17
+                    )
                 ),
                 RecommendationSituation(
                     description = "18. Phase 2 was played: discussion must be detailed and focus on correct answers because pPeer = 0 and d < 0",
@@ -2219,8 +2202,7 @@ class ComponentTestingController(
                             explanationPPeer = ExplanationPPeer.PPEER_ZERO,
                             popupDetailedExplanation = PopupDetailedExplanation.POPULAR_ANSWERS_CORRECT
                         )
-                    ),
-                    sequenceId = 18
+                    )
                 ),
                 RecommendationSituation(
                     description = "19. Phase 2 was played: discussion must focus on correct answers because pPeer > 0 and d > 0",
@@ -2259,8 +2241,7 @@ class ComponentTestingController(
                             explanationPPeer = ExplanationPPeer.PPEER_POS,
                             popupDetailedExplanation = PopupDetailedExplanation.POPULAR_ANSWERS_CORRECT
                         )
-                    ),
-                    sequenceId = 19
+                    )
                 ),
                 RecommendationSituation(
                     description = "20. Phase 2 was played: discussion must focus on correct answers because pPeer = 0 and d > 0",
@@ -2299,8 +2280,7 @@ class ComponentTestingController(
                             explanationPPeer = ExplanationPPeer.PPEER_ZERO,
                             popupDetailedExplanation = PopupDetailedExplanation.POPULAR_ANSWERS_CORRECT
                         )
-                    ),
-                    sequenceId = 20
+                    )
                 ),
                 RecommendationSituation(
                     description = "21. Phase 2 was played: discussion must be focus on correct answers because pPeer > 0 and d = 0",
@@ -2339,8 +2319,7 @@ class ComponentTestingController(
                             explanationPPeer = ExplanationPPeer.PPEER_POS,
                             popupDetailedExplanation = PopupDetailedExplanation.POPULAR_ANSWERS_CORRECT
                         )
-                    ),
-                    sequenceId = 21
+                    )
                 ),
                 RecommendationSituation(
                     description = "22. Phase 2 was played: discussion focus on correct answers because pPeer = 0 and d = 0",
@@ -2379,8 +2358,7 @@ class ComponentTestingController(
                             explanationPPeer = ExplanationPPeer.PPEER_ZERO,
                             popupDetailedExplanation = PopupDetailedExplanation.POPULAR_ANSWERS_CORRECT
                         )
-                    ),
-                    sequenceId = 22
+                    )
                 ),
                 RecommendationSituation(
                     description = "23. Phase 2 was played: discussion must be detailed and focus on incorrect answers because pPeer < 0 and d < 0",
@@ -2419,8 +2397,7 @@ class ComponentTestingController(
                             explanationPPeer = ExplanationPPeer.PPEER_NEG,
                             popupDetailedExplanation = PopupDetailedExplanation.POPULAR_ANSWERS_INCORRECT
                         )
-                    ),
-                    sequenceId = 23
+                    )
                 ),
                 RecommendationSituation(
                     description = "24. Phase 2 was played: discussion must focus on incorrect answers because pPeer < 0 and d > 0",
@@ -2459,10 +2436,11 @@ class ComponentTestingController(
                             explanationPPeer = ExplanationPPeer.PPEER_NEG,
                             popupDetailedExplanation = PopupDetailedExplanation.POPULAR_ANSWERS_INCORRECT
                         )
-                    ),
-                    sequenceId = 24
+                    )
                 )
-            )
+            ).mapIndexed { index, recommendationSituation ->
+                recommendationSituation.sequenceId = (index + 1L); recommendationSituation
+            }
         )
 
         return "/player/assignment/sequence/components/test-recommendation"
@@ -2471,7 +2449,7 @@ class ComponentTestingController(
     data class RecommendationSituation(
         val description: String,
         val resultsModel: ResultsModel?,
-        val sequenceId: Long
+        var sequenceId: Long = 0
     )
 
     @GetMapping("/sequence-info")
@@ -2650,11 +2628,11 @@ class ComponentTestingController(
                 choices = true,
                 userHasCompletedPhase2 = false,
                 nextResponseToGrade =
-                ExclusiveChoiceResponseData(
-                    id = 1,
-                    choice = 1,
-                    explanation = "1st explanation"
-                ),
+                    ExclusiveChoiceResponseData(
+                        id = 1,
+                        choice = 1,
+                        explanation = "1st explanation"
+                    ),
                 lastResponseToGrade = false,
                 secondAttemptAllowed = true,
                 secondAttemptAlreadySubmitted = false,
@@ -2820,12 +2798,13 @@ class ComponentTestingController(
                             DraxoGrading.computeGrade(draxoEvaluation),
                             draxoEvaluation,
                             canReactOnPeerGrading = true,
-                            canHidePeerGrading = true
+                            canHidePeerGrading = true,
+                            draxoPeerGradingId = (i + 100000L),
                         )
                     ),
                     null,
-                    false,
-                    true
+                    hideName = false,
+                    canSeeChatGPTEvaluation = true
                 )
             }
         )

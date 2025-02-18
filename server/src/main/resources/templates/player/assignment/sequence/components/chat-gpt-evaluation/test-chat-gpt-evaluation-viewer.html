@@ -34,8 +34,34 @@
             <h3 th:text="${situation.description}"></h3>
 
             <div th:replace="player/assignment/sequence/components/chat-gpt-evaluation/_chat-gpt-evaluation-viewer.html :: chatGptEvaluation(${situation.model})"></div>
+
+            <div th:replace="player/assignment/sequence/components/chat-gpt-evaluation/_chat-gpt-evaluation-report-modal.html ::
+                                reportModal(${situation.model.sequenceId}, ${situation.model.annotation}, ${situation.model.evaluationId})">
+            </div>
         </th:block>
 
     </section>
+
+        <!--/*
+    As we use fake data for this page, we can't rely on the existing modal manager,
+    because it will search in the database for the data.
+    So we need to create a new modal manager for this page.
+    */-->
+    <script type="text/javascript">
+        $(function () {
+            const reportModal = 'show-report-modal';
+
+            window.addEventListener('message', (event) => {
+                if (event.data.command === reportModal) {
+                    console.log('Details modal');
+                    console.log(event.data);
+                    $('#reportIAModal_' + event.data.evaluationId).modal('show');
+                } else {
+                    console.log('Unknown command: ' + event.data.command);
+                    console.log(event.data);
+                }
+            })
+        });
+    </script>
     </body>
 </html>

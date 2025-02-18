@@ -21,35 +21,60 @@
       th:replace="layout/leftMenu :: leftMenuLayout(title=~{::title}, pageSpecificMenu=~{}, content=~{::body}, extraHeader=~{::head/script})"
       xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/html">
 
-<head>
-  <meta charset="UTF-8">
-  <title>Test recommendations</title>
-<!--  <script type="text/javascript" th:src="@{/js/vega-min.js}"></script>-->
-  <script type="text/javascript" th:src="@{/js/vega.js}"></script>
-  <script type="text/javascript" th:src="@{/js/vega-lite.js}"></script>
-  <script type="text/javascript" th:src="@{/js/vega-embed.js}"></script>
-  <script type="text/javascript" th:src="@{/js/underscore-min.js}"></script>
-  <script type="text/javascript" th:src="@{/js/graph/result-graph.js}"></script>
-  <script type="text/javascript" th:src="@{/js/vega-min.js}"></script>
-  <script type="text/javascript" th:src="@{/js/underscore-min.js}"></script>
-  <script th:inline="javascript">
-    saveAction = function(sequenceId, action, object){
-      if(sequenceId != null){
-        fetch([[${@environment.getProperty('elaastic.questions.url')}]] + 'action/' + sequenceId + '/saveAction/' + action + '/' + object)
-      }
-    }
-  </script>
-</head>
-<body>
-<section>
-  <h2>Results</h2>
+    <head>
+        <meta charset="UTF-8">
+        <title>Test recommendations</title>
+        <!--  <script type="text/javascript" th:src="@{/js/vega-min.js}"></script>-->
+        <script type="text/javascript" th:src="@{/js/vega.js}"></script>
+        <script type="text/javascript" th:src="@{/js/vega-lite.js}"></script>
+        <script type="text/javascript" th:src="@{/js/vega-embed.js}"></script>
+        <script type="text/javascript" th:src="@{/js/underscore-min.js}"></script>
+        <script type="text/javascript" th:src="@{/js/graph/result-graph.js}"></script>
+        <script type="text/javascript" th:src="@{/js/vega-min.js}"></script>
+        <script type="text/javascript" th:src="@{/js/underscore-min.js}"></script>
+        <script th:inline="javascript">
+            saveAction = function (sequenceId, action, object) {
+                if (sequenceId != null) {
+                    fetch([[${@environment.getProperty('elaastic.questions.url')}]] + 'action/' + sequenceId + '/saveAction/' + action + '/' + object)
+                }
+            }
+        </script>
+    </head>
+    <body>
+    <section>
+        <h2>Results</h2>
 
-  <th:block th:each="situation : ${recommendationSituations}">
-    <h3 th:text="${situation.description}"></h3>
+        <th:block th:each="situation : ${recommendationSituations}">
+            <h3 th:text="${situation.description}"></h3>
 
-    <div
-      th:replace="player/assignment/sequence/components/_recommendation.html :: recommendation(${situation.resultsModel},${situation.sequenceId})"></div>
-  </th:block>
-</section>
-</body>
+            <div
+                    th:replace="player/assignment/sequence/components/_recommendation.html :: recommendation(${situation.resultsModel},${situation.sequenceId})"></div>
+
+            <div th:replace="/player/assignment/sequence/components/_recommendationExplanationPopup.html :: recommendationExplanationPopup(${situation.sequenceId},${situation.resultsModel})">
+            </div>
+        </th:block>
+    </section>
+    <!--/*
+    As we use fake data for this page, we can't rely on the existing modal manager,
+    because it will search in the database for the data.
+    So we need to create a new modal manager for this page.
+    */-->
+    <script type="text/javascript">
+        $(function () {
+            const recommendationModal = 'show-recommendation-modal';
+
+            window.addEventListener('message', (event) => {
+                if (event.data.command === recommendationModal) {
+                    console.log('Details modal');
+                    console.log(event.data);
+                    console.log('Recommendation modal');
+                    $('#recommendation_explanation_for_' + event.data.sequenceId).modal('show');
+                } else {
+                    console.log('Unknown command: ' + event.data.command);
+                    console.log(event.data);
+                }
+            })
+        });
+    </script>
+    </body>
 </html>
