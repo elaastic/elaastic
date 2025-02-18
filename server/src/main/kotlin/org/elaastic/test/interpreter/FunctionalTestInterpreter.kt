@@ -1,10 +1,13 @@
 package org.elaastic.test.interpreter
 
-import org.elaastic.sequence.ExecutionContext
 import org.elaastic.activity.response.ConfidenceDegree
+import org.elaastic.sequence.ExecutionContext
 import org.elaastic.test.interpreter.command.*
+import org.slf4j.LoggerFactory
 
 class FunctionalTestInterpreter : Interpreter() {
+
+    private val log = LoggerFactory.getLogger(javaClass)
 
     override fun parseCommand(command: String, args: List<String>) =
         when (command) {
@@ -16,7 +19,10 @@ class FunctionalTestInterpreter : Interpreter() {
             }
 
             CommandDescriptor.SUBMIT_RESPONSE.command -> {
-                require(args.size == 4 || args.size == 5) { CommandDescriptor.SUBMIT_RESPONSE.displayUsage() }
+                require(args.size == 4 || args.size == 5) {
+                    log.error("$args size is not valid (4 or 5) actual size is ${args.size}")
+                    CommandDescriptor.SUBMIT_RESPONSE.displayUsage()
+                }
                 SubmitResponse(
                     phase = when (args[0]) {
                         "1" -> Phase.PHASE_1
