@@ -9,6 +9,12 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import org.togglz.core.manager.FeatureManager
 
+/**
+ * Service to build the model for the teacher result dashboard.
+ *
+ * Do not mix with the [DashboardModelFactory][org.elaastic.player.dashboard.DashboardModelFactory]
+ * which display information about the progression of learner in a sequence.
+ */
 @Service
 class TeacherResultDashboardService(
     @Autowired val responseService: ResponseService,

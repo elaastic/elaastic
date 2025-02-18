@@ -26,6 +26,22 @@ import java.math.BigDecimal
 
 object RecommendationResolver {
 
+    /**
+     * The limit of response in the first phase to build the recommendation.
+     */
+    private const val LIMIT_TO_BUILD = 10
+
+    /**
+     * Resolve the recommendation for the given sequence.
+     *
+     * If the number of responses for the first phase is less than [LIMIT_TO_BUILD], the recommendation is null.
+     *
+     * @param responseSet the response set
+     * @param peerGradings the peer gradings
+     * @param sequence the sequence
+     * @param messageBuilder the message builder
+     * @return the recommendation model
+     */
     fun resolve(
         responseSet: ResponseSet,
         peerGradings: List<PeerGrading>?,
@@ -34,7 +50,7 @@ object RecommendationResolver {
     ): RecommendationModel? {
         var result: RecommendationModel? = null
         val firstResponses = responseSet[1].filter { response -> !response.fake }
-        if (firstResponses.size >= 10) {
+        if (firstResponses.size >= LIMIT_TO_BUILD) {
             if (sequence.recommendableAfterPhase1()) {
                 val p1 = IndicatorCalculator.computeP(firstResponses)
                 val noCorrectExplanations =
