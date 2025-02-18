@@ -94,6 +94,7 @@
             const evaluationId = [[${chatGptEvaluationModel.evaluationId}]];
 
             $('#reportIABtn_' + evaluationId).on("click", () => {
+                // See modal-manager.html for the display logic of the modal
                 window.parent.postMessage({
                     command: 'show-report-modal',
                     evaluationId: evaluationId,

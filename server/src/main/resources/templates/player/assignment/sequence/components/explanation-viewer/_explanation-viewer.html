@@ -54,7 +54,7 @@
                 let sequenceId = /*[[${sequenceId}]]*/ '';
 
                 $('#btn_all_explanations_for_' + sequenceId).on("click", function () {
-                    // TODO save action in the database
+                    // See modal-manager.html for the display logic of the modal
                     window.parent.postMessage({
                         command: 'show-all-explanations-modal',
                         sequenceId: sequenceId
