@@ -31,7 +31,8 @@
         <h2>Show a DRAXO evaluation</h2>
 
         <!-- Link to the css file for the custom DRAXO grid -->
-        <link rel="stylesheet" type="text/css" th:href="@{'/css/draxo-show.css'}"/>
+        <link rel="stylesheet" type="text/css" th:href="@{'/css/evaluation.css'}"/>
+        <link rel="stylesheet" th:href="@{'/css/draxo/draxo-grid.css'}">
         <div th:replace="player/assignment/sequence/phase/evaluation/method/draxo/_draxo-show::draxoShow(${model},${false})"></div>
 
     </section>

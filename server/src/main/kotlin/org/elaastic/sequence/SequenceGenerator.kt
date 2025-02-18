@@ -74,7 +74,7 @@ object SequenceGenerator {
                         owner = user,
                         rank = 0,
                         state = setup.sequenceState,
-                        statement = Statement.createDefaultStatement(user),
+                        statement = Statement.createDefaultStatement(user).also { it.id = (++idSequence) },
                         assignment = null,
                         executionContext = setup.executionContext,
                         resultsArePublished = setup.resultsArePublished
