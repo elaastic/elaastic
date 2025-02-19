@@ -9,7 +9,7 @@ package org.elaastic.activity.evaluation.peergrading.draxo.option
  * @property DONT_KNOW
  * @property NO_OPINION
  *
- * @see org.elaastic.questions.assignment.sequence.peergrading.draxo.DraxoPeerGrading
+ * @see org.elaastic.activity.evaluation.peergrading.draxo.DraxoPeerGrading
  */
 enum class OptionId(val codeI18n: String) {
     YES("common.yes"),
