@@ -1,6 +1,7 @@
 <script setup lang="ts">
 
 import {useI18n} from "vue-i18n";
+import {OptionType} from "@/components/evaluation/draxo/OptionType";
 
 const {t} = useI18n()
 
@@ -18,13 +19,23 @@ class Option {
     return t(`option.${this.i18nCode}`)
   }
 
-  public get(type: string): Option {
-    Option.values().forEach(option => {
-      if (option.i18nCode === type) {
-        return option;
+  public static get(type: OptionType | null): Option | null {
+    if (type != null) {
+      switch (type) {
+        case OptionType.YES:
+          return Option.YES;
+        case OptionType.NO:
+          return Option.NO;
+        case OptionType.PARTIALLY:
+          return Option.PARTIALLY;
+        case OptionType.DONT_KNOW:
+          return Option.DONT_KNOW;
+        case OptionType.NO_OPINION:
+          return Option.NO_OPINION;
       }
-    });
-    return Option.NO_OPINION;
+    }
+
+    return null;
   }
 
   public getCssClass(): string {
@@ -81,14 +92,44 @@ class Criteria {
   }
 }
 
+interface DraxoGridProps {
+  /**
+   * The value of the criteria D
+   */
+  criteriaD: OptionType | null,
+  /**
+   * The value of the criteria R
+   */
+  criteriaR: OptionType | null,
+  /**
+   * The value of the criteria A
+   */
+  criteriaA: OptionType | null,
+  /**
+   * The value of the criteria X
+   */
+  criteriaX: OptionType | null,
+  /**
+   * The value of the criteria O
+   */
+  criteriaO: OptionType | null
+}
+
+const props = defineProps<DraxoGridProps>()
+
 
 // map from criteria to a random Option
 const criteriaOptions = new Map<Criteria, Option | null>()
-criteriaOptions.set(Criteria.D, Option.YES)
-criteriaOptions.set(Criteria.R, Option.YES)
-criteriaOptions.set(Criteria.A, Option.NO)
-criteriaOptions.set(Criteria.X, Option.DONT_KNOW)
-criteriaOptions.set(Criteria.O, null)
+criteriaOptions.set(Criteria.D, Option.get(props.criteriaD))
+criteriaOptions.set(Criteria.R, Option.get(props.criteriaR))
+criteriaOptions.set(Criteria.A, Option.get(props.criteriaA))
+criteriaOptions.set(Criteria.X, Option.get(props.criteriaX))
+criteriaOptions.set(Criteria.O, Option.get(props.criteriaO))
+// criteriaOptions.set(Criteria.D, Option.YES)
+// criteriaOptions.set(Criteria.R, Option.YES)
+// criteriaOptions.set(Criteria.A, Option.NO)
+// criteriaOptions.set(Criteria.X, Option.DONT_KNOW)
+// criteriaOptions.set(Criteria.O, null)
 
 
 </script>
@@ -117,12 +158,6 @@ criteriaOptions.set(Criteria.O, null)
 </template>
 
 <style scoped>
-:root {
-  --border-color: #7A7A7A;
-  --default-color: #757575;
-  --default-bg-color: #F2F2F2;
-}
-
 .DRAXO-grid {
   display: flex;
   flex-direction: row;
@@ -229,6 +264,7 @@ criteriaOptions.set(Criteria.O, null)
   }
 
   /* If their is an icon next to the text (span), add a little margin */
+
   .custom-step-content span:has(~ .v-icon) {
     margin-right: 1.1em;
   }
@@ -238,10 +274,10 @@ criteriaOptions.set(Criteria.O, null)
   display: none;
 
   .custom-step {
-    border-left: 1px solid #7A7A7A !important;
-    border-right: 1px solid #7A7A7A !important;
-    border-bottom: 1px solid #7A7A7A !important;
-    border-top: 1px solid #7A7A7A !important;
+    border-left: 1px solid #7A7A7A;
+    border-right: 1px solid #7A7A7A;
+    border-bottom: 1px solid #7A7A7A;
+    border-top: 1px solid #7A7A7A;
   }
 }
 
