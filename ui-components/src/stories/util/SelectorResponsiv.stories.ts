@@ -1,7 +1,7 @@
 import type {Meta, StoryObj} from '@storybook/vue3';
-import type {Selection} from "@/components/util/SelectorResponsiv.vue";
+import type {Selection} from "@/components/util/SelectorResponsive.vue";
 
-import SelectorResponsiv from "@/components/util/SelectorResponsiv.vue";
+import SelectorResponsive from "@/components/util/SelectorResponsive.vue";
 import {expect, fn, userEvent, waitFor, within} from "@storybook/test";
 
 // Define the interface for args
@@ -12,8 +12,8 @@ interface Args {
 
 // More on how to set up stories at: https://storybook.js.org/docs/writing-stories
 const meta: any = {
-  title: 'Util/SelectorResponsiv',
-  component: SelectorResponsiv,
+  title: 'Util/SelectorResponsive',
+  component: SelectorResponsive,
   args: {
     onChangeSelection: fn(),
   },
@@ -25,7 +25,7 @@ const meta: any = {
       }
     }
   }
-} satisfies Meta<typeof SelectorResponsiv>;
+} satisfies Meta<typeof SelectorResponsive>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;

@@ -2,7 +2,7 @@
 
 import {computed, ref} from 'vue'
 import {useI18n} from "vue-i18n";
-import SelectorResponsiv, {type Selection} from "@/components/util/SelectorResponsiv.vue";
+import SelectorResponsive, {type Selection} from "@/components/util/SelectorResponsive.vue";
 
 const {t} = useI18n()
 
@@ -74,7 +74,7 @@ const submitUtilityGrade = () => {
       <div v-if=" props.isChatGPT && !props.isTeacher" readonly>{{ t('chatGPT-review-student-label') }}</div>
       <div v-if=" props.isChatGPT &&  props.isTeacher" readonly>{{ t('chatGPT-review-teacher-label') }}</div>
 
-      <SelectorResponsiv :selections="possibleGrade" :selected="props.selectedGrade"
+      <SelectorResponsive :selections="possibleGrade" :selected="props.selectedGrade"
                          @changeSelection="setSelectedUtilityGrade"/>
     </v-col>
   </v-row>
