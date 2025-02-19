@@ -51,7 +51,7 @@
                             onSubmitReport(reportReason, reportDetail) {
                                 window.parent.postMessage({
                                     command: 'report-submitted_' + evaluationId,
-                                    reportReason: JSON.parse(JSON.stringify(reportReason)),
+                                    reportReason: JSON.parse(JSON.stringify(reportReason)), // Deep copy of the object
                                     reportDetail
                                 })
                             }
