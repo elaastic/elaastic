@@ -27,7 +27,7 @@
     <iframe id="evaluation-reaction-app-dialog" class="transparent-iframe" th:src="@{/ui/moderation/evaluation-reaction}"
             width="100%"></iframe>
 
-    <!--/* Initialise the <confronting-viewpoint app & interact with it */-->
+    <!--/* Initialize the <confronting-viewpoint app & interact with it */-->
     <script th:inline="javascript">
         const iframe = document.getElementById('evaluation-reaction-app');
         const iframeTeacher = document.getElementById('evaluation-reaction-app-teacher');
@@ -41,7 +41,7 @@
             iframeTeacher.contentWindow.elaastic.initializeEvaluationReaction(true, true, null, "", false, 1)
         }
         iframeDialog.onload = () => {
-            iframeDialog.contentWindow.elaastic.initializeEvaluationReaction(false, false, null, "This is a contnent to report", true, 1)
+            iframeDialog.contentWindow.elaastic.initializeEvaluationReaction(false, false, null, "This is a content to report", true, 1)
         }
         window.addEventListener('message', (event) => {
             if (event.data.command === 'grade-submitted_1') {
