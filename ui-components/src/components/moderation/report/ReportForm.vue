@@ -14,11 +14,9 @@ class ReportReason {
   private constructor(public readonly key: string) {}
 
   shortLabel(): string {
-    const { t } = useI18n();
     return t(`reportReason.${this.key}.short`);
   }
   longLabel(): string {
-    const { t } = useI18n();
     return t(`reportReason.${this.key}.long`);
   }
 
@@ -58,7 +56,9 @@ const canSubmit = () => {
 }
 
 const submitReport = () => {
-  emit('submitReport', selectedReportReason.value, reportDetail.value ?? '')
+  if (canSubmit()) {
+    emit('submitReport', selectedReportReason.value, reportDetail.value ?? '')
+  }
 }
 const cancel = () => {
   // Reset the form
