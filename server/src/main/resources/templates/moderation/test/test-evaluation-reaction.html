@@ -1,0 +1,65 @@
+<!--
+  ~ Elaastic - formative assessment system
+  ~ Copyright (C) 2019. University Toulouse 1 Capitole, University Toulouse 3 Paul Sabatier
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Affero General Public License as
+  ~ published by the Free Software Foundation, either version 3 of the
+  ~ License, or (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU Affero General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Affero General Public License
+  ~ along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  -->
+<div th:fragment="utilityGradeVue"
+     th:remove="tag"
+     xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/html">
+
+    <!--/* iframe allowing to load the <utility-grade> app in a isolated context */-->
+    <iframe id="evaluation-reaction-app" class="transparent-iframe" th:src="@{/ui/moderation/evaluation-reaction}"
+            width="100%"></iframe>
+    <iframe id="evaluation-reaction-app-teacher" class="transparent-iframe" th:src="@{/ui/moderation/evaluation-reaction}"
+            width="100%"></iframe>
+    <iframe id="evaluation-reaction-app-dialog" class="transparent-iframe" th:src="@{/ui/moderation/evaluation-reaction}"
+            width="100%"></iframe>
+
+    <!--/* Initialize the <confronting-viewpoint app & interact with it */-->
+    <script th:inline="javascript">
+        const iframe = document.getElementById('evaluation-reaction-app');
+        const iframeTeacher = document.getElementById('evaluation-reaction-app-teacher');
+        const iframeDialog = document.getElementById('evaluation-reaction-app-dialog');
+
+        /*[- Trigger the app init function on iframe loading -]*/
+        iframe.onload = () => {
+            iframe.contentWindow.elaastic.initializeEvaluationReaction(false, false, null, "Content to report",false, 1)
+        }
+        iframeTeacher.onload = () => {
+            iframeTeacher.contentWindow.elaastic.initializeEvaluationReaction(true, true, null, "", false, 1)
+        }
+        iframeDialog.onload = () => {
+            iframeDialog.contentWindow.elaastic.initializeEvaluationReaction(false, false, null, "This is a content to report", true, 1)
+        }
+        window.addEventListener('message', (event) => {
+            if (event.data.command === 'grade-submitted_1') {
+                const gradeSubmitted = event.data.grade;
+                console.log(gradeSubmitted)
+            } else if (event.data.command === 'report-submitted_1') {
+                const reportReason = event.data.reportReason;
+                const reportDetail = event.data.reportDetail;
+                console.log(reportReason)
+                console.log(reportDetail)
+            }
+        })
+
+        const optionIframeResiser = {
+            license: 'GPLv3',
+            waitForLoad: true
+        };
+        /*[- Init iframe resize. AS we didn't specify one iframe, it will select all -]*/
+        iframeResize(optionIframeResiser)
+    </script>
+</div>

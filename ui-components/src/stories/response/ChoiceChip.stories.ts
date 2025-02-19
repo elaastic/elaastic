@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/vue3'
 
-import ChoiceChip from '@/stories/response/ChoiceChip.vue'
+import ChoiceChip from '@/components/response/ChoiceChip.vue'
 
 const meta = {
   title: 'Response/ChoiceChip',

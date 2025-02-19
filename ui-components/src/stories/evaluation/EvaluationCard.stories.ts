@@ -1,8 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/vue3'
 
-import EvaluationCard from '@/stories/evaluation/EvaluationCard.vue'
+import EvaluationCard from '@/components/evaluation/EvaluationCard.vue'
 import { ref } from 'vue'
-import type { LikertValue } from '@/stories/evaluation/Likert'
+import type { LikertValue } from '@/components/evaluation/Likert'
 
 const meta = {
   title: 'Evaluation/EvaluationCard',

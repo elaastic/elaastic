@@ -1,0 +1,62 @@
+<!--
+  ~ Elaastic - formative assessment system
+  ~ Copyright (C) 2019. University Toulouse 1 Capitole, University Toulouse 3 Paul Sabatier
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Affero General Public License as
+  ~ published by the Free Software Foundation, either version 3 of the
+  ~ License, or (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU Affero General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Affero General Public License
+  ~ along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  -->
+
+<!DOCTYPE html>
+<html lang="en" th:replace="layout/vuejs-app :: vueJsAppLayout(title=~{::title}, content=~{::body}, style=~{})"
+      xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/html">
+
+    <head>
+        <meta charset="UTF-8">
+        <title>Utility Grade Selector</title>
+    </head>
+
+    <body>
+    <div id="utility-grade-app" class="ui-app">
+        <!-- Loader -->
+        <div class="lds-ripple">
+            <div></div>
+            <div></div>
+        </div>
+    </div>
+    <script th:inline="javascript">
+        window.elaastic = {
+            /**
+             * Initialize the utility grade component
+             * @param isChatGPT If the evaluation to grade is a ChatGPT evaluation
+             * @param isTeacher If the user is a teacher
+             * @param evaluationId The id of the evaluation to grade
+             */
+            initializeUtilityGrade: (isChatGPT, isTeacher,selectedGrade, evaluationId) => {
+                const app = Vue.createApp(
+                        ElaasticVueComponents.UtilityGrade,
+                        {
+                            isChatGPT,
+                            isTeacher,
+                            selectedGrade,
+                            onSubmitUtilityGrade(grade) {
+                                window.parent.postMessage({command: 'grade-submitted_' + evaluationId, grade})
+                            }
+                        }
+                )
+                ElaasticVueComponents.registerPlugins(app)
+                app.mount(`#utility-grade-app`)
+            }
+        }
+    </script>
+    </body>
+</html>

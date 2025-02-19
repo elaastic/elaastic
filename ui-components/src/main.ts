@@ -1,7 +1,11 @@
-import ConfrontingViewpoint from '@/stories/evaluation/ConfrontingViewpoint.vue'
-import { registerPlugins } from '@/plugins'
+import ConfrontingViewpoint from '@/components/evaluation/ConfrontingViewpoint.vue'
+import UtilityGrade from '@/components/moderation/UtilityGrade.vue';
+import EvaluationReaction from '@/components/moderation/EvaluationReaction.vue';
+import {registerPlugins} from '@/plugins'
 
 export {
+  registerPlugins,
   ConfrontingViewpoint,
-  registerPlugins
+  UtilityGrade,
+  EvaluationReaction,
 }

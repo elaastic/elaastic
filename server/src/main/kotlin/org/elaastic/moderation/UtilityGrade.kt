@@ -18,6 +18,14 @@
 
 package org.elaastic.moderation
 
+/**
+ * All the grade that can be given to a [ReportCandidate]
+ *
+ * @property STRONGLY_DISAGREE
+ * @property DISAGREE
+ * @property AGREE
+ * @property STRONGLY_AGREE
+ */
 enum class UtilityGrade {
     STRONGLY_DISAGREE,
     DISAGREE,

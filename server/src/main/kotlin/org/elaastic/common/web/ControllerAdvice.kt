@@ -30,15 +30,26 @@ import javax.servlet.http.HttpServletRequest
 import org.springframework.web.multipart.MaxUploadSizeExceededException
 import javax.persistence.EntityNotFoundException
 
+/**
+ * Controller advice to add common attributes to all views.
+ */
 @ControllerAdvice
 class ControllerAdvice {
 
     @Value("\${elaastic.questions.version}")
     private lateinit var applicationVersion: String
 
+    @Value("\${ui.components.version}")
+    private lateinit var uiComponentsVersion: String
+
     @ModelAttribute("applicationVersion")
     fun getApplicationVersion(): String {
         return applicationVersion
+    }
+
+    @ModelAttribute("uiComponentsVersion")
+    fun getUiComponentVersion(): String {
+        return uiComponentsVersion
     }
 
     @ModelAttribute("logoutUrl")

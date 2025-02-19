@@ -123,3 +123,4 @@ config
 
 # Misc
 paper.pdf
+ui-components/chromatic.config.json

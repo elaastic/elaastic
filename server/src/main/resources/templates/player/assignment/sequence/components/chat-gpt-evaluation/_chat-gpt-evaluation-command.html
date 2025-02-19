@@ -20,88 +20,118 @@
      th:fragment="chatGptEvaluationCommand(chatGptEvaluationModel)"
      th:with="utilityGradeSelected=${chatGptEvaluationModel.viewedByTeacher ? chatGptEvaluationModel.teacherUtilityGrade : chatGptEvaluationModel.utilityGrade}">
 
-    <form class="ui form"
-          style="align-items: end;"
-          th:action="@{/chatGptEvaluation/sequence/{sequenceId}/submit-utility-grade(sequenceId=${chatGptEvaluationModel.sequenceId})}"
-          method="post">
-        <!--/* TODO use a correct data */-->
+    <form class="ui form" style="align-items: end;" method="post"
+          th:id="'form-utility-grade_' + ${chatGptEvaluationModel.evaluationId}"
+          th:action="@{/chatGptEvaluation/sequence/{sequenceId}/submit-utility-grade(sequenceId=${chatGptEvaluationModel.sequenceId})}">
+
         <input type="hidden" name="isTeacher" th:value="${chatGptEvaluationModel.viewedByTeacher}">
-
         <input type="hidden" name="evaluationId" th:value="${chatGptEvaluationModel.evaluationId}">
-        <div class="ui grid stackable" style="align-items: end; margin-bottom: 1em;">
-
-            <!--/* Utility grade selection */-->
-            <div class="field twelve wide column utilitySelectionApp"
-                 th:id="'utilitySelectionApp-' + ${chatGptEvaluationModel.evaluationId}"
-                 style="margin-bottom: 0">
-
-                <!--/* Utility grade label */-->
-                <label th:if="${chatGptEvaluationModel.viewedByTeacher}"
-                       th:text="#{player.sequence.chatGptEvaluation.utilityGrade.label.teacher}"></label>
-                <label th:unless="${chatGptEvaluationModel.viewedByTeacher}"
-                       th:text="#{player.sequence.chatGptEvaluation.utilityGrade.label}"></label>
-                <input type="hidden" name="utilityGrade" v-model="selectedUtilityGrade"/>
-
-                <!--/* Utility grade selection */-->
-                <div class="ui menu stackable fluid pagination">
-                    <a th:each="utilityGrade : ${chatGptEvaluationModel.utilityGradeValues}" class="item"
-                       th:attr="'v-on:click'=|setSelectedUtilityGrade('${utilityGrade.name()}')|,'v-bind:class'=|{ active: selectedUtilityGrade === '${utilityGrade.name()}' }|"
-                       th:text="#{|player.sequence.chatGptEvaluation.utilityGrade.${utilityGrade.name()}|}">
-                    </a>
-                </div>
-            </div>
-
-            <!--/* Report button only visible for the student */-->
-            <div th:unless="${chatGptEvaluationModel.viewedByTeacher}" class="field four wide column"
-                 id="reportSelectionApp">
-                <div class="ui menu pagination" style="width: 100%;">
-                    <a class="item" style="color: #b03060; width: 100%;"
-                       th:onclick="|$('#reportModal_${chatGptEvaluationModel.sequenceId}').modal('show');|">
-                        <i class="exclamation triangle icon"></i>
-                        <span th:text="#{player.sequence.chatGptEvaluation.reportButton}"></span>
-                    </a>
-                </div>
-            </div>
-        </div>
-        <!-- Submit Utility grade button -->
-        <div id="submit-button-utility-grade" style="display: none"
-             th:attr="evaluationId=${chatGptEvaluationModel.evaluationId}">
-            <input type="submit" value="Soumettre" class="ui primary button">
-        </div>
+        <input type="hidden" name="utilityGrade" th:value="${utilityGradeSelected}">
     </form>
 
-    <div th:replace="player/assignment/sequence/components/chat-gpt-evaluation/_chat-gpt-evaluation-report-modal.html :: reportModal(${chatGptEvaluationModel.sequenceId},${chatGptEvaluationModel.annotation},${chatGptEvaluationModel.reportValues},${chatGptEvaluationModel.evaluationId})"></div>
+    <form th:id="'form-report-evaluation-chatGPT_' + ${chatGptEvaluationModel.evaluationId}" method="post"
+          th:action="@{/chatGptEvaluation/sequence/{sequenceId}/report-chat-gpt-evaluation(sequenceId=${chatGptEvaluationModel.sequenceId})}">
+        <input type="hidden" name="evaluationId" th:value="${chatGptEvaluationModel.evaluationId}">
+        <input type="hidden" name="reason"/>
+        <input type="hidden" name="other-reason-comment"/>
+    </form>
 
+    <!--/* iframe allowing to load the <evaluation-reaction> app in an isolated context */-->
+    <iframe th:id="'chatgpt-evaluation-reaction-app_' + ${chatGptEvaluationModel.evaluationId}"
+            class="transparent-iframe" th:src="@{/ui/moderation/evaluation-reaction}" width="100%">
+    </iframe>
+
+    <div class="ui message error" style="display: none;"
+         th:id="'error-message_' + ${chatGptEvaluationModel.evaluationId}">
+        <i class="close icon"></i>
+        <div class="header" th:text="#{evaluation.submitUtilityGrade.error.header}">Error</div>
+        <p th:text="#{evaluation.submitUtilityGrade.error.content}">
+            There was an error while submitting the grade.
+            Please try again later.
+        </p>
+    </div>
 
     <script th:inline="javascript">
-        new Vue({
-            el: '#utilitySelectionApp-' + [[${chatGptEvaluationModel.evaluationId}]],
-            data: {
-                selectedUtilityGrade: [[${utilityGradeSelected?.name()}]]
-            },
-            methods: {
-                setSelectedUtilityGrade: function (clickedUtilityGrade) {
-                    this.selectedUtilityGrade = clickedUtilityGrade
-                    $('#submit-button-utility-grade[evaluationId="' + [[${chatGptEvaluationModel.evaluationId}]] + '"]').slideDown();
-                }
+        $(function () {
+            const evaluationId = /*[[${chatGptEvaluationModel.evaluationId}]]*/ '';
+            const selectedGrade = /*[[${utilityGradeSelected}]]*/ null;
+            const contentToReport = /*[[${chatGptEvaluationModel.annotation}]]*/'';
+
+            const isTeacher = /*[[${chatGptEvaluationModel.viewedByTeacher}]]*/ false;
+            const isChatGPT = true; /*[- This is a ChatGPT evaluation -]*/
+            const beADialog = false; /*[- For now, we don't want a dialog as it's broken due to the iframe -]*/
+
+            const iframeSelector = 'chatgpt-evaluation-reaction-app_' + evaluationId;
+            const iframe = document.getElementById(iframeSelector);
+
+            /*[- Trigger the app init function on iframe loading -]*/
+            iframe.onload = () => {
+                iframe.contentWindow.elaastic.initializeEvaluationReaction(
+                        isChatGPT,
+                        isTeacher,
+                        selectedGrade,
+                        contentToReport,
+                        beADialog,
+                        evaluationId
+                )
             }
-        })
+
+            window.addEventListener('message', (event) => {
+                if (event.data.command === 'grade-submitted_' + evaluationId) {
+                    const gradeSubmitted = event.data.grade;
+                    console.log(event.data.command, gradeSubmitted)
+
+                    submitUtilityGrade(evaluationId, gradeSubmitted)
+                } else if (event.data.command === 'report-submitted_' + evaluationId) {
+                    const reportReason = event.data.reportReason;
+                    const reportDetail = event.data.reportDetail;
+                    console.log(event.data.command, reportReason, reportDetail)
+
+                    reportEvaluation(evaluationId, reportReason, reportDetail)
+                }
+            })
+
+            /*[- Init iframe resize -]*/
+            iframeResize({
+                license: 'GPLv3',
+                waitForLoad: true
+            }, '#' + iframeSelector)
+        });
+
+        function submitUtilityGrade(evaluationId, utilityGrade) {
+            const form = $('#form-utility-grade_' + evaluationId);
+            const $errorMessage = $('#error-message_' + evaluationId);
+            form.children('input[name="utilityGrade"]').val(utilityGrade);
+
+            const url = form.attr('action');
+            const data = form.serialize();
+
+            $.post(url, data)
+                    .fail(() => {
+                        $errorMessage.slideDown();
+                        setTimeout(function () {
+                            $errorMessage.slideUp();
+                        }, 5000)
+                    });
+        }
+
+        function reportEvaluation(evaluationId, reasons, otherReasonComment) {
+            const form = $('#form-report-evaluation-chatGPT_' + evaluationId);
+            form.children('input[name="reason"]').val(reasons);
+            form.children('input[name="other-reason-comment"]').val(otherReasonComment);
+
+            console.log(form);
+
+            const url = form.attr('action');
+            const data = form.serialize();
+
+            console.log(url, data);
+
+            $.post(url, data, (response) => {
+                window.location.reload()
+            })
+        }
     </script>
-
-    <style>
-        .item {
-            justify-content: center;
-        }
-
-        .utilitySelectionApp .item {
-            width: 25%;
-        }
-
-        .utilitySelectionApp .active.item {
-            background-color: #dff0ff !important;
-            color: #0e6eb8 !important;
-        }
-    </style>
 
 </div>
 

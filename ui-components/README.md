@@ -1,61 +1,186 @@
 # elaastic-vue-components
 
-This template should help get you started developing with Vue 3 in Vite.
+## How to develop a new Vue.js component and integrate it in a Thymeleaf template
 
-## Recommended IDE Setup
+### 1. Create a new Vue.js component
 
-[VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur).
+### 2. Create a story for the new component
 
-## Type Support for `.vue` Imports in TS
+In the `src/stories` folder, create a new file named `YourComponentName.stories.ts` and add the following code:
 
-TypeScript cannot handle type information for `.vue` imports by default, so we replace the `tsc` CLI with `vue-tsc` for type checking. In editors, we need [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) to make the TypeScript language service aware of `.vue` types.
+```typescript
+import type {Meta, StoryObj} from '@storybook/vue3'
+import YourComponent from '@/path/to/your/component/YourComponent.vue'
 
-## Customize configuration
+const meta: any = {
+    title: 'Folder/YourComponent', // The title of the story
+    component: YourComponent, // The component to be rendered
+    tags: ['autodocs'],
+    parameters: {
+        docs: {
+            description: {
+                story: 'This is the description of the story',
+            },
+        },
+    },
+} satisfies Meta<typeof YourComponent>
+export default meta
 
-See [Vite Configuration Reference](https://vite.dev/config/).
+type Story = StoryObj<typeof meta>
 
-## Project Setup
-
-```sh
-npm install
+export const Primary: Story = {
+    args: {
+        // The props you want to pass to the component
+    },
+}
 ```
 
-### Compile and Hot-Reload for Development
+More on how to set up stories at: https://storybook.js.org/docs/writing-stories
 
-```sh
-npm run dev
+### 3. Create a new version of the bundle with the new component
+
+First find the `main.ts` file in the `src` folder and add your component to the list of components to be exported:
+
+```typescript
+import {registerPlugins} from '@/plugins'
+import YourComponent from '@/path/to/your/component/YourComponent.vue'
+
+
+export {
+    registerPlugins,
+    YourComponent
+}
 ```
 
-### Type-Check, Compile and Minify for Production
+Then go to the `build.gradle.kts`, located in `server/build.gradle.kts`, update the version number:
 
-```sh
-npm run build
+```koltin
+//[...]
+// You can find it at the top of the file
+var uiComponentsVersion = "0.0.20" // Update the version number
+//[...]
 ```
 
-### Run Unit Tests with [Vitest](https://vitest.dev/)
+Reload the project and run the following command in the terminal at the root of the project:
 
-```sh
-npm run test:unit
+```shell
+./gradlew updateVueComponents
 ```
 
-### Run End-to-End Tests with [Cypress](https://www.cypress.io/)
+Then you can update the version number of the `application.properties`.
 
-```sh
-npm run test:e2e:dev
+- `server/src/main/resources/application.properties`
+- `server/src/test/resources/application.properties`
+
+```properties
+# You can find it at the top of the file
+ui.components.version=0.0.20 #Update the version number
 ```
 
-This runs the end-to-end tests against the Vite development server.
-It is much faster than the production build.
+### 4. Integrate the new component in a Thymeleaf template
 
-But it's still recommended to test the production build with `test:e2e` before deploying (e.g. in CI environments):
+Create a new template file with following content:
 
-```sh
-npm run build
-npm run test:e2e
+```html
+//Copyright
+
+<!DOCTYPE html>
+<html lang="en" th:replace="layout/vuejs-app :: vueJsAppLayout(title=~{::title}, content=~{::body}, style=~{})"
+      xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/html">
+
+    [...]
+
+</html>
 ```
 
-### Lint with [ESLint](https://eslint.org/)
+Add a loader:
 
-```sh
-npm run lint
+```html
+
+<body>
+<div id="your-component-app" class="ui-app">
+    <!-- Loader -->
+    <div class="lds-ripple">
+        <div></div>
+        <div></div>
+    </div>
+</div>
+</body>
 ```
+
+Add the script that will create the Vue.js app:
+
+```javascript
+window.elaastic = {
+    initializeYourComponent: (props1, props2) => {
+        const app = Vue.createApp(
+                ElaasticVueComponents.YourComponent,
+                {
+                    props1: props1,
+                    props2: props2
+                    onAnEventTriggerByYourComponent(valueReturned) {
+                        window.parent.postMessage({command: 'event-trigger', valueReturned})
+                    }
+                }
+        )
+        ElaasticVueComponents.registerPlugins(app)
+        app.mount(`#your-component-app`)
+    }
+}
+```
+
+Create a Controller in the backend that will serve the template:
+
+```kotlin
+/*
+ * Copyright
+ */
+
+package org.elaastic.folder
+
+import org.springframework.stereotype.Controller
+import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.RequestMapping
+
+@Controller
+@RequestMapping("/ui/folder")
+class FolderUIController() {
+
+    @GetMapping("/your-component")
+    fun yourComponent() = "folder/components/your-component"
+}
+```
+
+Use an iframe to get the Thymleaf template of YourComponent
+
+```html
+<iframe id="your-component-app" class="transparent-iframe" th:src="@{/ui/folder/your-component}"
+            width="100%"></iframe>
+
+    <!--/* Initialise the your-component app & interact with it */-->
+    <script th:inline="javascript">
+        const iframe = document.getElementById('your-component-app');
+
+        /*[- Trigger the app init function on iframe loading -]*/
+        iframe.onload = () => {
+            const props1 = 123;
+            const props2 = "Lorem";
+            iframe.contentWindow.elaastic.initializeYourComponent(props1, props2)
+        }
+        window.addEventListener('message', (event) => {
+            if (event.data.command === 'event-trigger') {
+                const valueReturned = event.data.valueReturned;
+                console.log(valueReturned)
+            }
+        })
+
+        const optionIframeResiser = {
+            license: 'GPLv3',
+            waitForLoad: true
+        };
+        /*[- Init iframe resize. As we didn't specify one iframe, it will select all -]*/
+        iframeResize(optionIframeResiser)
+    </script>
+```
+
+And that's it! You can now use your new component in a Thymeleaf template.

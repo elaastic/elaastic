@@ -1,6 +1,7 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import java.util.*
 
-ext["spring-security.version"]="5.8.3"
+ext["spring-security.version"] = "5.8.3"
 
 plugins {
     id("org.springframework.boot") version "2.7.13"
@@ -14,6 +15,7 @@ plugins {
 
 group = "org.elaastic.questions"
 version = "6.3.7"
+var uiComponentsVersion = "0.0.20"
 
 java {
     sourceCompatibility = JavaVersion.VERSION_17
@@ -50,8 +52,8 @@ dependencies {
     implementation("org.hibernate:hibernate-jcache")
     implementation("org.ehcache:ehcache:3.6.3")
 //	implementation("org.springframework.boot:spring-boot-starter-oauth2-client")
-	implementation("org.springframework.boot:spring-boot-starter-security")
-	implementation("org.springframework.security:spring-security-cas")
+    implementation("org.springframework.boot:spring-boot-starter-security")
+    implementation("org.springframework.security:spring-security-cas")
     implementation("org.springframework.boot:spring-boot-starter-thymeleaf")
     implementation("org.thymeleaf.extras:thymeleaf-extras-springsecurity5")
     implementation("com.fasterxml.jackson.core:jackson-databind")
@@ -72,7 +74,7 @@ dependencies {
     implementation("com.github.heneke.thymeleaf:thymeleaf-extras-togglz:1.0.1.RELEASE")
     implementation("com.toedter:spring-hateoas-jsonapi:1.6.0")
     implementation("org.jsoup:jsoup:1.16.1")
-    
+
 
     testImplementation("org.springframework.security:spring-security-test")
 
@@ -133,11 +135,53 @@ tasks.register("dockerBuild") {
     description = "Builds the Docker image aligned with the elaastic version"
     doLast {
         exec {
-            commandLine("docker", "build",
+            commandLine(
+                "docker", "build",
                 "-t", "elaastic/elaastic-questions-server:v$version",
                 "-t", "elaastic/elaastic-questions-server:latest",
-                ".")
+                "."
+            )
         }
     }
 }
 
+tasks.register<Exec>("updateVueComponents") {
+    group = "UI"
+    description = "Update the Vue.js components bundle"
+
+    doFirst {
+        // Get the version from local variable
+        val version = uiComponentsVersion
+
+        // Verify version format
+        if (!version.matches(Regex("""^\d+\.\d+\.\d+$"""))) {
+            throw GradleException("Invalid version format. Version should be in format: X.Y.Z")
+        }
+
+        workingDir("../ui-components/scripts")
+        val isWindowsOS = System.getProperty("os.name").lowercase(Locale.getDefault()).contains("windows")
+
+        // Verify script exists before execution
+        val scriptFile = if (isWindowsOS) {
+            file("../ui-components/scripts/update-bundle.bat")
+        } else {
+            file("../ui-components/scripts/update-bundle.sh")
+        }
+
+        if (!scriptFile.exists()) {
+            throw GradleException("Script file not found at: ${scriptFile.absolutePath}")
+        } else {
+            println("Script file found at: ${scriptFile.absolutePath}")
+        }
+
+        // Execute the script based on OS
+        if (isWindowsOS) {
+            commandLine("cmd", "/c", "update-bundle.bat", version)
+        } else {
+            commandLine("./update-bundle.sh", version)
+        }
+
+        // Warn the user to update the application.properties with the new version
+        println("Please update the application.properties with the new version: $version")
+    }
+}
